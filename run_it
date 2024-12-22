@@ -1,0 +1,8 @@
+#! /bin/bash
+
+rm -r -f work >& /dev/null
+mkdir work
+
+#exit
+
+./catalyst wait_random/wait_random work/
