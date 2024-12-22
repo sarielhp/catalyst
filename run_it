@@ -3,6 +3,14 @@
 rm -r -f work >& /dev/null
 mkdir work
 
-#exit
 
+
+# regular version
 ./catalyst wait_random/wait_random work/
+
+
+
+exit
+
+# Script version
+./catalyst wait_random/wait_random_script work/

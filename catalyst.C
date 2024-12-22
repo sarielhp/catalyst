@@ -366,6 +366,7 @@ SManagerPtr  create_scheduler( AbstractSequence  & seq_gen )
 
 void  SManager::check_for_success()
 {
+    //printf( "\n\n\n\n\nSUCC: %s\n", get_success_file_name() );
     if  ( is_file_exists( get_success_file_name() ) )
         f_success_found = true;
 }
@@ -385,7 +386,7 @@ void  SManager::check_for_done_tasks()
             active_tasks.erase( active_tasks.begin() + ind );
             pthread_mutex_unlock( &mutex_tasks );
         }
-    debug_myprintf( "Active tasks: %d\n", (int)active_tasks.size() );
+    //debug_myprintf( "Active tasks: %d\n", (int)active_tasks.size() );
 }
 
 
@@ -395,18 +396,40 @@ void   SManager::terminate_expired_tasks()
     //printf( "\n\n\n\nf_success_found: %d\n", (int)f_success_found );
     for  ( int  ind  = active_tasks.size() - 1; ind >= 0; ind-- ) {
         if  ( f_success_found  ||  active_tasks[ ind ]->is_expired() ) {
+            check_for_success();
+
             if  ( active_tasks[ ind ]->is_successful() )
                 f_success_found = true;
 
             //printf( "Canceling?\n" ); fflush( stdout );
+            pid_t cpid = active_tasks[ ind ]->get_child_pid();
 
-            //printf( "KILL Process ID: %d\n",
-            //          (int)active_tasks[ ind ]->get_child_pid() );
-            kill( active_tasks[ ind ]->get_child_pid(), SIGTERM ); //SIGKILL );
-            kill( active_tasks[ ind ]->get_child_pid(), SIGKILL ); //SIGKILL );
+            printf( "KILL Process ID: %d\n", cpid );
 
-            //pthread_cancel( active_tasks[ ind ]->thread );
+            char buff[1024] = "";
+
+            ////////////////////////////////////////////////////////////
+            // Murder!!! For some strange reason to kill the process
+            // and all tis children, we need to both use pkill and
+            // kill. Don't ask me why..
+            //
+            // pkill is needed to kill all the child processes of the
+            // process (what happens if ALG is a script.
+            ////////////////////////////////////////////////////////////
+            //sprintf( buff, "pkill -P %d > /dev/null 2 >& 1", cpid );
+            sprintf( buff, "pkill -P %d", cpid );
+            system( buff );
+
+            //sprintf( buff, "kill -9 %d", cpid );
+            //system( buff );
+            fflush( stdout );
+
+            kill( cpid, SIGKILL );
+
+            pthread_cancel( active_tasks[ ind ]->thread );
+            check_for_success();
             pthread_join( active_tasks[ ind ]->thread, NULL );
+            check_for_success();
 
             pthread_mutex_lock( &mutex_tasks );
             delete   active_tasks[ ind ];
@@ -469,15 +492,20 @@ void   SManager::main_loop()
     do {
         //printf( "Looping...\n" );
         check_for_done_tasks();
+        //printf( "A Looping...\n" );
         if  ( is_found_success() )
             break;
+        //printf( "B Looping...\n" );
         terminate_expired_tasks();
         if  ( is_found_success() )
             break;
+        //printf( "C Looping...\n" );
         spawn_tasks();
+        //printf( "D Looping...\n" );
         if  ( is_found_success() )
             break;
 
+        //printf( "E Looping...\n" );
         sleep( 1 );
 
     }  while ( ! is_found_success() );
@@ -642,7 +670,7 @@ int  main(int   argc, char*   argv[])
     p_manager->start_main_thread();
 
     while  ( ! p_manager->is_done() ) {
-        printf( "Sleeping...\n" );
+        ///printf( "Sleeping...\n" );
         sleep( 1 );
     }
 
