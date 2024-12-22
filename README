@@ -1,0 +1,34 @@
+1. To compile use make.
+
+2. Createa program to be used by catalyst:
+
+   Create a script/program (say named) ALG. The program would be
+   initialized as follows:
+
+   ALG  word_dir/ [success_file_name]
+
+   The [success_file_name] should be created by the program only if it
+   was successful - it is a good idea if the file would contain the
+   command line the program was called on, so that one can identify
+   which copy of the program/directory contains the computed data of
+   the successful fun.
+
+3. Its a good idea to create script that starts catalyst. An example
+is provided in the script "run_it". It remove the global work
+directory, recreate it, and call catalyst, as follows;
+
+
+   ./catalyst ALG global_work_dir/
+
+Catalyst runs many copies of ALG - the 1th created copy is run at
+directory global_word_dir/000001/, etc.
+
+
+Limitations
+===========
+
+Catalyst should compile on any posix compliant system - currently
+tested only on linux.
+
+
+================================================================
