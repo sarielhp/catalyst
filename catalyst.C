@@ -147,6 +147,11 @@ private:
     int  time_limit;
     pid_t pid;
 
+    // The wide search implementation
+    int  task_index;   // 1,2,3,...
+    int  next_wakeup;  // next_wakeup = current_wakeup + task_index
+
+    
 public:
     pthread_t  thread;
 public:
@@ -237,12 +242,12 @@ private:
     int  counter_tasks_created;
     bool  f_done;
     string  success_file;
+    AbstractSequence  * seq_gen;
 
-public:
-    void  set_success_file( string s ) { success_file = s; }
+    /// Wide search implementation
+    bool  f_wide_search; 
 
     int   max_jobs_number;
-    bool  f_scheduler_created;
     bool  f_scheduler_stop;
     //deque_tasks  tasks;
     std::vector<Task *>   active_tasks;
@@ -252,10 +257,13 @@ public:
     pthread_t  scheduler_thread;
     char * success_fn;
 
-    AbstractSequence  * seq_gen;
-
+public:
+    void  set_success_file( string s ) { success_file = s; }
     bool  is_found_success() {
         return  f_success_found;
+    }
+    void  set_seq_generator( AbstractSequence  * _seq_gen ) {
+        seq_gen = _seq_gen;
     }
 
     void  check_for_success();
@@ -270,12 +278,12 @@ public:
 
     SManager()
     {
+        f_wide_search = false;
         success_fn = NULL;
         f_done = false;
         counter_tasks_created = 0;
         f_success_found = false;
         max_jobs_number = 1;
-        f_scheduler_created = false;
         f_scheduler_stop = false;
         mutex_tasks  = PTHREAD_MUTEX_INITIALIZER;
         scheduler_awake_cond  = PTHREAD_COND_INITIALIZER;
@@ -283,6 +291,10 @@ public:
         seq_gen = NULL;
     }
 
+    void wakeup_thread() {
+        pthread_cond_broadcast( & scheduler_awake_cond );
+    }
+    
     void set_success( bool  f_val ) {
         f_success_found = f_val;
     }
@@ -337,12 +349,7 @@ void  * task_do( void  * this_ptr )
     //debug_myprintf( "TASK done!\n" );
 
     p_task->set_done( true );
-
-    SManagerPtr  p_sched = p_task->manager();//p_scheduler;
-
-    // Wake up the scheduler!!!
-    pthread_cond_broadcast( & p_sched->scheduler_awake_cond );
-    //pthread_cond_broadcast( & p_sched->scheduler_awake_cond );
+    p_task->manager()->wakeup_thread();
 
     return  NULL;
 }
@@ -357,9 +364,7 @@ SManagerPtr  create_scheduler( AbstractSequence  & seq_gen )
 
     p_manager = new SManager();
     assert( p_manager != NULL );
-    p_manager->seq_gen = &seq_gen;
-
-    p_manager->f_scheduler_created = true;
+    p_manager->set_seq_generator( &seq_gen );
 
     return  p_manager;
 }
