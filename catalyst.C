@@ -21,6 +21,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include <algorithm>
 #include  <thread>
 #include  <string>
 #include  <vector>
@@ -82,7 +83,7 @@ public:
 };
 
 
-class   CounterSequence : public AbstractSequence
+class   SequenceCounter : public AbstractSequence
 {
 private:
     int  counter;
@@ -94,11 +95,10 @@ private:
         return  last;
     }
 public:
-    CounterSequence()
+    SequenceCounter()
     {
         counter = 0;
     }
-
 
     virtual  int  next()
     {
@@ -117,6 +117,24 @@ public:
 };
 
 
+class   SequencePlusOne : public AbstractSequence
+{
+private:
+    int  counter;
+
+public:
+    SequencePlusOne()
+    {
+        counter = 0;
+    }
+
+    virtual  int  next()
+    {
+        return  counter++;
+    }
+};
+
+
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -129,7 +147,7 @@ inline bool is_file_exists(const std::string& name) {
 
 /*--- Constants ---*/
 
-void  * task_do( void  * this_ptr );
+void  * task_run( void  * this_ptr );
 void  * main_scheduler_loop( void  * );
 
 class SManager;
@@ -147,11 +165,12 @@ private:
     int  time_limit;
     pid_t pid;
 
+
     // The wide search implementation
     int  task_index;   // 1,2,3,...
     int  next_wakeup;  // next_wakeup = current_wakeup + task_index
+    int  time_delta;   // Time to add for next wakeup
 
-    
 public:
     pthread_t  thread;
 public:
@@ -160,15 +179,26 @@ public:
         f_done = f_success = false;
         p_manager = NULL;
         f_done = f_success = false;
+        next_wakeup = 0;
+        time_delta = 0;
     }
 
+    void   set_done() { f_done = true; }
+
     pid_t  get_child_pid() { return  pid; }
+
+    int  next_wakeup_time() const { return   next_wakeup; }
 
     int  get_time_limit() { return time_limit; }
     void  set_command( string  s ) { command = s; }
     void  set_dir( string  s ) { dir = s; }
 
     void  set_time_limit( int  _limit ) { time_limit = _limit; }
+
+    void  compute_next_wakeup() {
+        assert( time_delta > 0 );
+        next_wakeup += time_delta;
+    }
 
     bool  is_successful() { return  f_success; }
     bool  is_expired()
@@ -207,7 +237,7 @@ public:
         int  ret;
 
         f_done = false;
-        ret = pthread_create( &thread, NULL, task_do, (void *)this );
+        ret = pthread_create( &thread, NULL, task_run, (void *)this );
         if  ( ret != 0 ) {
             fprintf( stderr, "Unable to create thread for [%s]\n",
                      command.c_str() );
@@ -232,6 +262,16 @@ public:
 };
 
 
+class TaskComparatorByWakeup {
+public:
+    bool operator()( const Task  * a, const Task  * b) const {
+        assert( ( a != NULL )  &&  ( b != NULL ) );
+
+        return a->next_wakeup_time() > b->next_wakeup_time(); // For a max heap
+    }
+};
+
+
 typedef std::deque<Task>  deque_tasks;
 
 class SManager
@@ -245,17 +285,19 @@ private:
     AbstractSequence  * seq_gen;
 
     /// Wide search implementation
-    bool  f_wide_search; 
+    bool  f_wide_search;
 
     int   max_jobs_number;
     bool  f_scheduler_stop;
-    //deque_tasks  tasks;
+        //deque_tasks  tasks;
     std::vector<Task *>   active_tasks;
+    std::vector<Task *>   suspended_tasks;
     pthread_mutex_t   mutex_tasks;
     pthread_cond_t    scheduler_awake_cond;
     pthread_mutex_t   scheduler_awake_mutex;
     pthread_t  scheduler_thread;
     char * success_fn;
+    int  g_timer;
 
 public:
     void  set_success_file( string s ) { success_file = s; }
@@ -265,6 +307,9 @@ public:
     void  set_seq_generator( AbstractSequence  * _seq_gen ) {
         seq_gen = _seq_gen;
     }
+
+    void  set_wide_search( bool  flag ) { f_wide_search = flag; }
+
 
     void  check_for_success();
 
@@ -289,12 +334,13 @@ public:
         scheduler_awake_cond  = PTHREAD_COND_INITIALIZER;
         scheduler_awake_mutex  = PTHREAD_MUTEX_INITIALIZER;
         seq_gen = NULL;
+        g_timer = 0;
     }
 
     void wakeup_thread() {
         pthread_cond_broadcast( & scheduler_awake_cond );
     }
-    
+
     void set_success( bool  f_val ) {
         f_success_found = f_val;
     }
@@ -331,7 +377,7 @@ public:
 };
 
 /*--- Start of code ---*/
-void  * task_do( void  * this_ptr )
+void  * task_run( void  * this_ptr )
 {
     Task  * p_task;
 
@@ -355,7 +401,7 @@ void  * task_do( void  * this_ptr )
 }
 
 
-SManagerPtr  create_scheduler( AbstractSequence  & seq_gen )
+SManagerPtr  create_scheduler( )
 {
     static SManagerPtr  p_manager = NULL;
 
@@ -364,10 +410,11 @@ SManagerPtr  create_scheduler( AbstractSequence  & seq_gen )
 
     p_manager = new SManager();
     assert( p_manager != NULL );
-    p_manager->set_seq_generator( &seq_gen );
 
     return  p_manager;
 }
+
+
 
 void  SManager::check_for_success()
 {
@@ -382,17 +429,57 @@ void  SManager::check_for_done_tasks()
 {
     //printf( "void  SManager::check_for_done_tasks()\n" );
     check_for_success();
-    for  ( int  ind  = active_tasks.size() - 1; ind >= 0; ind-- )
-        if  ( active_tasks[ ind ]->is_done() ) {
-            if (  active_tasks[ ind ]->is_successful() )
+    for  ( int  ind  = active_tasks.size() - 1; ind >= 0; ind-- ) {
+        Task  * p_task = active_tasks[ ind ];
+
+        if  ( p_task->is_done() ) {
+            if ( p_task->is_successful() )
                 f_success_found = true;
             pthread_mutex_lock( &mutex_tasks );
-            delete   active_tasks[ ind ];
+            if  ( ! f_wide_search )
+                delete   p_task;
+            else {
+                p_task->compute_next_wakeup();
+                suspended_tasks.push_back( p_task );
+                push_heap( suspended_tasks.begin(), suspended_tasks.end(),
+                                TaskComparatorByWakeup() );
+
+                for ( unsigned  k = 0; k < ( suspended_tasks.size() - 1 ); k++ ) {
+                    if  ( suspended_tasks[ k ]->next_wakeup_time()
+                          > suspended_tasks[ k + 1 ]->next_wakeup_time() ) {
+                        printf( "\n\n\nSORTING ORDER WROGN\n" );
+                        exit( -1 );
+                    }
+                }
+            }
+
             active_tasks.erase( active_tasks.begin() + ind );
             pthread_mutex_unlock( &mutex_tasks );
         }
+    }
     //debug_myprintf( "Active tasks: %d\n", (int)active_tasks.size() );
 }
+
+
+void   kill_process( pid_t  cpid )
+{
+    char buff[1024] = "";
+
+    //////////////////////////////////////////////////////////////////
+    // Murder!!! For some strange reason to kill the process
+    // and all tis children, we need to both use pkill and
+    // kill. Don't ask me why..
+    //
+    // pkill is needed to kill all the child processes of the
+    // process (what happens if ALG is a script.
+    //////////////////////////////////////////////////////////////////
+    //sprintf( buff, "pkill -P %d > /dev/null 2 >& 1", cpid );
+    sprintf( buff, "pkill -P %d", cpid );
+    system( buff );
+
+    kill( cpid, SIGKILL );
+}
+
 
 
 void   SManager::terminate_expired_tasks()
@@ -400,47 +487,36 @@ void   SManager::terminate_expired_tasks()
     check_for_success();
     //printf( "\n\n\n\nf_success_found: %d\n", (int)f_success_found );
     for  ( int  ind  = active_tasks.size() - 1; ind >= 0; ind-- ) {
-        if  ( f_success_found  ||  active_tasks[ ind ]->is_expired() ) {
+        Task  * p_task = active_tasks[ ind ];
+
+        if  ( ( ! f_success_found )  &&  ( ! p_task->is_expired() ) )
+            continue;
+
+        check_for_success();
+
+        if  ( p_task->is_successful() )
+            f_success_found = true;
+        // XXX
+        pid_t cpid = p_task->get_child_pid();
+        if   ( f_success_found  ||  ( ! f_wide_search ) ) {
+            kill_process( cpid );
+
+            pthread_cancel( p_task->thread );
+            check_for_success();
+            pthread_join( p_task->thread, NULL );
             check_for_success();
 
-            if  ( active_tasks[ ind ]->is_successful() )
-                f_success_found = true;
-
-            //printf( "Canceling?\n" ); fflush( stdout );
-            pid_t cpid = active_tasks[ ind ]->get_child_pid();
-
-            printf( "KILL Process ID: %d\n", cpid );
-
-            char buff[1024] = "";
-
-            ////////////////////////////////////////////////////////////
-            // Murder!!! For some strange reason to kill the process
-            // and all tis children, we need to both use pkill and
-            // kill. Don't ask me why..
-            //
-            // pkill is needed to kill all the child processes of the
-            // process (what happens if ALG is a script.
-            ////////////////////////////////////////////////////////////
-            //sprintf( buff, "pkill -P %d > /dev/null 2 >& 1", cpid );
-            sprintf( buff, "pkill -P %d", cpid );
-            system( buff );
-
-            //sprintf( buff, "kill -9 %d", cpid );
-            //system( buff );
-            fflush( stdout );
-
-            kill( cpid, SIGKILL );
-
-            pthread_cancel( active_tasks[ ind ]->thread );
-            check_for_success();
-            pthread_join( active_tasks[ ind ]->thread, NULL );
-            check_for_success();
-
-            pthread_mutex_lock( &mutex_tasks );
-            delete   active_tasks[ ind ];
-            active_tasks.erase( active_tasks.begin() + ind );
-            pthread_mutex_unlock( &mutex_tasks );
+            p_task->set_done( true );
+            continue;
         }
+
+        // f_success_found == false  &&  f_wide_search = true
+        assert( ! f_success_found );
+        assert( p_task->is_expired() );
+        assert( f_wide_search );
+        
+        ///suspend_process( cpid );
+        
     }
 }
 
@@ -639,15 +715,12 @@ int  main(int   argc, char*   argv[])
     if  ( argc == 0 )
         usage();
 
-    CounterSequence  cnt;
+    SequenceCounter  cnt;
     /*
-    for  ( int  i = 0; i <= 10; i++ ) {
-        printf( "%d\n", cnt.next() );
-        }*/
-
-
-    if ( argc != 3 )
-        usage();
+      for  ( int  i = 0; i <= 10; i++ ) {
+      printf( "%d\n", cnt.next() );
+      }
+    */
 
     // Just terminate child processes when they are done, don't let
     // them become zombies...
@@ -657,21 +730,30 @@ int  main(int   argc, char*   argv[])
 
     sigaction(SIGCHLD, &arg, NULL);
 
+    //SequenceCounter   seq_gen;
+    SManagerPtr p_manager = create_scheduler();
 
-
-    CounterSequence   seq_gen;
-    SManagerPtr p_manager = create_scheduler( seq_gen );
-    p_manager->set_program( argv[ 1 ] );
-    p_manager->set_work_dir( argv[ 2 ] );
-
-    printf( "bogi\n" );
+    if  ( argc == 4 ) {
+        if  ( strcasecmp( argv[ 1 ], "-a" ) != 0 )
+            usage();
+        p_manager->set_program( argv[ 2 ] );
+        p_manager->set_work_dir( argv[ 3 ] );
+        p_manager->set_wide_search( true );
+        p_manager->set_seq_generator( new  SequencePlusOne() );
+    } else {
+        if  ( argc != 3 )
+            usage();
+        p_manager->set_program( argv[ 1 ] );
+        p_manager->set_work_dir( argv[ 2 ] );
+        p_manager->set_seq_generator( new  SequenceCounter() );
+    }
 
     unsigned int numThreads = std::thread::hardware_concurrency();
     p_manager->set_threads_num(  numThreads );
 
     p_manager->set_success_file( "success.txt" );
 
-    printf( "bogi B\n" );
+    //    printf( "bogi B\n" );
     p_manager->start_main_thread();
 
     while  ( ! p_manager->is_done() ) {
