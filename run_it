@@ -3,14 +3,14 @@
 rm -r -f work >& /dev/null
 mkdir work
 
-
+### Without the -a it is the old version
 
 # regular version
-./catalyst wait_random/wait_random work/
+./catalyst -a wait_random_busy/wrb_script work/
 
 
 
 exit
 
 # Script version
-./catalyst wait_random/wait_random_script work/
+./catalyst -a wait_random/wait_random_script work/

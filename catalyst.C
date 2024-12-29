@@ -127,7 +127,7 @@ public:
 
     virtual  int  next()
     {
-        return  counter++;
+        return  ++counter;
     }
 };
 
@@ -156,13 +156,12 @@ private:
     //int   thread_id;
     bool  f_done, f_success;
     time_t  start_time;
-    int  time_limit;
+    int  time_limit, id;
     pid_t pid;
 
 
     // The wide search implementation
-    int  task_index;   // 1,2,3,...
-    int  next_wakeup;  // next_wakeup = current_wakeup + task_index
+    int  next_wakeup;  // next_wakeup = current_wakeup + time_delta
     int  time_delta;   // Time to add for next wakeup
 
 public:
@@ -177,6 +176,8 @@ public:
         time_delta = 0;
     }
 
+    void   set_time_delta( int  _dlt ) { time_delta = _dlt; }
+    void   set_id( int  _id ) { id = _id; }
     int    process_status();
     void   set_done() { f_done = true; }
 
@@ -200,8 +201,10 @@ public:
     {
         if  ( f_done  ||  f_success )
             return  true;
-        if  ( duration()  > time_limit )
+        if  ( duration()  > time_limit ) {
+            printf( "EXPIRED!\n" );
             return  true;
+        }
         return  false;
     }
 
@@ -230,6 +233,7 @@ public:
     const  char   * get_cmd() { return  command.c_str(); }
 
     Task( const char  * _cmd ) {
+        id = 0;
         command = string( _cmd );
         f_done = false;
     }
@@ -257,6 +261,7 @@ public:
 
 typedef std::deque<Task>  deque_tasks;
 
+// XManager
 class SManager
 {
 private:
@@ -266,6 +271,8 @@ private:
     bool  f_done;
     string  success_file;
     AbstractSequence  * seq_gen;
+
+    int  time_counter;
 
     /// Wide search implementation
     bool  f_wide_search;
@@ -306,6 +313,7 @@ public:
 
     SManager()
     {
+        time_counter = 0;
         f_wide_search = false;
         success_fn = NULL;
         f_done = false;
@@ -317,6 +325,7 @@ public:
         g_timer = 0;
     }
 
+    bool  slots_available();
     void wakeup_thread() {
     }
 
@@ -324,9 +333,10 @@ public:
         f_success_found = f_val;
     }
 
-    void set_program( const char  * _prog ) { prog = _prog; }
-    void set_work_dir( const char  * _dir ) { work_dir = _dir; }
-    void terminate_expired_tasks();
+    void   set_program( const char  * _prog ) { prog = _prog; }
+    void   set_work_dir( const char  * _dir ) { work_dir = _dir; }
+    void   handle_expired_tasks();
+    void   kill_all_tasks();
 
     bool  is_done()
     {
@@ -347,25 +357,13 @@ public:
         max_jobs_number = jobs_limit;
     }
 
+    void   suspend_process( int  ind );
+    void   resume_first_process();
 
+    void   verify_suspended_tasks_heap();
 };
 
 /*--- Start of code ---*/
-
-
-SManagerPtr  create_scheduler( )
-{
-    static SManagerPtr  p_manager = NULL;
-
-    if  ( p_manager != NULL )
-        return  p_manager;
-
-    p_manager = new SManager();
-    assert( p_manager != NULL );
-
-    return  p_manager;
-}
-
 
 
 void  SManager::check_for_success()
@@ -379,7 +377,6 @@ void  SManager::check_for_success()
 
 void  SManager::check_for_done_tasks()
 {
-    //printf( "void  SManager::check_for_done_tasks()\n" );
     check_for_success();
     for  ( int  ind  = active_tasks.size() - 1; ind >= 0; ind-- ) {
         Task  * p_task = active_tasks[ ind ];
@@ -387,23 +384,7 @@ void  SManager::check_for_done_tasks()
         if  ( p_task->is_done() ) {
             if ( p_task->is_successful() )
                 f_success_found = true;
-            if  ( ! f_wide_search )
-                delete   p_task;
-            else {
-                p_task->compute_next_wakeup();
-                suspended_tasks.push_back( p_task );
-                push_heap( suspended_tasks.begin(), suspended_tasks.end(),
-                                TaskComparatorByWakeup() );
-
-                for ( unsigned  k = 0; k < ( suspended_tasks.size() - 1 ); k++ ) {
-                    if  ( suspended_tasks[ k ]->next_wakeup_time()
-                          > suspended_tasks[ k + 1 ]->next_wakeup_time() ) {
-                        printf( "\n\n\nSORTING ORDER WROGN\n" );
-                        exit( -1 );
-                    }
-                }
-            }
-
+            delete   p_task;
             active_tasks.erase( active_tasks.begin() + ind );
         }
     }
@@ -431,24 +412,128 @@ void   kill_process( pid_t  cpid )
 }
 
 
+void    SManager::verify_suspended_tasks_heap()
+{
+    for ( unsigned  k = 0; k < ( suspended_tasks.size() - 1 ); k++ ) {
+        unsigned u = 2*k+1;
+        if  ( u >= suspended_tasks.size() )
+            continue;
+        if  ( suspended_tasks[ k ]->next_wakeup_time()
+              > suspended_tasks[ u ]->next_wakeup_time() ) {
+            printf( "\n\n\nSORTING ORDER WROGN\n" );
+            exit( -1 );
+        }
+        u = 2*k+2;
+        if  ( u >= suspended_tasks.size() )
+            continue;
+        if  ( suspended_tasks[ k ]->next_wakeup_time()
+              > suspended_tasks[ u ]->next_wakeup_time() ) {
+            printf( "\n\n\nSORTING ORDER WROGN\n" );
+            exit( -1 );
+        }
+    }
+}
 
-void   SManager::terminate_expired_tasks()
+
+void   SManager::suspend_process( int  ind )
+{
+    Task  * p_task = active_tasks[ ind ];
+
+    //----------------------------------------------------
+    // Suspending the process: The low level stuff
+    pid_t cpid = p_task->get_child_pid();
+    char buff[1024] = "";
+
+    sprintf( buff, "pkill -SIGSTOP -P %d", cpid );
+    system( buff );
+
+    kill( cpid, SIGSTOP );
+
+    // Moving the task to suspended array...
+    // Suspending a process is a bit tricky, since we have to keep
+    // them sorted by wakeup time.
+    active_tasks.erase( active_tasks.begin() + ind );
+
+    p_task->compute_next_wakeup();
+    suspended_tasks.push_back( p_task );
+    push_heap( suspended_tasks.begin(), suspended_tasks.end(),
+               TaskComparatorByWakeup() );
+
+    // Verify suspended tasks are sorted correct in the *heap*
+    verify_suspended_tasks_heap();
+}
+
+
+void   SManager::resume_first_process()
+{
+    assert( f_wide_search );
+    assert( suspended_tasks.size() > 0 );
+
+    Task * p_task = suspended_tasks.front() ;
+
+    //----------------------------------------------------
+    // Suspending the process: Low level stuff
+    pid_t cpid = p_task->get_child_pid();
+    char buff[1024] = "";
+
+    sprintf( buff, "pkill -SIGCONT -P %d", cpid );
+    system( buff );
+
+    kill( cpid, SIGCONT );
+
+    /// Moving it from suspend to resumed tasks...
+    active_tasks.push_back( p_task );
+
+    pop_heap( suspended_tasks.begin(), suspended_tasks.end(),
+              TaskComparatorByWakeup() );
+    suspended_tasks.pop_back();
+    verify_suspended_tasks_heap();
+}
+
+
+void   SManager::kill_all_tasks()
+{
+    for  ( int  ind  = active_tasks.size() - 1; ind >= 0; ind-- ) {
+        //printf( "IND: %d\n", ind );
+        Task  * p_task = active_tasks[ ind ];
+        kill_process( p_task->get_child_pid() );
+        active_tasks.erase( active_tasks.begin() + ind );
+        delete p_task;
+    }
+    for  ( int  jnd  = suspended_tasks.size() - 1; jnd >= 0; jnd-- ) {
+        //printf( "JND: %d\n", jnd );
+        Task  * p_task = suspended_tasks[ jnd ];
+        kill_process( p_task->get_child_pid() );
+        suspended_tasks.erase( suspended_tasks.begin() + jnd );
+        delete p_task;
+    }
+}
+
+
+void   SManager::handle_expired_tasks()
 {
     int  count = 0;
 
     check_for_success();
+    if   ( f_success_found )
+        return;
+
+    printf( "handle_expired_tasks\n" );
     //printf( "\n\n\n\nf_success_found: %d\n", (int)f_success_found );
     for  ( int  ind  = active_tasks.size() - 1; ind >= 0; ind-- ) {
         Task  * p_task = active_tasks[ ind ];
 
-        if  ( ( ! f_success_found )  &&  ( ! p_task->is_expired() ) )
+        if   ( f_success_found )
+            return;
+        if   ( ! p_task->is_expired() )
             continue;
+        printf( "Expired task????\n" );
 
         check_for_success();
 
         if  ( p_task->is_successful() )
             f_success_found = true;
-        // XXX
+
         pid_t cpid = p_task->get_child_pid();
         if   ( f_success_found  ||  ( ! f_wide_search ) ) {
             count++;
@@ -464,9 +549,8 @@ void   SManager::terminate_expired_tasks()
         assert( ! f_success_found );
         assert( p_task->is_expired() );
         assert( f_wide_search );
-
-        ///suspend_process( cpid );
-
+        printf( "Suspending process!\n" );
+        suspend_process( ind );
     }
     if  ( count > 0 )
         printf( "Killed %d processes\n", count );
@@ -484,10 +568,20 @@ void  SManager::spawn_single_task()
     //printf( "New task created!\n" );
     Task  * tsk = new  Task();
 
-    tsk->set_time_limit( (int)seq_gen->next() );
+    counter_tasks_created++;
+
+    // We run a process for one second if we are in the wide search mode...
+    if  ( f_wide_search ) {
+        tsk->set_id( counter_tasks_created );
+        tsk->set_time_limit( 1 );
+        tsk->set_time_delta( (int)seq_gen->next() );
+        //printf( "XXXX\n" ); fflush( stdout );
+        tsk->compute_next_wakeup();
+        //printf( "ZZZZ\n" ); fflush( stdout );
+    } else
+        tsk->set_time_limit( (int)seq_gen->next() );
     tsk->set_manager( this );
 
-    counter_tasks_created++;
     char buf[1024];
     sprintf( buf, "/%06d", counter_tasks_created );
 
@@ -504,15 +598,48 @@ void  SManager::spawn_single_task()
 }
 
 
+bool  SManager::slots_available()
+{
+    return   ( (int)( active_tasks.size() ) < max_jobs_number );
+}
+
+
 void  SManager::spawn_tasks()
 {
     check_for_success();
 
     if  ( f_success_found )
         return;
+    if  ( ! f_wide_search ) {
+        while  ( slots_available() ) {
+            spawn_single_task();
+        }
+        return;
+    }
 
-    while  ( (int)( active_tasks.size() ) < max_jobs_number ) {
-        //printf( "ST Spawnning...\n" );
+    assert( f_wide_search ); // Just for clarity
+
+    // If no slot is available, then we have to wait for some active
+    // tasks to be suspended...
+    if  ( ! slots_available() )
+        return;
+    while  ( slots_available() ) {
+        if  ( suspended_tasks.size() == 0 ) {
+            time_counter++;   // TIME forward by one unit
+            spawn_single_task();
+            continue;
+        }
+
+        assert( suspended_tasks.size() > 0 );
+
+        int  future = time_counter + 1;
+        if  ( suspended_tasks[ 0 ]->next_wakeup_time() < future ) {
+            resume_first_process();
+            continue;
+        }
+
+        // Everything is in the future, we might as well move into it...
+        time_counter++;   // TIME forward by one unit
         spawn_single_task();
     }
 }
@@ -528,9 +655,10 @@ void   SManager::main_loop()
         if  ( is_found_success() )
             break;
         //printf( "ML B Looping...\n" );
-        terminate_expired_tasks();
+        handle_expired_tasks();
         if  ( is_found_success() )
             break;
+
         //printf( "ML C Looping...\n" );
         spawn_tasks();
         //printf( "D Looping...\n" );
@@ -541,24 +669,24 @@ void   SManager::main_loop()
         sleep( 1 );
 
     }  while ( ! is_found_success() );
-    terminate_expired_tasks();
+    kill_all_tasks();
     f_done = true;
 }
 
 
 void  waitpid_error( int  status )
 {
-        if (WIFEXITED(status)) {
-            printf("child exited, status=%d\n", WEXITSTATUS(status));
-        } else if (WIFSIGNALED(status)) {
-            printf("child killed (signal %d)\n", WTERMSIG(status));
-        } else if (WIFSTOPPED(status)) {
-            printf("child stopped (signal %d)\n", WSTOPSIG(status));
-        } else if (WIFCONTINUED(status)) {
-            printf("child continued\n");
-        } else {    /* Non-standard case -- may never happen */
-            printf("Unexpected status (0x%x)\n", status);
-        }
+    if (WIFEXITED(status)) {
+        printf("child exited, status=%d\n", WEXITSTATUS(status));
+    } else if (WIFSIGNALED(status)) {
+        printf("child killed (signal %d)\n", WTERMSIG(status));
+    } else if (WIFSTOPPED(status)) {
+        printf("child stopped (signal %d)\n", WSTOPSIG(status));
+    } else if (WIFCONTINUED(status)) {
+        printf("child continued\n");
+    } else {    /* Non-standard case -- may never happen */
+        printf("Unexpected status (0x%x)\n", status);
+    }
 }
 
 #define  STATUS_RUNNING 73
@@ -663,7 +791,8 @@ int  main(int   argc, char*   argv[])
     sigaction(SIGCHLD, &arg, NULL);
 
     //SequenceCounter   seq_gen;
-    SManagerPtr p_manager = create_scheduler();
+    SManagerPtr p_manager = new SManager();
+    assert( p_manager != NULL );
 
     if  ( argc == 4 ) {
         if  ( strcasecmp( argv[ 1 ], "-a" ) != 0 )
