@@ -7,7 +7,7 @@
 #include  <stdlib.h>
 #include  <stdio.h>
 #include  <assert.h>
-#include  <pthread.h>
+//#include  <pthread.h>
 #include  <string.h>
 #include  <unistd.h>
 #include  <spawn.h>
@@ -67,9 +67,6 @@ void    debug_myprintf( const char  * format, ... )
     //printf( "out: %s\n", out.c_str() );
     fputs( out.c_str(), stdout );
 }
-
-
-
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -139,16 +136,13 @@ public:
 
 
 
-inline bool is_file_exists(const std::string& name) {
-  struct stat buffer;
-  return (stat (name.c_str(), &buffer) == 0);
+inline bool   is_file_exists(const std::string& name) {
+  struct stat   buffer;
+  return (stat( name.c_str(), &buffer ) == 0);
 }
 
 
 /*--- Constants ---*/
-
-void  * task_run( void  * this_ptr );
-void  * main_scheduler_loop( void  * );
 
 class SManager;
 typedef class SManager   * SManagerPtr;
@@ -159,7 +153,7 @@ class  Task
 private:
     SManagerPtr   p_manager;
     string  command, dir;
-    int   thread_id;
+    //int   thread_id;
     bool  f_done, f_success;
     time_t  start_time;
     int  time_limit;
@@ -175,7 +169,7 @@ public:
     pthread_t  thread;
 public:
     Task() {
-        thread_id = 0;
+        //thread_id = 0;
         f_done = f_success = false;
         p_manager = NULL;
         f_done = f_success = false;
@@ -183,6 +177,7 @@ public:
         time_delta = 0;
     }
 
+    int    process_status();
     void   set_done() { f_done = true; }
 
     pid_t  get_child_pid() { return  pid; }
@@ -230,24 +225,12 @@ public:
     {
         return  p_manager;
     }
-    void  execute();
+    void  launch();
 
     const  char   * get_cmd() { return  command.c_str(); }
-    void  run() {
-        int  ret;
-
-        f_done = false;
-        ret = pthread_create( &thread, NULL, task_run, (void *)this );
-        if  ( ret != 0 ) {
-            fprintf( stderr, "Unable to create thread for [%s]\n",
-                     command.c_str() );
-            fflush( stderr );
-        }
-    }
 
     Task( const char  * _cmd ) {
         command = string( _cmd );
-        thread_id = 0;
         f_done = false;
     }
 
@@ -330,15 +313,11 @@ public:
         f_success_found = false;
         max_jobs_number = 1;
         f_scheduler_stop = false;
-        mutex_tasks  = PTHREAD_MUTEX_INITIALIZER;
-        scheduler_awake_cond  = PTHREAD_COND_INITIALIZER;
-        scheduler_awake_mutex  = PTHREAD_MUTEX_INITIALIZER;
         seq_gen = NULL;
         g_timer = 0;
     }
 
     void wakeup_thread() {
-        pthread_cond_broadcast( & scheduler_awake_cond );
     }
 
     void set_success( bool  f_val ) {
@@ -361,44 +340,17 @@ public:
     void  spawn_tasks();
     void  check_for_done_tasks();
     void  main_loop();
-    int   wait_on_queue();
-    //    int   execute_command( const char  * cmd  );
+    //int   wait_on_queue();
 
     void  set_jobs_limit( int  jobs_limit )
     {
         max_jobs_number = jobs_limit;
     }
 
-    void  start_main_thread() {
-        pthread_create( &(scheduler_thread), NULL,
-                        &main_scheduler_loop, (void *)this );
-    }
 
 };
 
 /*--- Start of code ---*/
-void  * task_run( void  * this_ptr )
-{
-    Task  * p_task;
-
-    p_task = (Task *)this_ptr;
-
-    // Make sure the thread is cancel friendly
-    int prevType;
-    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &prevType);
-
-    p_task->record_start_time();
-    printf( "TIME limit: %d\n", p_task->get_time_limit() );
-
-    p_task->execute();
-
-    //debug_myprintf( "TASK done!\n" );
-
-    p_task->set_done( true );
-    p_task->manager()->wakeup_thread();
-
-    return  NULL;
-}
 
 
 SManagerPtr  create_scheduler( )
@@ -435,7 +387,6 @@ void  SManager::check_for_done_tasks()
         if  ( p_task->is_done() ) {
             if ( p_task->is_successful() )
                 f_success_found = true;
-            pthread_mutex_lock( &mutex_tasks );
             if  ( ! f_wide_search )
                 delete   p_task;
             else {
@@ -454,7 +405,6 @@ void  SManager::check_for_done_tasks()
             }
 
             active_tasks.erase( active_tasks.begin() + ind );
-            pthread_mutex_unlock( &mutex_tasks );
         }
     }
     //debug_myprintf( "Active tasks: %d\n", (int)active_tasks.size() );
@@ -484,6 +434,8 @@ void   kill_process( pid_t  cpid )
 
 void   SManager::terminate_expired_tasks()
 {
+    int  count = 0;
+
     check_for_success();
     //printf( "\n\n\n\nf_success_found: %d\n", (int)f_success_found );
     for  ( int  ind  = active_tasks.size() - 1; ind >= 0; ind-- ) {
@@ -499,11 +451,9 @@ void   SManager::terminate_expired_tasks()
         // XXX
         pid_t cpid = p_task->get_child_pid();
         if   ( f_success_found  ||  ( ! f_wide_search ) ) {
+            count++;
             kill_process( cpid );
 
-            pthread_cancel( p_task->thread );
-            check_for_success();
-            pthread_join( p_task->thread, NULL );
             check_for_success();
 
             p_task->set_done( true );
@@ -514,10 +464,12 @@ void   SManager::terminate_expired_tasks()
         assert( ! f_success_found );
         assert( p_task->is_expired() );
         assert( f_wide_search );
-        
+
         ///suspend_process( cpid );
-        
+
     }
+    if  ( count > 0 )
+        printf( "Killed %d processes\n", count );
 }
 
 
@@ -529,6 +481,7 @@ void  SManager::spawn_single_task()
     if  ( (int)( active_tasks.size() ) >= max_jobs_number )
         return;
 
+    //printf( "New task created!\n" );
     Task  * tsk = new  Task();
 
     tsk->set_time_limit( (int)seq_gen->next() );
@@ -545,12 +498,9 @@ void  SManager::spawn_single_task()
     tsk->set_command( prog );
     tsk->set_dir( new_dir );
 
-    pthread_mutex_lock( &mutex_tasks );
-    //tasks.pop_front();
     active_tasks.push_back( tsk );
-    pthread_mutex_unlock( &mutex_tasks );
 
-    tsk->run();
+    tsk->launch();
 }
 
 
@@ -562,6 +512,7 @@ void  SManager::spawn_tasks()
         return;
 
     while  ( (int)( active_tasks.size() ) < max_jobs_number ) {
+        //printf( "ST Spawnning...\n" );
         spawn_single_task();
     }
 }
@@ -571,16 +522,16 @@ void   SManager::main_loop()
 {
     //printf( "main loop entered...\n" );
     do {
-        //printf( "Looping...\n" );
+        //printf( "ML Looping...\n" );
         check_for_done_tasks();
         //printf( "A Looping...\n" );
         if  ( is_found_success() )
             break;
-        //printf( "B Looping...\n" );
+        //printf( "ML B Looping...\n" );
         terminate_expired_tasks();
         if  ( is_found_success() )
             break;
-        //printf( "C Looping...\n" );
+        //printf( "ML C Looping...\n" );
         spawn_tasks();
         //printf( "D Looping...\n" );
         if  ( is_found_success() )
@@ -595,36 +546,60 @@ void   SManager::main_loop()
 }
 
 
-void  * main_scheduler_loop( void  * _p_manager)
+void  waitpid_error( int  status )
 {
-    SManager   * p_manager = (SManager *)_p_manager;
-
-    p_manager->main_loop();
-
-    return  NULL;
-}
-
-
-int  SManager::wait_on_queue()
-{
-    pthread_cond_broadcast( &scheduler_awake_cond );
-    do {
-        //printf( "************** WAITING!!!\n" ); fflush( stdout );
-        pthread_cond_broadcast( &scheduler_awake_cond );
-        pthread_mutex_lock( &scheduler_awake_mutex );
-        if   ( active_tasks.size() > 0 )  {
-            pthread_cond_wait( &scheduler_awake_cond,
-                               &scheduler_awake_mutex );
+        if (WIFEXITED(status)) {
+            printf("child exited, status=%d\n", WEXITSTATUS(status));
+        } else if (WIFSIGNALED(status)) {
+            printf("child killed (signal %d)\n", WTERMSIG(status));
+        } else if (WIFSTOPPED(status)) {
+            printf("child stopped (signal %d)\n", WSTOPSIG(status));
+        } else if (WIFCONTINUED(status)) {
+            printf("child continued\n");
+        } else {    /* Non-standard case -- may never happen */
+            printf("Unexpected status (0x%x)\n", status);
         }
-        pthread_mutex_unlock( &scheduler_awake_mutex );
-    }  while  ( active_tasks.size() > 0 );
+}
 
-    return  0;
+#define  STATUS_RUNNING 73
+#define  STATUS_DONE    74
+#define  STATUS_PAUSED  75
+
+
+int    Task::process_status()
+{
+    int status, endID;
+
+    endID = waitpid( pid, &status, WNOHANG|WUNTRACED);
+    if (endID == -1) {            /* error calling waitpid       */
+        perror("waitpid error");
+        exit(EXIT_FAILURE);
+    }
+    if (endID == 0) /* child still running         */
+        return  STATUS_RUNNING;
+
+    if (endID == pid ) {  /* child ended                 */
+        if (WIFEXITED(status)) {
+            f_done = true;
+            return  STATUS_DONE;
+        }
+        if (WIFSIGNALED(status)) {
+            printf("Child ended because of an uncaught signal.n");
+            assert( false );
+            return  -1;
+        }
+        if (WIFSTOPPED(status))
+            return  STATUS_PAUSED;
+    }
+
+    return -1;
 }
 
 
-void  Task::execute()
+void  Task::launch()
 {
+    record_start_time();
+
     if  ( p_manager->is_found_success() ) {
         printf( "BINGO!\n" );
         f_done = true;
@@ -640,7 +615,6 @@ void  Task::execute()
     char * prog_dir = strdup( dir.c_str() );
     char * success_fn = p_manager->get_success_file_name();
     char *argv[] = { prog_name, prog_dir, success_fn, NULL};
-    int status;
     posix_spawnattr_t attr;
 
     // Initialize spawn attributes
@@ -650,51 +624,12 @@ void  Task::execute()
     // posix_spawnattr_setflags(&attr, POSIX_SPAWN_SETSCHEDULER);
 
     // Spawn a new process
+    //printf( "New process started!\n" );
     if (posix_spawn(&pid, command.c_str(), NULL, &attr, argv, NULL) != 0) {
         perror("spawn failed");
         exit(EXIT_FAILURE);
     }
-    //printf( "PROCESS: %d\n", pid );
-
-    //int status;
-    //    wpid = waitpid( pid, &status, WUNTRACED | WCONTINUED);
-
-    do {
-        //printf( "Wait...\n" );
-        pid_t  wpid = waitpid( pid, &status, WUNTRACED | WCONTINUED );
-        //printf( "\n\n\nXXXWait done...\n" );
-        if (wpid == -1) {
-            // Child process is dead. Bye bye...
-            //perror("waitpid");
-            //exit(EXIT_FAILURE);
-            break;
-        }
-
-        if (WIFEXITED(status)) {
-            printf("child exited, status=%d\n", WEXITSTATUS(status));
-        } else if (WIFSIGNALED(status)) {
-            printf("child killed (signal %d)\n", WTERMSIG(status));
-        } else if (WIFSTOPPED(status)) {
-            printf("child stopped (signal %d)\n", WSTOPSIG(status));
-        } else if (WIFCONTINUED(status)) {
-            printf("child continued\n");
-        } else {    /* Non-standard case -- may never happen */
-            printf("Unexpected status (0x%x)\n", status);
-        }
-        printf( "WHILE...\n" );
-    } while (!WIFEXITED(status) && !WIFSIGNALED(status));
-
-    /*sleep( 1 );
-
-    if  ( is_file_exists( dir + "success.txt" ) ) {
-        printf( "DONE DONE DONE DONE!\n" );
-        p_manager->set_success( true  );
-        f_success = true;
-        }*/
-
 }
-
-
 
 
 void  usage()
@@ -704,9 +639,6 @@ void  usage()
             "catastrophic running times for Las Vegas Algorithms.\n" );
     exit( -1 );
 }
-
-
-
 
 
 int  main(int   argc, char*   argv[])
@@ -754,12 +686,8 @@ int  main(int   argc, char*   argv[])
     p_manager->set_success_file( "success.txt" );
 
     //    printf( "bogi B\n" );
-    p_manager->start_main_thread();
 
-    while  ( ! p_manager->is_done() ) {
-        ///printf( "Sleeping...\n" );
-        sleep( 1 );
-    }
+    p_manager->main_loop();
 
     printf( "Everything is done???\n" );
 
