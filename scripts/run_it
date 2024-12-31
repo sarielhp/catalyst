@@ -7,10 +7,21 @@ mkdir work
 # -a: pause/resume version
 # 
 
+
+START=$(date +%s)
+
+
 ### Without the -a it is the old version
 
 # Regular counter search abort/restart version
 ./catalyst wait_random_busy/wrb_script work/
+
+END=$(date +%s)
+
+DIFF=$(( $END - $START ))
+
+echo RUNTIME: $DIFF
+
 
 exit
 
