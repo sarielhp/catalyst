@@ -201,8 +201,8 @@ public:
     {
         if  ( f_done  ||  f_success )
             return  true;
-        if  ( duration()  > time_limit ) {
-            printf( "EXPIRED!\n" );
+        if  ( duration()  >= time_limit ) {
+            //printf( "EXPIRED!\n" );
             return  true;
         }
         return  false;
@@ -351,11 +351,6 @@ public:
     void  check_for_done_tasks();
     void  main_loop();
     //int   wait_on_queue();
-
-    void  set_jobs_limit( int  jobs_limit )
-    {
-        max_jobs_number = jobs_limit;
-    }
 
     void   suspend_process( int  ind );
     void   resume_first_process();
@@ -811,6 +806,7 @@ int  main(int   argc, char*   argv[])
 
     unsigned int numThreads = std::thread::hardware_concurrency();
     p_manager->set_threads_num(  numThreads );
+    //p_manager->set_threads_num(  1 );
 
     p_manager->set_success_file( "success.txt" );
 
