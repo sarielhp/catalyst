@@ -14,6 +14,8 @@ build: catalyst
 .PHONY: clean
 clean:
 	rm -f catalyst success.txt
+	rm -r -f work/
+	mkdir work 
 	$(call FOREACH,clean)
 
 catalyst: catalyst.C
