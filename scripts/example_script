@@ -1,0 +1,23 @@
+#! /bin/bash
+
+# $1: Work directory
+# $2: Name of success file
+
+BDIR=/home/prog/
+PROG=pmpl
+
+# Copy all the files to the new work directory...
+cp -r $BDIR/* $1/
+
+#########################################3
+# Go into work directory
+
+cd $1
+
+./pmpl -f *.xml
+
+# Check if run was successful
+
+# It it was successful: Write the info into the success file...
+
+echo $* > $2
