@@ -338,6 +338,7 @@ public:
 
     void   set_program( const char  * _prog ) { prog = _prog; }
     void   set_work_dir( const char  * _dir ) { work_dir = _dir; }
+    string   get_work_dir() { return  work_dir; }
     void   handle_expired_tasks();
     void   kill_all_tasks();
 
@@ -783,6 +784,13 @@ void  usage()
     exit( -1 );
 }
 
+void  append_backslash( char  * buf )
+{
+    int  len = strlen( buf );
+    if  ( ( len == 0 )  ||  ( buf[ len - 1 ] != '/' ) )
+        strcat( buf, "/" );
+}
+
 
 int  main(int   argc, char*   argv[])
 {
@@ -828,8 +836,14 @@ int  main(int   argc, char*   argv[])
     p_manager->set_threads_num(  numThreads );
     //p_manager->set_threads_num(  1 );
 
+    char  buf[ 1024 ];
     char  out_success_fn[ 1024 ];   
-    realpath( "success.txt", out_success_fn );
+    
+    strcpy( buf, p_manager->get_work_dir().c_str() );
+    append_backslash( buf );
+    strcat( buf, "success.txt" );
+    
+    realpath( buf, out_success_fn );
 
     //printf( "Out_success_fn: %s\n", out_success_fn );
     
