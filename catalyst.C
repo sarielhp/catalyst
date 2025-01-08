@@ -201,10 +201,13 @@ public:
     {
         if  ( f_done  ||  f_success )
             return  true;
+        //printf( "Duration: %d\n", duration() );
+        //printf( "Time limit: %d\n", time_limit );
         if  ( duration()  >= time_limit ) {
             //printf( "EXPIRED!\n" );
             return  true;
         }
+        //printf( "FALSE\n" );
         return  false;
     }
 
@@ -305,7 +308,7 @@ public:
 
     char  * get_success_file_name() {
         if  ( success_fn == NULL ) {
-            string  s = work_dir + success_file;
+            string  s = success_file;
             success_fn = strdup( s.c_str() );
         }
         return  success_fn;
@@ -383,6 +386,7 @@ void  SManager::check_for_done_tasks()
             active_tasks.erase( active_tasks.begin() + ind );
         }
     }
+    //printf( "\n\n\nActive tasks: %d\n", (int)active_tasks.size() );
     //debug_myprintf( "Active tasks: %d\n", (int)active_tasks.size() );
 }
 
@@ -466,6 +470,9 @@ void   SManager::resume_first_process()
 
     Task * p_task = suspended_tasks.front() ;
 
+    // Update the start time of the process
+    p_task->record_start_time();
+    
     //----------------------------------------------------
     // Suspending the process: Low level stuff
     pid_t cpid = p_task->get_child_pid();
@@ -522,7 +529,7 @@ void   SManager::handle_expired_tasks()
             return;
         if   ( ! p_task->is_expired() )
             continue;
-        printf( "Expired task????\n" );
+        ///printf( "Expired task????\n" );
 
         check_for_success();
 
@@ -544,7 +551,7 @@ void   SManager::handle_expired_tasks()
         assert( ! f_success_found );
         assert( p_task->is_expired() );
         assert( f_wide_search );
-        printf( "Suspending process!\n" );
+        ///printf( "Suspending process!\n" );
         suspend_process( ind );
     }
     if  ( count > 0 )
@@ -577,10 +584,15 @@ void  SManager::spawn_single_task()
         tsk->set_time_limit( (int)seq_gen->next() );
     tsk->set_manager( this );
 
-    char buf[1024];
-    sprintf( buf, "/%06d", counter_tasks_created );
+    char buf[1024];    
+    sprintf( buf, "%06d", counter_tasks_created );
 
-    string new_dir =  work_dir + buf;
+    string new_dir;
+    if  ( work_dir.back() == '/' )
+        new_dir =  work_dir + buf;
+    else
+        new_dir =  work_dir + "/" + buf;
+    
     mkdir( new_dir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH );
 
     string  out_cmd = prog + " " + new_dir;
@@ -644,6 +656,11 @@ void   SManager::main_loop()
 {
     //printf( "main loop entered...\n" );
     do {
+        printf( "Active: %4d   suspended: %4d   SIM TIME: %6d\n",
+                (int)active_tasks.size(),
+                (int)suspended_tasks.size(),
+                time_counter );
+
         //printf( "ML Looping...\n" );
         check_for_done_tasks();
         //printf( "A Looping...\n" );
@@ -737,6 +754,8 @@ void  Task::launch()
     char * prog_name = strdup(  command.c_str() );
     char * prog_dir = strdup( dir.c_str() );
     char * success_fn = p_manager->get_success_file_name();
+
+    
     char *argv[] = { prog_name, prog_dir, success_fn, NULL};
     posix_spawnattr_t attr;
 
@@ -748,6 +767,7 @@ void  Task::launch()
 
     // Spawn a new process
     //printf( "New process started!\n" );
+    //printf( "CMD: %s\n", command.c_str() );
     if (posix_spawn(&pid, command.c_str(), NULL, &attr, argv, NULL) != 0) {
         perror("spawn failed");
         exit(EXIT_FAILURE);
@@ -808,7 +828,12 @@ int  main(int   argc, char*   argv[])
     p_manager->set_threads_num(  numThreads );
     //p_manager->set_threads_num(  1 );
 
-    p_manager->set_success_file( "success.txt" );
+    char  out_success_fn[ 1024 ];   
+    realpath( "success.txt", out_success_fn );
+
+    //printf( "Out_success_fn: %s\n", out_success_fn );
+    
+    p_manager->set_success_file( out_success_fn );
 
     //    printf( "bogi B\n" );
 

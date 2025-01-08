@@ -9,15 +9,26 @@ PROG=pmpl
 # Copy all the files to the new work directory...
 cp -r $BDIR/* $1/
 
+
+
 #########################################3
 # Go into work directory
 
 cd $1
 
-./pmpl -f *.xml
+python seed_create.py
+./pmpl -f created_file_name.xml
+
 
 # Check if run was successful
+# In this case - a file with .stat exists in the directory...
+#
+L=$(find . | grep -i  .stat | wc -l)
+if  (( $L > 0 )); then
+    # Creaet & write into the success file///
+    echo  $* > $2
+else
+    echo "Nope"
+fi
 
-# It it was successful: Write the info into the success file...
 
-echo $* > $2
