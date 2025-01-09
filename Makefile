@@ -19,4 +19,4 @@ clean:
 	$(call FOREACH,clean)
 
 catalyst: catalyst.C
-	g++ -Wall -o catalyst catalyst.C
+	g++ -std=c++17 -Wall -o catalyst catalyst.C
