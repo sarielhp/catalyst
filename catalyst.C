@@ -12,6 +12,7 @@
 #include  <unistd.h>
 #include  <spawn.h>
 #include  <sys/wait.h>
+#include  <limits.h>
 
 #include  <time.h>
 #include  <stdarg.h>
@@ -28,6 +29,10 @@
 #include  <deque>
 
 using namespace std;
+
+#define  STATUS_RUNNING 73
+#define  STATUS_DONE    74
+#define  STATUS_PAUSED  75
 
 
 static bool  global_f_verbose = true;
@@ -132,6 +137,22 @@ public:
 };
 
 
+class   SequenceMaxInt : public AbstractSequence
+{
+private:
+
+public:
+    SequenceMaxInt()
+    {
+    }
+
+    virtual  int  next()
+    {
+        return  INT_MAX;
+    }
+};
+
+
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -201,12 +222,16 @@ public:
     {
         if  ( f_done  ||  f_success )
             return  true;
-        //printf( "Duration: %d\n", duration() );
-        //printf( "Time limit: %d\n", time_limit );
         if  ( duration()  >= time_limit ) {
             //printf( "EXPIRED!\n" );
             return  true;
         }
+
+        if  ( process_status() ==  STATUS_DONE ) {
+            f_done = true;
+            return  true;
+        }
+
         //printf( "FALSE\n" );
         return  false;
     }
@@ -280,6 +305,8 @@ private:
     /// Wide search implementation
     bool  f_wide_search;
 
+    bool  f_parallel_search;
+
     int   max_jobs_number;
     bool  f_scheduler_stop;
         //deque_tasks  tasks;
@@ -302,6 +329,7 @@ public:
     }
 
     void  set_wide_search( bool  flag ) { f_wide_search = flag; }
+    void  set_parallel_search( bool  flag ) { f_parallel_search = flag; }
 
 
     void  check_for_success();
@@ -317,7 +345,7 @@ public:
     SManager()
     {
         time_counter = 0;
-        f_wide_search = false;
+        f_parallel_search = f_wide_search = false;
         success_fn = NULL;
         f_done = false;
         counter_tasks_created = 0;
@@ -473,7 +501,7 @@ void   SManager::resume_first_process()
 
     // Update the start time of the process
     p_task->record_start_time();
-    
+
     //----------------------------------------------------
     // Suspending the process: Low level stuff
     pid_t cpid = p_task->get_child_pid();
@@ -496,12 +524,14 @@ void   SManager::resume_first_process()
 
 void   SManager::kill_all_tasks()
 {
+    int  count = 0;
     for  ( int  ind  = active_tasks.size() - 1; ind >= 0; ind-- ) {
         //printf( "IND: %d\n", ind );
         Task  * p_task = active_tasks[ ind ];
         kill_process( p_task->get_child_pid() );
         active_tasks.erase( active_tasks.begin() + ind );
         delete p_task;
+        count++;
     }
     for  ( int  jnd  = suspended_tasks.size() - 1; jnd >= 0; jnd-- ) {
         //printf( "JND: %d\n", jnd );
@@ -509,7 +539,10 @@ void   SManager::kill_all_tasks()
         kill_process( p_task->get_child_pid() );
         suspended_tasks.erase( suspended_tasks.begin() + jnd );
         delete p_task;
+        count++;
     }
+    if  ( count > 0 )
+        printf( "Killed %d processes\n", count );
 }
 
 
@@ -521,7 +554,7 @@ void   SManager::handle_expired_tasks()
     if   ( f_success_found )
         return;
 
-    printf( "handle_expired_tasks\n" );
+    //printf( "handle_expired_tasks\n" );
     //printf( "\n\n\n\nf_success_found: %d\n", (int)f_success_found );
     for  ( int  ind  = active_tasks.size() - 1; ind >= 0; ind-- ) {
         Task  * p_task = active_tasks[ ind ];
@@ -547,6 +580,8 @@ void   SManager::handle_expired_tasks()
             p_task->set_done( true );
             continue;
         }
+        if   ( f_parallel_search )
+            continue;
 
         // f_success_found == false  &&  f_wide_search = true
         assert( ! f_success_found );
@@ -585,7 +620,7 @@ void  SManager::spawn_single_task()
         tsk->set_time_limit( (int)seq_gen->next() );
     tsk->set_manager( this );
 
-    char buf[1024];    
+    char buf[1024];
     sprintf( buf, "%06d", counter_tasks_created );
 
     string new_dir;
@@ -593,7 +628,7 @@ void  SManager::spawn_single_task()
         new_dir =  work_dir + buf;
     else
         new_dir =  work_dir + "/" + buf;
-    
+
     mkdir( new_dir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH );
 
     string  out_cmd = prog + " " + new_dir;
@@ -702,9 +737,6 @@ void  waitpid_error( int  status )
     }
 }
 
-#define  STATUS_RUNNING 73
-#define  STATUS_DONE    74
-#define  STATUS_PAUSED  75
 
 
 int    Task::process_status()
@@ -742,21 +774,15 @@ void  Task::launch()
     record_start_time();
 
     if  ( p_manager->is_found_success() ) {
-        printf( "BINGO!\n" );
         f_done = true;
         return;
     }
-
-    //printf( "TSK: [%s]  %d\n", command.c_str(), (int)time_limit );
-    //fflush( stdout );
-    //int  val = system( command.c_str() );
-
 
     char * prog_name = strdup(  command.c_str() );
     char * prog_dir = strdup( dir.c_str() );
     char * success_fn = p_manager->get_success_file_name();
 
-    
+
     char *argv[] = { prog_name, prog_dir, success_fn, NULL};
     posix_spawnattr_t attr;
 
@@ -818,12 +844,22 @@ int  main(int   argc, char*   argv[])
     assert( p_manager != NULL );
 
     if  ( argc == 4 ) {
-        if  ( strcasecmp( argv[ 1 ], "-a" ) != 0 )
+        bool  f_parallel = ( strcasecmp( argv[ 1 ], "-p" ) == 0 );
+        bool  f_wide = ( strcasecmp( argv[ 1 ], "-a" ) == 0 );
+        if  ( (!f_parallel)  &&  ( ! f_wide ) )
             usage();
+
+
         p_manager->set_program( argv[ 2 ] );
         p_manager->set_work_dir( argv[ 3 ] );
-        p_manager->set_wide_search( true );
-        p_manager->set_seq_generator( new  SequencePlusOne() );
+        if  ( f_wide ) {
+            p_manager->set_wide_search( true );
+            p_manager->set_seq_generator( new  SequencePlusOne() );
+        }
+        if  ( f_parallel ) {
+            p_manager->set_parallel_search( true );
+            p_manager->set_seq_generator( new  SequenceMaxInt() );
+        }
     } else {
         if  ( argc != 3 )
             usage();
@@ -837,16 +873,16 @@ int  main(int   argc, char*   argv[])
     //p_manager->set_threads_num(  1 );
 
     char  buf[ 1024 ];
-    char  out_success_fn[ 1024 ];   
-    
+    char  out_success_fn[ 1024 ];
+
     strcpy( buf, p_manager->get_work_dir().c_str() );
     append_backslash( buf );
     strcat( buf, "success.txt" );
-    
+
     realpath( buf, out_success_fn );
 
     //printf( "Out_success_fn: %s\n", out_success_fn );
-    
+
     p_manager->set_success_file( out_success_fn );
 
     //    printf( "bogi B\n" );

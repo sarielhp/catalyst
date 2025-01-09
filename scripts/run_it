@@ -13,8 +13,8 @@ START=$(date +%s)
 
 ### Without the -a it is the old version
 
-# Wide search pause/resume version
-./catalyst -a wait_random_busy/wrb_script work/
+
+./catalyst -p wait_random_busy/wrb_script work/
 
 
 END=$(date +%s)
@@ -26,11 +26,20 @@ echo RUNTIME: $DIFF
 
 exit
 
-# Regular counter search abort/restart version
-./catalyst wait_random_busy/wrb_script work/
+
+
+
+##########################################################################
 
 # Wide search pause/resume version
 ./catalyst -a wait_random_busy/wrb_script work/
+
+# Parallel search pause/resume version
+./catalyst -p wait_random_busy/wrb_script work/
+
+
+# Regular counter search abort/restart version
+./catalyst wait_random_busy/wrb_script work/
 
 exit
 
