@@ -304,7 +304,6 @@ private:
 
     /// Wide search implementation
     bool  f_wide_search;
-
     bool  f_parallel_search;
 
     int   max_jobs_number;
@@ -356,6 +355,7 @@ public:
         g_timer = 0;
     }
 
+    const char   * get_mode_str();
     bool  slots_available();
     void wakeup_thread() {
     }
@@ -382,12 +382,11 @@ public:
     void  spawn_tasks();
     void  check_for_done_tasks();
     void  main_loop();
-    //int   wait_on_queue();
 
-    void   suspend_process( int  ind );
-    void   resume_first_process();
+    void  suspend_process( int  ind );
+    void  resume_first_process();
 
-    void   verify_suspended_tasks_heap();
+    void  verify_suspended_tasks_heap();
 };
 
 /*--- Start of code ---*/
@@ -688,9 +687,22 @@ void  SManager::spawn_tasks()
 }
 
 
+const char   * SManager::get_mode_str()
+{
+    if  ( f_wide_search )
+        return "Wide search";
+    if  ( f_parallel_search )
+        return "Parallel search";
+
+    return   "Parallel Counter";
+}
+
+
 void   SManager::main_loop()
 {
-    //printf( "main loop entered...\n" );
+    printf( "MODE               : %s\n", get_mode_str() );
+    printf( "# of parallel jobs : %d\n", max_jobs_number );
+
     do {
         printf( "Active: %4d   suspended: %4d   SIM TIME: %6d\n",
                 (int)active_tasks.size(),

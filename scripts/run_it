@@ -14,7 +14,7 @@ START=$(date +%s)
 ### Without the -a it is the old version
 
 
-./catalyst -p wait_random_busy/wrb_script work/
+./catalyst -a wait_random_busy/wrb_script work/
 
 
 END=$(date +%s)
