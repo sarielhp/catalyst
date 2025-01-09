@@ -2,8 +2,8 @@
 
 function  do_a_run() {
     echo "Running (might take a while)..."
-    rm -r -f work >& /dev/null
-    mkdir work
+    #rm -r -f work >& /dev/null
+    #mkdir work
 
     START=$(date +%s)
 
@@ -27,13 +27,15 @@ function  do_a_run() {
 ############################################################
 
 PROG=wait_random_busy/wrb_script
+
+### Number of runs
 TIMES=2
 
 ############################################################
 
 LOG=log_wide_search.txt
 CATALYST_FLAGS="-a"
-rm -f $FL
+rm -f $LOG
 for i in  $(seq 1 $TIMES); do
     echo "LOG file: " $LOG
     echo "Wide search: " $i
@@ -43,7 +45,7 @@ done
 ################################################################
 LOG=log_parallel_search.txt
 CATALYST_FLAGS="-p"
-rm -f $FL
+rm -f $LOG
 for i in $(seq 1 $TIMES); do
     echo "LOG file: " $LOG
     echo "Wide search: " $i
@@ -54,7 +56,7 @@ done
 ################################################################
 LOG=log_counter_search.txt
 CATALYST_FLAGS=""
-rm -f $FL
+rm -f $LOG
 for i in $(seq 1 $TIMES); do
     echo "LOG file: " $LOG
     echo "Wide search: " $i
