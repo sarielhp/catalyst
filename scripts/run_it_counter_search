@@ -1,0 +1,14 @@
+#! /bin/bash
+
+rm -r -f work >& /dev/null
+mkdir work
+
+START=$(date +%s)
+
+./catalyst wait_random_busy/wrb_script work/
+
+END=$(date +%s)
+
+DIFF=$(( $END - $START ))
+
+echo RUNTIME: $DIFF

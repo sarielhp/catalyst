@@ -1,0 +1,22 @@
+#! /bin/bash
+
+rm -r -f work >& /dev/null
+mkdir work
+
+#
+# -a: Wide search (pause/resume version)
+# -p: Parallel search
+# No flag: Counter mode
+#
+
+START=$(date +%s)
+
+./catalyst -p wait_random_busy/wrb_script work/
+
+
+END=$(date +%s)
+
+DIFF=$(( $END - $START ))
+
+echo RUNTIME: $DIFF
+

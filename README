@@ -14,14 +14,17 @@
    computed data of the successful fun.
 
 3. Its a good idea to create script that starts catalyst. An example
-   is provided in the script "scripts/run_it". It remove the global work
-   directory, recreate it, and call catalyst, as follows;
+   is provided in the script "scripts/run_it". It call catalyst, as
+   follows;
 
-
-   ./catalyst ALG global_work_dir/
+   ./catalyst ALG temp_work_dir/
 
    Catalyst runs many copies of ALG - the 1th created copy is run at
-   directory global_word_dir/000001/, etc.
+   directory temp_word_dir/000001/, etc.
+
+WARNNING: Catalyst deletes the temp_work_dir/ and recreates it. Do not
+store any information you want to keep in this directory.
+
 
 Modes
 =====

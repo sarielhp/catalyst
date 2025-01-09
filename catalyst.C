@@ -22,11 +22,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <algorithm>
+#include  <algorithm>
 #include  <thread>
 #include  <string>
 #include  <vector>
 #include  <deque>
+#include  <filesystem>
 
 using namespace std;
 
@@ -365,7 +366,7 @@ public:
     }
 
     void   set_program( const char  * _prog ) { prog = _prog; }
-    void   set_work_dir( const char  * _dir ) { work_dir = _dir; }
+    void   set_work_dir( const char  * _dir ) { work_dir = strdup( _dir ); }
     string   get_work_dir() { return  work_dir; }
     void   handle_expired_tasks();
     void   kill_all_tasks();
@@ -525,7 +526,7 @@ void   SManager::kill_all_tasks()
 {
     int  count = 0;
     for  ( int  ind  = active_tasks.size() - 1; ind >= 0; ind-- ) {
-        //printf( "IND: %d\n", ind );
+        //printf( "IND: %d\n", ind );  fflush( stdout );
         Task  * p_task = active_tasks[ ind ];
         kill_process( p_task->get_child_pid() );
         active_tasks.erase( active_tasks.begin() + ind );
@@ -533,7 +534,7 @@ void   SManager::kill_all_tasks()
         count++;
     }
     for  ( int  jnd  = suspended_tasks.size() - 1; jnd >= 0; jnd-- ) {
-        //printf( "JND: %d\n", jnd );
+        //printf( "JNDx: %d\n", jnd ); fflush( stdout );
         Task  * p_task = suspended_tasks[ jnd ];
         kill_process( p_task->get_child_pid() );
         suspended_tasks.erase( suspended_tasks.begin() + jnd );
@@ -793,7 +794,7 @@ void  Task::launch()
     char * prog_name = strdup(  command.c_str() );
     char * prog_dir = strdup( dir.c_str() );
     char * success_fn = p_manager->get_success_file_name();
-
+    printf( "SUCC: [%s]\n", success_fn );
 
     char *argv[] = { prog_name, prog_dir, success_fn, NULL};
     posix_spawnattr_t attr;
@@ -806,7 +807,7 @@ void  Task::launch()
 
     // Spawn a new process
     //printf( "New process started!\n" );
-    //printf( "CMD: %s\n", command.c_str() );
+    printf( "CMD: %s\n", command.c_str() );
     if (posix_spawn(&pid, command.c_str(), NULL, &attr, argv, NULL) != 0) {
         perror("spawn failed");
         exit(EXIT_FAILURE);
@@ -822,7 +823,7 @@ void  usage()
     exit( -1 );
 }
 
-void  append_backslash( char  * buf )
+void  append_slash( char  * buf )
 {
     int  len = strlen( buf );
     if  ( ( len == 0 )  ||  ( buf[ len - 1 ] != '/' ) )
@@ -832,7 +833,7 @@ void  append_backslash( char  * buf )
 
 int  main(int   argc, char*   argv[])
 {
-    printf( "time: %ld\n", time( NULL ) );
+    //printf( "time: %ld\n", time( NULL ) );
     if  ( argc == 0 )
         usage();
 
@@ -864,6 +865,7 @@ int  main(int   argc, char*   argv[])
 
         p_manager->set_program( argv[ 2 ] );
         p_manager->set_work_dir( argv[ 3 ] );
+        //printf( "WORK DIR: %s\n", argv[ 3 ] );
         if  ( f_wide ) {
             p_manager->set_wide_search( true );
             p_manager->set_seq_generator( new  SequencePlusOne() );
@@ -877,6 +879,7 @@ int  main(int   argc, char*   argv[])
             usage();
         p_manager->set_program( argv[ 1 ] );
         p_manager->set_work_dir( argv[ 2 ] );
+        printf( "WORK DIR: %s\n", argv[ 2 ] );
         p_manager->set_seq_generator( new  SequenceCounter() );
     }
 
@@ -888,12 +891,30 @@ int  main(int   argc, char*   argv[])
     char  out_success_fn[ 1024 ];
 
     strcpy( buf, p_manager->get_work_dir().c_str() );
-    append_backslash( buf );
-    strcat( buf, "success.txt" );
 
-    realpath( buf, out_success_fn );
+    //printf( "BUFY: %s\n", buf );
 
-    //printf( "Out_success_fn: %s\n", out_success_fn );
+
+    std::filesystem::remove_all( buf );
+
+    mkdir( buf, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH );
+
+    ///printf( "BUFX: %s\n", buf );
+
+    char  work_dir[ 1024 ];
+
+    char  * rpath = realpath( buf, out_success_fn );
+    assert( rpath != NULL );
+    append_slash( out_success_fn );
+    strcpy( work_dir, out_success_fn );
+
+    p_manager->set_work_dir( work_dir );
+
+    strcat( out_success_fn, "success.txt" );
+
+
+    printf( "Work directory : %s\n", work_dir );
+    printf( "Success file   : %s\n", out_success_fn );
 
     p_manager->set_success_file( out_success_fn );
 
