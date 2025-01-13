@@ -472,10 +472,18 @@ void   SManager::suspend_process( int  ind )
     pid_t cpid = p_task->get_child_pid();
     char buff[1024] = "";
 
-    sprintf( buff, "pkill -SIGSTOP -P %d", cpid );
-    system( buff );
+    bool  f_signal_stop = false;
+    if  ( f_signal_stop ) {
+        sprintf( buff, "pkill -SIGSTOP -P %d", cpid );
+        system( buff );
 
-    kill( cpid, SIGSTOP );
+        kill( cpid, SIGSTOP );
+    } else {
+        sprintf( buff, "pkill -SIGTSTP -P %d", cpid );
+        system( buff );
+
+        kill( cpid, SIGTSTP );
+    }
 
     // Moving the task to suspended array...
     // Suspending a process is a bit tricky, since we have to keep
