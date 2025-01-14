@@ -1,5 +1,30 @@
 #! /bin/bash
 
+
+function  count_lines() {
+    X=$(wc -l $1)
+    Y=${X% *}
+    echo $Y
+}
+
+function  f_kill_grep() {
+    TDIR=/tmp/sariel/kill_grep
+    mkdir -p $TDIR >& /dev/null
+    TFL=$TDIR/kill_grep.txt
+
+    ps auxw | grep $1 | grep -v kill_grep | grep -v grep > $TFL
+    L=$(count_lines $TFL)
+    if  (( $L > 0 )); then
+        cat $TFL |  gi -v kill_grep
+        echo "ESCAPED PROCESSES: " $L
+        kill -9 `cat $TFL | awk '{print $2}'` >& /dev/null
+    fi
+    echo "NO ESCAPED PROCESSES"
+}
+
+
+
+
 function  do_a_run() {
     echo "Running (might take a while)..."
     #rm -r -f work >& /dev/null
@@ -15,7 +40,11 @@ function  do_a_run() {
 
     DIFF=$(( $END - $START ))
 
-    echo RUNTIME: $DIFF 
+    #sleep 1
+    f_kill_grep wait #
+    f_kill_grep $PROG #
+
+    echo RUNTIME: $DIFF
     echo "" >> $LOG
     echo "---------------------------------------------------" >> $LOG
     echo RUNTIME: $DIFF >> $LOG
