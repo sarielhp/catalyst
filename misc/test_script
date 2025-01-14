@@ -1,0 +1,12 @@
+#! /bin/bash
+
+L=$(find . | grep -i  .txt | wc -l)
+
+if  (( $L > 0 )); then
+    echo "Successful run"
+else
+    echo "FAIL"
+fi
+
+echo $L
+echo NOPE

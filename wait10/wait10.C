@@ -14,22 +14,21 @@ using namespace std;
 
 void  usage()
 {
-    printf( "usage:\n\twait10  [working-dir]\n" );
+    printf( "usage:\n\twait10  [working-dir] [success-file]\n" );
     exit( -1 );
 }
 
 
 int  main( int   argc, char   * argv[] )
 {
-    if  (argc != 2 )
+    if  (argc != 3 )
         usage();
 
     sleep(10);
     printf( "done\n" );
 
-    string  fname( string( argv[ 1 ] ) + string( "/success.txt" ) );
 
-    FILE * fl = fopen( fname.c_str(), "wt" );
+    FILE * fl = fopen( argv[2], "wt" );
     fclose( fl );
 
     return  0;
