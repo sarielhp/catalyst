@@ -27,11 +27,11 @@ function  do_a_run() {
 ############################################################
 
 #PROG=wait_random_busy/wrb_script
-PROG=wait/wait10
+PROG=wait_forever_99/wforever_script
 
 
 ### Number of runs
-TIMES=2
+TIMES=100
 
 ############################################################
 
@@ -44,15 +44,19 @@ for i in  $(seq 1 $TIMES); do
     do_a_run
 done
 
-################################################################
-LOG=log_parallel_search.txt
-CATALYST_FLAGS="-p"
-rm -f $LOG
-for i in $(seq 1 $TIMES); do
-    echo "LOG file: " $LOG
-    echo "Wide search: " $i
-    do_a_run
-done
+function  parallel_tests() {
+    ################################################################
+    LOG=log_parallel_search.txt
+    CATALYST_FLAGS="-p"
+    rm -f $LOG
+    for i in $(seq 1 $TIMES); do
+        echo "LOG file: " $LOG
+        echo "Wide search: " $i
+        do_a_run
+    done
+}
+
+# parallel_tests()
 
 
 ################################################################

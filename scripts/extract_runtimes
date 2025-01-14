@@ -1,0 +1,4 @@
+#! /bin/bash
+
+
+grep RUNTIME $* | awk '{print $2}'
