@@ -1,7 +1,10 @@
 SUBDIRS := wait10 wait_random wait_random_busy
 
-STR:=$(datestrext)
-HST:=$(hostname -s)
+STR := $(shell datestrext)
+
+HST:=$(shell hostname -s)
+
+V := "Time/date: ${STR} from $(HST)"
 
 
 define FOREACH
@@ -24,9 +27,11 @@ clean:
 
 git_push: clean
 	rm -r -f work
-	echo  "Time/date: ${STR} from ${HST}"
-#git commit -a --allow-empty-message -m "Time/date: $(STR) from $(HST)"
-#	git push
+#	echo " ---- "#
+#	echo ${STR}#
+#	echo $(V)
+	$(shell git commit -a --allow-empty-message -m "$(V)")
+	$(shell git push)
 
 
 catalyst: catalyst.C
