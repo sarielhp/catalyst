@@ -30,7 +30,8 @@ git_push: clean
 #	echo " ---- "#
 #	echo ${STR}#
 #	echo $(V)
-	$(shell git commit -a --allow-empty-message -m "$(V)")
+#	echo	$(shell git commit -a --allow-empty-message -m "$(V)")
+	$(shell echo git commit -a --allow-empty-message -m \""$(V)"\")
 	$(shell git push)
 
 
