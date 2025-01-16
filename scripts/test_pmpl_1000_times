@@ -1,0 +1,9 @@
+#! /bin/bash
+
+for  i in $(seq 1000);
+do
+     echo $i
+     rm -r -f work
+     cat_exp/pmpl_script work/ success.txt > x
+     wc -l x
+done
