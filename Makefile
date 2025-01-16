@@ -24,8 +24,9 @@ clean:
 
 git_push: clean
 	rm -r -f work
-	git commit -a --allow-empty-message -m "Time/date: $(STR) from $(HST)"
-	git push
+	echo  "Time/date: ${STR} from ${HST}"
+#git commit -a --allow-empty-message -m "Time/date: $(STR) from $(HST)"
+#	git push
 
 
 catalyst: catalyst.C
