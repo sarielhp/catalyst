@@ -420,23 +420,30 @@ void  SManager::check_for_done_tasks()
 }
 
 
-void   kill_process( pid_t  cpid )
-{
-    char buff[1024] = "";
+//////////////////////////////////////////////////////////////////
+// Murder!!! For some strange reason to kill the process
+// and all its children, we need to both use pkill and
+// kill. Don't ask me why..
+//
+// pkill is needed to kill all the child processes of the
+// process (what happens if ALG is a script.
+//////////////////////////////////////////////////////////////////
 
-    //////////////////////////////////////////////////////////////////
-    // Murder!!! For some strange reason to kill the process
-    // and all tis children, we need to both use pkill and
-    // kill. Don't ask me why..
-    //
-    // pkill is needed to kill all the child processes of the
-    // process (what happens if ALG is a script.
-    //////////////////////////////////////////////////////////////////
-    //sprintf( buff, "pkill -P %d > /dev/null 2 >& 1", cpid );
-    sprintf( buff, "pkill -P %d", cpid );
+void  send_signal( pid_t  cpid, int sig, const char  * sig_str )
+{
+    char  buff[ 1024 ];
+
+
+    sprintf( buff, "pkill -%s -P %d", sig_str, cpid );
     system( buff );
 
-    kill( cpid, SIGKILL );
+    kill( cpid, sig );
+}
+
+
+void   kill_process( pid_t  cpid )
+{
+    send_signal( cpid, SIGKILL, "SIGKILL" );
 }
 
 
@@ -469,21 +476,7 @@ void   SManager::suspend_process( int  ind )
 
     //----------------------------------------------------
     // Suspending the process: The low level stuff
-    pid_t cpid = p_task->get_child_pid();
-    char buff[1024] = "";
-
-    bool  f_signal_stop = false;
-    if  ( f_signal_stop ) {
-        sprintf( buff, "pkill -SIGSTOP -P %d", cpid );
-        system( buff );
-
-        kill( cpid, SIGSTOP );
-    } else {
-        sprintf( buff, "pkill -SIGTSTP -P %d", cpid );
-        system( buff );
-
-        kill( cpid, SIGTSTP );
-    }
+    send_signal( p_task->get_child_pid(), SIGTSTP, "SIGTSTP" );
 
     // Moving the task to suspended array...
     // Suspending a process is a bit tricky, since we have to keep
@@ -512,13 +505,7 @@ void   SManager::resume_first_process()
 
     //----------------------------------------------------
     // Suspending the process: Low level stuff
-    pid_t cpid = p_task->get_child_pid();
-    char buff[1024] = "";
-
-    sprintf( buff, "pkill -SIGCONT -P %d", cpid );
-    system( buff );
-
-    kill( cpid, SIGCONT );
+    send_signal( p_task->get_child_pid(), SIGCONT, "SIGCONT" );
 
     /// Moving it from suspend to resumed tasks...
     active_tasks.push_back( p_task );
@@ -528,6 +515,8 @@ void   SManager::resume_first_process()
     suspended_tasks.pop_back();
     verify_suspended_tasks_heap();
 }
+
+
 
 
 void   SManager::kill_all_tasks()
@@ -543,9 +532,18 @@ void   SManager::kill_all_tasks()
     }
     for  ( int  jnd  = suspended_tasks.size() - 1; jnd >= 0; jnd-- ) {
         //printf( "JNDx: %d\n", jnd ); fflush( stdout );
+
         Task  * p_task = suspended_tasks[ jnd ];
-        kill_process( p_task->get_child_pid() );
+        pid_t   cpid = p_task->get_child_pid();
+
+        /// First resume it...
+        /// ... then kill it.
+        send_signal( cpid, SIGCONT, "SIGCONT" );
+        send_signal( cpid, SIGKILL, "SIGKILL" );
+
+        //kill_process( p_task->get_child_pid() );
         suspended_tasks.erase( suspended_tasks.begin() + jnd );
+
         delete p_task;
         count++;
     }
