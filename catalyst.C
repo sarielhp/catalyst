@@ -433,6 +433,13 @@ void  send_signal( pid_t  cpid, int sig, const char  * sig_str )
 {
     char  buff[ 1024 ];
 
+    //killpg( cpid, sig );
+
+    //    sprintf( buff, "/bin/kill -s %s -- -%d", sig_str, cpid );
+    //printf( "XXX : %s\n", buff);
+    //system( buff );
+    //sprintf( buff, "pkill -%s -G %d", sig_str, cpid );
+    //system( buff );
 
     sprintf( buff, "pkill -%s -P %d", sig_str, cpid );
     system( buff );
@@ -525,7 +532,8 @@ void   SManager::kill_all_tasks()
     for  ( int  ind  = active_tasks.size() - 1; ind >= 0; ind-- ) {
         //printf( "IND: %d\n", ind );  fflush( stdout );
         Task  * p_task = active_tasks[ ind ];
-        kill_process( p_task->get_child_pid() );
+        //kill_process( p_task->get_child_pid() );
+        send_signal( p_task->get_child_pid(), SIGKILL, "SIGKILL" );
         active_tasks.erase( active_tasks.begin() + ind );
         delete p_task;
         count++;
@@ -540,7 +548,10 @@ void   SManager::kill_all_tasks()
         /// ... then kill it.
         send_signal( cpid, SIGCONT, "SIGCONT" );
         send_signal( cpid, SIGKILL, "SIGKILL" );
+        //send_signal( cpid, SIGKILL, "SIGTERM" );
 
+        // trap "echo received sigterm" SIGTERM
+        
         //kill_process( p_task->get_child_pid() );
         suspended_tasks.erase( suspended_tasks.begin() + jnd );
 

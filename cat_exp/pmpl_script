@@ -44,7 +44,12 @@ echo "----------------------------------------------"
 pwd
 echo "----------------------------------------------"
 
-python3 $BDIR/run_pmpl.py
+#trap "echo received sigterm" SIGTERM
+
+python3 $BDIR/prepare_pmpl_run.py
+
+/home/sariel/prog/25/pmpl/build/ppl_mp -f CatExperiment.xml
+
 
 # Check if run was successful
 # In this case - a file with .stat exists in the directory...
