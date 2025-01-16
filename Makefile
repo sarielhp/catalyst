@@ -1,7 +1,7 @@
 SUBDIRS := wait10 wait_random wait_random_busy
 
-STR:=`datestrext`
-HST:=`hostname -s`
+STR:=$(datestrext)
+HST:=$(hostname -s)
 
 
 define FOREACH
