@@ -5,7 +5,7 @@
        'baseFilename in the Problem node is for Simulator stat output only. -->
   <Problem baseFilename="CatExperiment">
 
-    <Environment filename="@@path_to_env@@/simple_narrow_passage.env"
+    <Environment filename="@@path_to_env@@/simple_narrow_passage_@@passage_sidelength@@.env"
       frictionCoefficient="0" gravity="0 0 0"/>
     <Robot label="boxy" filename="@@path_to_env@@/rot_boxy.robot">
 
