@@ -101,7 +101,7 @@ function  counter_tests() {
 #PROG=wait_random_busy/wrb_script
 #PROG=wait_forever_99/wforever_script
 PROG=cat_exp/pmpl_script
-TIMES=100
+TIMES=100 
 
 wide_tests
 
