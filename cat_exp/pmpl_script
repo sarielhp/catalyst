@@ -1,5 +1,7 @@
 #! /bin/bash
 
+PPLMP=/home/sariel/prog/25/pmpl/build/ppl_mp
+
 # $1: Work directory
 # $2: Name of success file
 
@@ -8,17 +10,13 @@ if  (( $# != 2 )); then
     exit -1
 fi
 
-#BDIR=/home/sariel/prog/25/catalyst/cat_exp 
+#BDIR=/home/sariel/prog/25/catalyst/cat_exp
 BDIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 
 mkdir $1 >& /dev/null
 
 # Copy all the files to the new work directory...
-# cp $BDIR/pmpl $1/
-cp $BDIR/run_pmpl.py $1/
-
-#echo XXXX
 
 cp $BDIR/CatExperimentTemplate.xml $1/
 if  [[ -e $1/env/ ]]; then
@@ -48,7 +46,7 @@ echo "----------------------------------------------"
 
 python3 $BDIR/prepare_pmpl_run.py
 
-/home/sariel/prog/25/pmpl/build/ppl_mp -f CatExperiment.xml
+$PPLMP -f CatExperiment.xml
 
 
 # Check if run was successful
@@ -56,10 +54,8 @@ python3 $BDIR/prepare_pmpl_run.py
 L=$(find . | grep -i  .stat | wc -l)
 if  (( $L > 0 )); then
     # Create & write into the success file...
-    echo "======================================================================================================================================================================================"
+    echo "=================================================================="
     echo  $* > $2
 else
     echo "Nope"
 fi
-
-
