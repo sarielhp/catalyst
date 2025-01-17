@@ -19,7 +19,7 @@ function  f_kill_grep() {
         echo "ESCAPED PROCESSES: " $L
         kill -9 `cat $TFL | awk '{print $2}'` >& /dev/null
     fi
-    echo "NO ESCAPED PROCESSES"
+    #echo "NO ESCAPED PROCESSES"
 }
 
 
@@ -56,23 +56,19 @@ function  do_a_run() {
 
 ############################################################
 
-#PROG=wait_random_busy/wrb_script
-#PROG=wait_forever_99/wforever_script
-PROG=cat_exp/pmpl_script
-
-### Number of runs
-TIMES=100
 
 ############################################################
 
-LOG=log_wide_search.txt
-CATALYST_FLAGS="-a"
-rm -f $LOG
-for i in  $(seq 1 $TIMES); do
-    echo "LOG file: " $LOG
-    echo "Wide search: " $i
-    do_a_run
-done
+function  wide_tests() {
+    LOG=log_wide_search.txt
+    CATALYST_FLAGS="-a"
+    rm -f $LOG
+    for i in  $(seq 1 $TIMES); do
+        echo "LOG file: " $LOG
+        echo "Wide search: " $i
+        do_a_run
+    done
+}
 
 function  parallel_tests() {
     ################################################################
@@ -90,15 +86,27 @@ function  parallel_tests() {
 
 
 ################################################################
-LOG=log_counter_search.txt
-CATALYST_FLAGS=""
-rm -f $LOG
-for i in $(seq 1 $TIMES); do
-    echo "LOG file: " $LOG
-    echo "Wide search: " $i
-    do_a_run
-done
+function  counter_tests() {
+    LOG=log_counter_search.txt
+    CATALYST_FLAGS=""
+    rm -f $LOG
+    for i in $(seq 1 $TIMES); do
+        echo "LOG file: " $LOG
+        echo "Wide search: " $i
+        do_a_run
+    done
+}
 
-echo BOGI
+
+#PROG=wait_random_busy/wrb_script
+#PROG=wait_forever_99/wforever_script
+PROG=cat_exp/pmpl_script
+TIMES=100
+
+wide_tests
+
+parallel_tests
+
+counter_tests
 
 exit -1
