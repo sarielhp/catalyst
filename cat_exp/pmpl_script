@@ -1,6 +1,7 @@
 #! /bin/bash
 
 PPLMP=/home/sariel/prog/25/pmpl/build/ppl_mp
+# PPLMP=/home/stav/mptools/src/pmpl
 
 # $1: Work directory
 # $2: Name of success file
