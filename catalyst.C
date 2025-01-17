@@ -762,7 +762,7 @@ void   SManager::main_loop()
         int  curr_time = (int)( time( NULL ) - start_time );
         printf( "Current time: %d\n", curr_time );
         fflush( stdout );
-        
+
         if  ( ( time_out > 0 )  &&  ( curr_time > time_out ) ) {
             printf( "\n\n\n" "Timeout exceeded! Exiting... \n\n\n" );
             break;
