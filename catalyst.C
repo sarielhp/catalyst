@@ -13,6 +13,7 @@
 #include  <spawn.h>
 #include  <sys/wait.h>
 #include  <limits.h>
+#include  <argp.h>
 
 #include  <time.h>
 #include  <stdarg.h>
@@ -29,12 +30,27 @@
 #include  <deque>
 #include  <filesystem>
 
+/////////////////////////////////////////////////////////////
 using namespace std;
 
 #define  STATUS_RUNNING 73
 #define  STATUS_DONE    74
 #define  STATUS_PAUSED  75
 
+
+
+///////////////////////////////////////////////////////////////
+
+void  append_slash( char  * buf )
+{
+    int  len = strlen( buf );
+    if  ( ( len == 0 )  ||  ( buf[ len - 1 ] != '/' ) )
+        strcat( buf, "/" );
+}
+
+
+
+////////////////////////////////////////////////////////////////
 
 static bool  global_f_verbose = true;
 
@@ -223,10 +239,8 @@ public:
     {
         if  ( f_done  ||  f_success )
             return  true;
-        if  ( duration()  >= time_limit ) {
-            //printf( "EXPIRED!\n" );
+        if  ( duration()  >= time_limit )
             return  true;
-        }
 
         if  ( process_status() ==  STATUS_DONE ) {
             f_done = true;
@@ -297,9 +311,10 @@ private:
     string  prog, work_dir;
     bool   f_success_found;
     int  counter_tasks_created;
-    bool  f_done;
+    bool  f_done, f_verbose;
     string  success_file;
     AbstractSequence  * seq_gen;
+    int  time_out;
 
     int  time_counter;
 
@@ -320,6 +335,8 @@ private:
     int  g_timer;
 
 public:
+    void  set_verbose( bool  _flag ) { f_verbose = _flag; }
+    void  set_timeout( int  t ) { time_out = t; }
     void  set_success_file( string s ) { success_file = s; }
     bool  is_found_success() {
         return  f_success_found;
@@ -349,11 +366,12 @@ public:
         success_fn = NULL;
         f_done = false;
         counter_tasks_created = 0;
-        f_success_found = false;
+        f_verbose = f_success_found = false;
         max_jobs_number = 1;
         f_scheduler_stop = false;
         seq_gen = NULL;
         g_timer = 0;
+        time_out = -1;
     }
 
     const char   * get_mode_str();
@@ -382,6 +400,8 @@ public:
     void  spawn_single_task();
     void  spawn_tasks();
     void  check_for_done_tasks();
+
+    void  prepare_to_run();
     void  main_loop();
 
     void  suspend_process( int  ind );
@@ -433,13 +453,6 @@ void  send_signal( pid_t  cpid, int sig, const char  * sig_str )
 {
     char  buff[ 1024 ];
 
-    //killpg( cpid, sig );
-
-    //    sprintf( buff, "/bin/kill -s %s -- -%d", sig_str, cpid );
-    //printf( "XXX : %s\n", buff);
-    //system( buff );
-    //sprintf( buff, "pkill -%s -G %d", sig_str, cpid );
-    //system( buff );
 
     sprintf( buff, "pkill -%s -P %d", sig_str, cpid );
     system( buff );
@@ -551,7 +564,7 @@ void   SManager::kill_all_tasks()
         //send_signal( cpid, SIGKILL, "SIGTERM" );
 
         // trap "echo received sigterm" SIGTERM
-        
+
         //kill_process( p_task->get_child_pid() );
         suspended_tasks.erase( suspended_tasks.begin() + jnd );
 
@@ -630,7 +643,6 @@ void  SManager::spawn_single_task()
         tsk->set_id( counter_tasks_created );
         tsk->set_time_limit( 1 );
         tsk->set_time_delta( (int)seq_gen->next() );
-        //printf( "XXXX\n" ); fflush( stdout );
         tsk->compute_next_wakeup();
         //printf( "ZZZZ\n" ); fflush( stdout );
     } else
@@ -716,23 +728,56 @@ const char   * SManager::get_mode_str()
 }
 
 
+void  SManager::prepare_to_run()
+{
+    char  out_success_fn[ 1024 ];
+
+    std::filesystem::remove_all( work_dir.c_str() );
+    mkdir( work_dir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH );
+
+    char  * rpath = realpath( work_dir.c_str(), out_success_fn );
+    assert( rpath != NULL );
+    append_slash( out_success_fn );
+
+    set_work_dir( out_success_fn );
+
+    strcat( out_success_fn, "success.txt" );
+
+    set_success_file( out_success_fn );
+}
+
+
+
 void   SManager::main_loop()
 {
     printf( "MODE               : %s\n", get_mode_str() );
     printf( "# of parallel jobs : %d\n", max_jobs_number );
+    printf( "-----------------------------------------------------------\n\n" );
+    fflush( stdout );
 
+    time_t  start_time = time( NULL );
+
+    //int  time_diff = 0;
     do {
-        printf( "Active: %4d   suspended: %4d   SIM TIME: %6d\n",
-                (int)active_tasks.size(),
-                (int)suspended_tasks.size(),
-                time_counter );
+        int  curr_time = (int)( time( NULL ) - start_time );
+        printf( "Current time: %d\n", curr_time );
+        fflush( stdout );
 
-        //printf( "ML Looping...\n" );
+        if  ( ( time_out > 0 )  &&  ( curr_time > time_out ) ) {
+            printf( "\n\n\n" "Timeout exceeded! Exiting... \n\n\n" );
+            break;
+        }
+
+        if  ( f_verbose )
+            printf( "Active: %4d   suspended: %4d   SIM TIME: %6d\n",
+                    (int)active_tasks.size(),
+                    (int)suspended_tasks.size(),
+                    time_counter );
+
         check_for_done_tasks();
-        //printf( "A Looping...\n" );
         if  ( is_found_success() )
             break;
-        //printf( "ML B Looping...\n" );
+
         handle_expired_tasks();
         if  ( is_found_success() )
             break;
@@ -831,6 +876,8 @@ void  Task::launch()
     }
 }
 
+////////////////////////////////////////////////////////////////////
+
 
 void  usage()
 {
@@ -840,26 +887,155 @@ void  usage()
     exit( -1 );
 }
 
-void  append_slash( char  * buf )
+
+
+
+
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+/// Argument handling...
+
+/* Program documentation. */
+static char doc[] =
+  "\n" "catalyst [Options]   PROG   WORKDIR";
+
+/* A description of the arguments we accept. */
+static char args_doc[] = "PROG   WORK-DIR";
+
+const char *argp_program_version =
+  "catalyst 0.3";
+const char *argp_program_bug_address =
+  "<sariel@illinois.edu>";
+
+
+/* The options we understand. */
+static struct argp_option options[] = {
+    {"wide",     'a', 0,      0,  "Wide search" },
+    {"parallel", 'p', 0,      0,  "Parallel search" },
+    {"verbose",  'v', 0,      0,  "Verbose" },
+    {"boring",   'b', 0,      0,  "Boring: Runs a single thread "
+                                  "no fancy nonsense." },
+    {"timeout",  't', "Seconds", OPTION_ARG_OPTIONAL,
+      "Timeout on running time of program"},
+  { 0 }
+};
+
+
+/* Used by main to communicate with parse_opt. */
+struct ArgsInfo
 {
-    int  len = strlen( buf );
-    if  ( ( len == 0 )  ||  ( buf[ len - 1 ] != '/' ) )
-        strcat( buf, "/" );
+    bool  f_wide_search, f_verbose, f_boring;
+    bool  f_parallel_search;
+    int   time_out;
+    const char *program;
+    const char *work_dir;
+    unsigned int  num_threads;
+
+    void init() {
+        /* Default values. */
+        f_wide_search = false;
+        f_boring = f_verbose = f_parallel_search = false;
+        time_out = -1;
+        program = "";
+        work_dir = "";
+        num_threads = std::thread::hardware_concurrency();
+    }
+};
+
+
+
+/* Parse a single option. */
+static error_t    parse_opt (int key, char *arg, struct argp_state *state)
+{
+    /* Get the input argument from argp_parse, which we
+       know is a pointer to our arguments structure. */
+    ArgsInfo    * p_info = (ArgsInfo *)state->input;
+
+  assert( p_info != NULL );
+
+  ArgsInfo  & info( *p_info );
+
+  switch (key) {
+  case 'a':
+      info.f_wide_search = true;
+      break;
+
+  case 'v':
+      info.f_verbose = true;
+      break;
+
+  case 'b':
+      info.f_boring = true;
+      break;
+
+  case 'p':
+      info.f_parallel_search = true;
+      break;
+
+  case  't' :
+      info.time_out = arg ? atoi(arg) : 100000;
+      if   ( info.time_out < 1 ) {
+          printf( "\n\n" "Error: Timeout has to be larger than 0!\n" );
+          exit( -1 );
+      }
+      break;
+
+  case ARGP_KEY_NO_ARGS:
+      argp_usage (state);
+
+
+  case ARGP_KEY_ARG:
+      if (state->arg_num >= 2)
+        /* Too many arguments. */
+        argp_usage (state);
+
+      if  ( state->arg_num == 0 )
+          info.program  = arg;
+      if  ( state->arg_num == 1 )
+          info.work_dir  = arg;
+      break;
+
+  case ARGP_KEY_END:
+      if (state->arg_num < 2)
+          /* Not enough arguments. */
+          argp_usage (state);
+      break;
+
+  default:
+      return ARGP_ERR_UNKNOWN;
+  }
+
+  if  ( info.f_wide_search  &&   info.f_parallel_search ) {
+      printf( "\n\n" "Not allowed to do both parallel search and wide search!!!\n" );
+      argp_usage (state);
+  }
+
+  return 0;
+}
+
+/* Our argp parser. */
+static struct argp argp = { options, parse_opt, args_doc, doc };
+
+
+void   parse_command_line( ArgsInfo  & info, int  argc, char  ** argv )
+{
+    /* Parse our arguments; every option seen by parse_opt will
+       be reflected in arguments. */
+    argp_parse (&argp, argc, argv, 0, 0, &info);
 }
 
 
+
+////////////////////////////////////////////////////////////////////
+
 int  main(int   argc, char*   argv[])
 {
-    //printf( "time: %ld\n", time( NULL ) );
-    if  ( argc == 0 )
-        usage();
+    ArgsInfo  opt;
 
-    SequenceCounter  cnt;
-    /*
-      for  ( int  i = 0; i <= 10; i++ ) {
-      printf( "%d\n", cnt.next() );
-      }
-    */
+    opt.init();
+
+    parse_command_line( opt, argc, argv );
+
 
     // Just terminate child processes when they are done, don't let
     // them become zombies...
@@ -873,6 +1049,7 @@ int  main(int   argc, char*   argv[])
     SManagerPtr p_manager = new SManager();
     assert( p_manager != NULL );
 
+    /*
     if  ( argc == 4 ) {
         bool  f_parallel = ( strcasecmp( argv[ 1 ], "-p" ) == 0 );
         bool  f_wide = ( strcasecmp( argv[ 1 ], "-a" ) == 0 );
@@ -898,48 +1075,39 @@ int  main(int   argc, char*   argv[])
         p_manager->set_work_dir( argv[ 2 ] );
         printf( "WORK DIR: %s\n", argv[ 2 ] );
         p_manager->set_seq_generator( new  SequenceCounter() );
+        }*/
+
+    p_manager->set_threads_num( opt.num_threads );
+    p_manager->set_program( opt.program );
+    p_manager->set_work_dir( opt.work_dir );
+
+    if   ( opt.f_boring ) {
+        p_manager->set_wide_search( false );
+        p_manager->set_parallel_search( true );
+        p_manager->set_threads_num( 1 );
     }
 
-    unsigned int numThreads = std::thread::hardware_concurrency();
-    p_manager->set_threads_num(  numThreads );
-    //p_manager->set_threads_num(  1 );
+    if  ( opt.f_wide_search ) {
+        p_manager->set_wide_search( true );
+        p_manager->set_seq_generator( new  SequencePlusOne() );
+    } else if  ( opt.f_parallel_search ) {
+        p_manager->set_parallel_search( true );
+        p_manager->set_seq_generator( new  SequenceMaxInt() );
+    } else {
+        p_manager->set_seq_generator( new  SequenceCounter() );
+    }
+    p_manager->set_verbose( opt.f_verbose );
 
-    char  buf[ 1024 ];
-    char  out_success_fn[ 1024 ];
+    p_manager->prepare_to_run();
 
-    strcpy( buf, p_manager->get_work_dir().c_str() );
+    printf( "Work directory     : %s\n", p_manager->get_work_dir().c_str() );
+    printf( "Success file       : %s\n", p_manager->get_success_file_name() );
 
-    //printf( "BUFY: %s\n", buf );
-
-
-    std::filesystem::remove_all( buf );
-
-    mkdir( buf, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH );
-
-    ///printf( "BUFX: %s\n", buf );
-
-    char  work_dir[ 1024 ];
-
-    char  * rpath = realpath( buf, out_success_fn );
-    assert( rpath != NULL );
-    append_slash( out_success_fn );
-    strcpy( work_dir, out_success_fn );
-
-    p_manager->set_work_dir( work_dir );
-
-    strcat( out_success_fn, "success.txt" );
-
-
-    printf( "Work directory : %s\n", work_dir );
-    printf( "Success file   : %s\n", out_success_fn );
-
-    p_manager->set_success_file( out_success_fn );
-
-    //    printf( "bogi B\n" );
+    p_manager->set_timeout( opt.time_out );
 
     p_manager->main_loop();
 
-    printf( "Everything is done???\n" );
+    ///printf( "Everything is done???\n" );
 
     return  0;
 }
