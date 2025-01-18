@@ -17,7 +17,7 @@ def replace_placeholders(content):
     content = content.replace("@@start@@", generate_numbers_from_ranges(start_ranges))
     content = content.replace("@@goal@@", generate_numbers_from_ranges(goal_ranges))
 
-    passage_sidelength = 1.8
+    passage_sidelength = 1.4
 
     content = content.replace("@@passage_sidelength@@", str(passage_sidelength))
 
