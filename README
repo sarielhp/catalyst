@@ -62,3 +62,9 @@ Catalyst should compile on any posix compliant system - currently
 tested only on linux.
 
 ================================================================
+Compilation
+-----------
+
+You might need to install procps:
+
+    apt-get install libproc2-dev
