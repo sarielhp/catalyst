@@ -1,0 +1,62 @@
+#! /bin/bash
+
+PPLMP=/home/sariel/prog/25/pmpl/build/ppl_mp
+# PPLMP=/home/stav/mptools/src/pmpl
+
+# $1: Work directory
+# $2: Name of success file
+
+if  (( $# != 2 )); then
+    printf "\n\npmpl_script [work_directory] [success_file]\n\n\n"
+    exit -1
+fi
+
+#BDIR=/home/sariel/prog/25/catalyst/cat_exp
+BDIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+
+mkdir $1 >& /dev/null
+
+# Copy all the files to the new work directory...
+
+cp $BDIR/CatExperimentTemplate.xml $1/
+if  [[ -e $1/env/ ]]; then
+    rm -r -f $1/env/
+fi
+mkdir  $1/env/ >& /dev/null
+cp -r $BDIR/env/* $1/env
+
+#exit -1
+
+TRG=$(realpath $1/env/)
+FL=$1/CatExperimentTemplate.xml
+
+sed s,@@path_to_env@@,$TRG, -i $FL
+echo cmd:$*
+
+#########################################3
+# Go into work directory
+
+cd $1
+
+echo "----------------------------------------------"
+pwd
+echo "----------------------------------------------"
+
+#trap "echo received sigterm" SIGTERM
+
+python3 $BDIR/prepare_pmpl_run.py
+
+$PPLMP -f CatExperiment.xml
+
+
+# Check if run was successful
+# In this case - a file with .stat exists in the directory...
+L=$(find . | grep -i  .stat | wc -l)
+if  (( $L > 0 )); then
+    # Create & write into the success file...
+    echo "=================================================================="
+    echo  $* > $2
+else
+    echo "Nope"
+fi
