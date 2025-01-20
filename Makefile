@@ -36,4 +36,4 @@ git_push: clean
 
 
 catalyst: catalyst.C
-	g++ -std=c++17 -Wall -o catalyst catalyst.C
+	g++ -std=c++17  -Wall -o catalyst catalyst.C -lproc2
