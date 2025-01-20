@@ -1,7 +1,10 @@
 #! /bin/bash
 
-PPLMP=/home/sariel/prog/25/pmpl/build/ppl_mp
-# PPLMP=/home/stav/mptools/src/pmpl
+if  [[ "$USER" -eq "sariel" ]]; then
+    PPLMP=/home/sariel/prog/25/pmpl/build/ppl_mp
+else
+    PPLMP=/home/stav/mptools/src/pmpl
+fi
 
 # $1: Work directory
 # $2: Name of success file
