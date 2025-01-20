@@ -72,7 +72,7 @@ function  random_tests() {
     for i in  $(seq 1 $TIMES); do
         printf "\n\n\n\n==================================================\n" 
         echo "LOG file: " $LOG
-        echo "Wide search # : " $i
+        echo "Random search # : " $i
         do_a_run
     done
 }
