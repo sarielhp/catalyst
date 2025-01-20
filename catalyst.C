@@ -20,8 +20,8 @@
 #include  <signal.h>
 
 
-#include <sys/types.h>
-#include <sys/stat.h>
+#include  <sys/types.h>
+#include  <sys/stat.h>
 
 #include  <algorithm>
 #include  <thread>
@@ -29,6 +29,8 @@
 #include  <vector>
 #include  <deque>
 #include  <filesystem>
+#include  <random>
+#include  <chrono>
 
 /////////////////////////////////////////////////////////////
 using namespace std;
@@ -166,6 +168,40 @@ public:
     virtual  int  next()
     {
         return  INT_MAX;
+    }
+};
+
+
+
+class   SequenceRandom : public AbstractSequence
+{
+private:
+    std::random_device rd; // Hardware-based random number generator
+    std::uniform_int_distribution<int> distribution;
+    std::mt19937 generator;
+
+    int   coin_flip() {
+        if  ( distribution(generator) >= 51 )
+            return  1;
+        else
+            return  0;
+    }
+
+public:
+    SequenceRandom()
+    {
+        generator = std::mt19937(rd()); // Mersenne Twister engine seeded with rd()
+        distribution  =  std::uniform_int_distribution<int>(1, 100); // Define the range
+    }
+
+    virtual  int  next()
+    {
+        int  num = 1;
+
+        while  ( coin_flip() )
+            num = (num << 1) + coin_flip();
+
+        return  num;
     }
 };
 
@@ -319,8 +355,7 @@ private:
     int  time_counter;
 
     /// Wide search implementation
-    bool  f_wide_search;
-    bool  f_parallel_search;
+    bool  f_wide_search, f_parallel_search, f_random_search;
 
     int   max_jobs_number;
     bool  f_scheduler_stop;
@@ -346,6 +381,7 @@ public:
     }
 
     void  set_wide_search( bool  flag ) { f_wide_search = flag; }
+    void  set_random_search( bool  flag ) { f_random_search = flag; }
     void  set_parallel_search( bool  flag ) { f_parallel_search = flag; }
 
 
@@ -362,7 +398,7 @@ public:
     SManager()
     {
         time_counter = 0;
-        f_parallel_search = f_wide_search = false;
+        f_random_search = f_parallel_search = f_wide_search = false;
         success_fn = NULL;
         f_done = false;
         counter_tasks_created = 0;
@@ -645,8 +681,11 @@ void  SManager::spawn_single_task()
         tsk->set_time_delta( (int)seq_gen->next() );
         tsk->compute_next_wakeup();
         //printf( "ZZZZ\n" ); fflush( stdout );
-    } else
-        tsk->set_time_limit( (int)seq_gen->next() );
+    } else {
+        int limit = (int)seq_gen->next();
+        printf( "LIMIT: %d\n", limit );
+        tsk->set_time_limit( limit );
+    }
     tsk->set_manager( this );
 
     char buf[1024];
@@ -723,8 +762,10 @@ const char   * SManager::get_mode_str()
         return "Wide search";
     if  ( f_parallel_search )
         return "Parallel search";
+    if  ( f_random_search )
+        return "Random search";
 
-    return   "Parallel Counter";
+    return   "Counter search";
 }
 
 
@@ -903,7 +944,7 @@ static char doc[] =
 static char args_doc[] = "PROG   WORK-DIR";
 
 const char *argp_program_version =
-  "catalyst 0.3";
+  "catalyst 0.4";
 const char *argp_program_bug_address =
   "<sariel@illinois.edu>";
 
@@ -915,6 +956,7 @@ static struct argp_option options[] = {
     {"verbose",  'v', 0,      0,  "Verbose" },
     {"boring",   'b', 0,      0,  "Boring: Runs a single thread "
                                   "no fancy nonsense." },
+    {"random",   'r', 0,      0,  "Random search" },
     {"timeout",  't', "Seconds", OPTION_ARG_OPTIONAL,
       "Timeout on running time of program"},
   { 0 }
@@ -924,7 +966,7 @@ static struct argp_option options[] = {
 /* Used by main to communicate with parse_opt. */
 struct ArgsInfo
 {
-    bool  f_wide_search, f_verbose, f_boring;
+    bool  f_wide_search, f_verbose, f_boring, f_random_search;
     bool  f_parallel_search;
     int   time_out;
     const char *program;
@@ -933,7 +975,7 @@ struct ArgsInfo
 
     void init() {
         /* Default values. */
-        f_wide_search = false;
+        f_random_search = f_wide_search = false;
         f_boring = f_verbose = f_parallel_search = false;
         time_out = -1;
         program = "";
@@ -958,6 +1000,10 @@ static error_t    parse_opt (int key, char *arg, struct argp_state *state)
   switch (key) {
   case 'a':
       info.f_wide_search = true;
+      break;
+
+  case 'r':
+      info.f_random_search = true;
       break;
 
   case 'v':
@@ -1036,7 +1082,6 @@ int  main(int   argc, char*   argv[])
 
     parse_command_line( opt, argc, argv );
 
-
     // Just terminate child processes when they are done, don't let
     // them become zombies...
     struct sigaction arg;
@@ -1048,34 +1093,6 @@ int  main(int   argc, char*   argv[])
     //SequenceCounter   seq_gen;
     SManagerPtr p_manager = new SManager();
     assert( p_manager != NULL );
-
-    /*
-    if  ( argc == 4 ) {
-        bool  f_parallel = ( strcasecmp( argv[ 1 ], "-p" ) == 0 );
-        bool  f_wide = ( strcasecmp( argv[ 1 ], "-a" ) == 0 );
-        if  ( (!f_parallel)  &&  ( ! f_wide ) )
-            usage();
-
-
-        p_manager->set_program( argv[ 2 ] );
-        p_manager->set_work_dir( argv[ 3 ] );
-        //printf( "WORK DIR: %s\n", argv[ 3 ] );
-        if  ( f_wide ) {
-            p_manager->set_wide_search( true );
-            p_manager->set_seq_generator( new  SequencePlusOne() );
-        }
-        if  ( f_parallel ) {
-            p_manager->set_parallel_search( true );
-            p_manager->set_seq_generator( new  SequenceMaxInt() );
-        }
-    } else {
-        if  ( argc != 3 )
-            usage();
-        p_manager->set_program( argv[ 1 ] );
-        p_manager->set_work_dir( argv[ 2 ] );
-        printf( "WORK DIR: %s\n", argv[ 2 ] );
-        p_manager->set_seq_generator( new  SequenceCounter() );
-        }*/
 
     p_manager->set_threads_num( opt.num_threads );
     p_manager->set_program( opt.program );
@@ -1093,6 +1110,8 @@ int  main(int   argc, char*   argv[])
     } else if  ( opt.f_parallel_search ) {
         p_manager->set_parallel_search( true );
         p_manager->set_seq_generator( new  SequenceMaxInt() );
+    } else if  ( opt.f_random_search ) {
+        p_manager->set_seq_generator( new  SequenceRandom() );    
     } else {
         p_manager->set_seq_generator( new  SequenceCounter() );
     }

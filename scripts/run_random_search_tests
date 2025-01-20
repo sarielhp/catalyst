@@ -1,0 +1,129 @@
+#! /bin/bash
+
+
+function  count_lines() {
+    X=$(wc -l $1)
+    Y=${X% *}
+    echo $Y
+}
+
+function  f_kill_grep() {
+    TDIR=/tmp/sariel/kill_grep
+    mkdir -p $TDIR >& /dev/null
+    TFL=$TDIR/kill_grep.txt
+
+    ps auxw | grep $1 | grep -v kill_grep | grep -v grep > $TFL
+    L=$(count_lines $TFL)
+    if  (( $L > 0 )); then
+        cat $TFL |  gi -v kill_grep
+        echo "ESCAPED PROCESSES: " $L
+        kill -9 `cat $TFL | awk '{print $2}'` >& /dev/null
+    fi
+    #echo "NO ESCAPED PROCESSES"
+}
+
+
+
+
+function  do_a_run() {
+    echo ""
+    echo ""
+    echo ""
+    echo "----------------------------------------------------------------"
+    date
+    echo "Running (might take a while)..."
+    #rm -r -f work >& /dev/null
+    #mkdir work
+
+    START=$(date +%s)
+
+    echo ./catalyst $CATALYST_FLAGS $PROG work/
+
+    ./catalyst $CATALYST_FLAGS $PROG work/ >> $LOG
+
+    END=$(date +%s)
+
+    DIFF=$(( $END - $START ))
+
+    #sleep 1
+    f_kill_grep wait #
+    f_kill_grep $PROG #
+    f_kill_grep ppl_mp
+
+    echo RUNTIME: $DIFF
+    echo "" >> $LOG
+    echo "---------------------------------------------------" >> $LOG
+    echo RUNTIME: $DIFF >> $LOG
+    echo "" >> $LOG
+    echo "" >> $LOG
+    echo "" >> $LOG
+}
+
+############################################################
+
+
+############################################################
+
+function  wide_tests() {
+    LOG=log_wide_search.txt
+    CATALYST_FLAGS="-a"
+    rm -f $LOG
+    for i in  $(seq 1 $TIMES); do
+        echo "LOG file: " $LOG
+        echo "Wide search # : " $i
+        do_a_run
+    done
+}
+
+
+function  random_tests() {
+    LOG=log_random_search.txt
+    CATALYST_FLAGS="-r"
+    rm -f $LOG
+    for i in  $(seq 1 $TIMES); do
+        echo "LOG file: " $LOG
+        echo "Wide search # : " $i
+        do_a_run
+    done
+}
+
+function  parallel_tests() {
+    ################################################################
+    LOG=log_parallel_search.txt
+    CATALYST_FLAGS="-p"
+    rm -f $LOG
+    for i in $(seq 1 $TIMES); do
+        echo "LOG file: " $LOG
+        echo "Parallel search # : " $i
+        do_a_run
+    done
+}
+
+# parallel_tests()
+
+
+################################################################
+function  counter_tests() {
+    LOG=log_counter_search.txt
+    CATALYST_FLAGS=""
+    rm -f $LOG
+    for i in $(seq 1 $TIMES); do
+        echo "LOG file: " $LOG
+        echo "Counter search #: " $i
+        do_a_run
+    done
+}
+
+
+#PROG=wait_random_busy/wrb_script
+#PROG=wait_forever_99/wforever_script
+PROG=cat_exp/pmpl_script
+TIMES=100
+
+#wide_tests
+
+#counter_tests
+
+random_tests
+
+exit -1
