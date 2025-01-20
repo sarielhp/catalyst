@@ -30,13 +30,15 @@ function  simulations_1_8()
 
     plot_it( [sort(counter_search), sort( wide_search ), sort( parallel_search ) ],
              ["Counter search" "Wide search" "Parallel search" ],
-             ODIR*"simulations.pdf" );
+             ODIR*"1_8.pdf" );
 
     q = histogram( [ sort(counter_search) sort(wide_search) sort(parallel_search)],
                     labels=["Counter search" "wide search" "parallel search"],
                     yaxis = ("Runs"),
                     xaxis=("Running times in seconds") );
-    savefig( q, "out/1_8_results.pdf" );
+    out_name = "out/1_8_histo.pdf";
+    savefig( q, out_name  );
+    println( "Created: ", out_name );
 end
 
 function  (@main)( ARGS )

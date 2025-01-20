@@ -105,8 +105,8 @@ TIMES=100
 
 wide_tests
 
-parallel_tests
-
 counter_tests
+
+parallel_tests
 
 exit -1
