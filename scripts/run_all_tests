@@ -57,10 +57,16 @@ function  do_a_run() {
 ############################################################
 
 
+function datestr() {
+    echo  `date +%m_%d_%y__%H_%M_%S`
+}
+
+
 ############################################################
 
 function  random_tests() {
-    LOG=log_random_search.txt
+    LOG=logs/$(datestr)_random_search.txt
+    #echo $LOG
     CATALYST_FLAGS="-r"
     rm -f $LOG
     for i in  $(seq 1 $TIMES); do
@@ -72,7 +78,7 @@ function  random_tests() {
 }
 
 function  wide_tests() {
-    LOG=log_wide_search.txt
+    LOG=logs/$(datestr)_wide_search.txt
     CATALYST_FLAGS="-a"
     rm -f $LOG
     for i in  $(seq 1 $TIMES); do
@@ -84,7 +90,7 @@ function  wide_tests() {
 
 function  parallel_tests() {
     ################################################################
-    LOG=log_parallel_search.txt
+    LOG=logs/$(datestr)_parallel_search.txt
     CATALYST_FLAGS="-p"
     rm -f $LOG
     for i in $(seq 1 $TIMES); do
@@ -99,7 +105,7 @@ function  parallel_tests() {
 
 ################################################################
 function  counter_tests() {
-    LOG=log_counter_search.txt
+    LOG=logs/$(datestr)_counter_search.txt
     CATALYST_FLAGS=""
     rm -f $LOG
     for i in $(seq 1 $TIMES); do
@@ -116,10 +122,9 @@ function  counter_tests() {
 PROG=cat_maze/pmpl_script
 TIMES=100 
 
-wide_tests
 
-counter_tests
 random_tests
+counter_tests
 wide_tests
 parallel_tests
 
