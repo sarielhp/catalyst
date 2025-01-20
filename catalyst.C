@@ -20,6 +20,7 @@
 #include  <signal.h>
 
 
+#include <libproc2/misc.h>
 #include  <sys/types.h>
 #include  <sys/stat.h>
 
@@ -31,6 +32,8 @@
 #include  <filesystem>
 #include  <random>
 #include  <chrono>
+
+#include <libproc2/pids.h>
 
 /////////////////////////////////////////////////////////////
 using namespace std;
@@ -456,6 +459,134 @@ void  SManager::check_for_success()
         f_success_found = true;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Copied shameless from ps source code...
+
+#define PIDSITEMS  70
+#define proc_t  struct pids_stack
+
+struct pids_info *Pids_info = NULL;   // our required <pids> context
+enum pids_item *Pids_items;           // allocated as PIDSITEMS
+int Pids_index;                       // actual number of active enums
+long Hertz;
+
+void procps_init(void)
+{
+    Hertz = procps_hertz_get();
+    proc_t *p;
+    // --- <pids> interface --------------------------------------------------
+    if (!Pids_items) {
+        Pids_items = (pids_item *)calloc(PIDSITEMS, sizeof(enum pids_item));
+        assert( Pids_items != NULL );
+    }
+
+    int  i;
+
+    for (int  i = 0; i < PIDSITEMS; i++)
+        Pids_items[i] = PIDS_noop;
+
+    i = PIDSITEMS;
+    if (!Pids_info) {
+        if (procps_pids_new(&Pids_info, Pids_items, i)) {
+            fprintf(stderr, "fatal library error, context\n");
+            exit( -1 );
+        }
+    }
+
+    Pids_items[0] = PIDS_TTY;
+    procps_pids_reset(Pids_info, Pids_items, 1);
+    if (!(p = fatal_proc_unmounted(Pids_info, 1))) {
+        fprintf(stderr, "fatal library error, lookup self\n");
+        exit( -1 );
+    }
+    // --- <pids> interface --------------------------------------------------
+}
+
+/* a 'results stack value' extractor macro
+   where: E=rel enum, T=data type, S=stack */
+#define rSv(E,T,S) PIDS_VAL(rel_ ## E, T, S, Pids_info)
+
+#define namREL(e) rel_ ## e
+//#define makEXT(e) extern int namREL(e);
+#define makREL(e) int namREL(e) = -1;
+#define chkREL(e) if (namREL(e) < 0) { \
+      Pids_items[Pids_index] = PIDS_ ## e; \
+      namREL(e) = (Pids_index < PIDSITEMS) ? Pids_index++ : rel_noop; }
+
+#define makEXT(e)  int namREL(e);
+
+makEXT(TIME_ALL)
+makEXT(noop)
+makEXT(TICS_ALL)
+makEXT(TICS_ALL_C)
+//makEXT(TICS_ALL)
+//makEXT2(TICS_ALL_C)
+
+
+#define setREL1(e) { \
+  if (!outbuf) { \
+    chkREL(e) \
+    return 0; \
+  } }
+#define setREL2(e1,e2) { \
+  if (!outbuf) { \
+    chkREL(e1) chkREL(e2) \
+    return 0; \
+  } }
+
+
+#define  STRLEN  1024
+
+/* cumulative CPU time in seconds (not same as "etimes") */
+int pr_times( char * outbuf,
+                     proc_t * pp){
+    //unsigned long long t;
+    //unsigned long t;
+    //setREL1(TIME_ALL)
+    //   t = rSv(TIME_ALL, real, pp);
+
+    unsigned long long tx;
+    unsigned ux;
+    setREL2(TICS_ALL,TICS_ALL_C)
+        //        tx = rSv(TICS_ALL_C, ull_int, pp);
+        tx = rSv(TICS_ALL_C, ull_int, pp);
+
+    printf( "TX: %llu\n", tx );
+    ux = tx / Hertz;
+
+    return snprintf(outbuf, STRLEN, "%3u:%02u", ux/60U, ux % 60U);
+    
+    //return snprintf(outbuf, STRLEN, "%lu", tx);
+}
+
+
+void  report_info( pid_t  pid )
+{
+    struct pids_fetch * pidread;
+    unsigned pidlist[10];
+    proc_t *buf;
+    enum pids_select_type which = PIDS_SELECT_PID;
+    
+    pidlist[ 0 ] = pid;
+    printf( "PID: %d\n", pid ); fflush( stdout );
+    pidread = procps_pids_select(Pids_info, pidlist, 1, which);
+    if (!pidread) {
+        fprintf(stderr, "fatal library error, reap\n" );
+        exit( -1 );
+    }
+
+    int  i;
+    for (i = 0; i < pidread->counts->total; i++) {
+        buf = pidread->stacks[i];
+        if(-1==(long)buf)
+            continue;
+        char  str[ STRLEN + 1 ];
+        pr_times( str, buf );
+        printf( "PROCPS TIME: %s\n", str );
+    }
+        
+
+}
 
 
 void  SManager::check_for_done_tasks()
@@ -463,6 +594,8 @@ void  SManager::check_for_done_tasks()
     check_for_success();
     for  ( int  ind  = active_tasks.size() - 1; ind >= 0; ind-- ) {
         Task  * p_task = active_tasks[ ind ];
+
+        report_info( p_task->get_child_pid() );
 
         if  ( p_task->is_done() ) {
             if ( p_task->is_successful() )
@@ -1094,6 +1227,8 @@ int  main(int   argc, char*   argv[])
     SManagerPtr p_manager = new SManager();
     assert( p_manager != NULL );
 
+    procps_init();
+
     p_manager->set_threads_num( opt.num_threads );
     p_manager->set_program( opt.program );
     p_manager->set_work_dir( opt.work_dir );
@@ -1111,7 +1246,7 @@ int  main(int   argc, char*   argv[])
         p_manager->set_parallel_search( true );
         p_manager->set_seq_generator( new  SequenceMaxInt() );
     } else if  ( opt.f_random_search ) {
-        p_manager->set_seq_generator( new  SequenceRandom() );    
+        p_manager->set_seq_generator( new  SequenceRandom() );
     } else {
         p_manager->set_seq_generator( new  SequenceCounter() );
     }
