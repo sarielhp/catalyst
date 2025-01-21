@@ -151,10 +151,10 @@ PROG=cat_maze/pmpl_script
 TIMES=100 
 
 
-boring_tests
+#boring_tests
 #random_tests
 #counter_tests
 #wide_tests
-#parallel_tests
+parallel_tests
 
 exit -1
