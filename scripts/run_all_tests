@@ -100,6 +100,30 @@ function  parallel_tests() {
     done
 }
 
+function  log_start() {
+    rm -f $LOG
+    echo "$LOG" > $LOG
+    echo "$PROG" >> $LOG
+    echo "$TIMES" >> $LOG
+    echo "FLAGS: $CATALYST_FLAGS" >> $LOG
+}
+
+function  main_loop() {
+    for i in $(seq 1 $TIMES); do
+        echo "LOG file: " $LOG
+        echo "Parallel search # : " $i
+        do_a_run
+    done
+}
+
+function  boring_tests() {
+    ################################################################
+    LOG=logs/$(datestr)_single_thread_boring_search.txt
+    CATALYST_FLAGS="-b"
+    log_start
+    main_loop
+}
+
 # parallel_tests()
 
 
@@ -123,9 +147,10 @@ PROG=cat_maze/pmpl_script
 TIMES=100 
 
 
-random_tests
-counter_tests
-wide_tests
-parallel_tests
+boring_tests
+#random_tests
+#counter_tests
+#wide_tests
+#parallel_tests
 
 exit -1
