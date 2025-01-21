@@ -1234,6 +1234,7 @@ int  main(int   argc, char*   argv[])
     p_manager->set_work_dir( opt.work_dir );
 
     if   ( opt.f_boring ) {
+        opt.f_parallel_search = true;
         p_manager->set_wide_search( false );
         p_manager->set_parallel_search( true );
         p_manager->set_threads_num( 1 );
