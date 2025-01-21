@@ -551,7 +551,7 @@ int pr_times( char * outbuf,
         //        tx = rSv(TICS_ALL_C, ull_int, pp);
         tx = rSv(TICS_ALL_C, ull_int, pp);
 
-    printf( "TX: %llu\n", tx );
+    //printf( "TX: %llu\n", tx );
     ux = tx / Hertz;
 
     return snprintf(outbuf, STRLEN, "%3u:%02u", ux/60U, ux % 60U);
@@ -568,7 +568,7 @@ void  report_info( pid_t  pid )
     enum pids_select_type which = PIDS_SELECT_PID;
     
     pidlist[ 0 ] = pid;
-    printf( "PID: %d\n", pid ); fflush( stdout );
+    //printf( "PID: %d\n", pid ); fflush( stdout );
     pidread = procps_pids_select(Pids_info, pidlist, 1, which);
     if (!pidread) {
         fprintf(stderr, "fatal library error, reap\n" );
@@ -582,7 +582,7 @@ void  report_info( pid_t  pid )
             continue;
         char  str[ STRLEN + 1 ];
         pr_times( str, buf );
-        printf( "PROCPS TIME: %s\n", str );
+        //printf( "PROCPS TIME: %s\n", str );
     }
         
 
