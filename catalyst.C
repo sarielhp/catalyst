@@ -454,7 +454,7 @@ public:
 
 void  SManager::check_for_success()
 {
-    printf( "SUCCESS?\n" ); fflush( stdout );
+    //printf( "SUCCESS?\n" ); fflush( stdout );
     //printf( "\n\n\n\n\nSUCC: %s\n", get_success_file_name() );
     if  ( is_file_exists( get_success_file_name() ) )
         f_success_found = true;
