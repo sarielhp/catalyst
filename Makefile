@@ -1,4 +1,4 @@
-SUBDIRS := wait10 wait_random wait_random_busy
+SUBDIRS := wait10 wait_random wait_random_busy wait_10_busy
 
 STR := $(shell datestrext)
 
