@@ -1230,11 +1230,13 @@ int  main(int   argc, char*   argv[])
 
     procps_init();
 
-    p_manager->set_threads_num( opt.num_threads );
+    //p_manager->set_threads_num( opt.num_threads );
+    p_manager->set_threads_num( opt.num_threads /2 );
     p_manager->set_program( opt.program );
     p_manager->set_work_dir( opt.work_dir );
 
     if   ( opt.f_boring ) {
+        opt.f_parallel_search = true;
         p_manager->set_wide_search( false );
         p_manager->set_parallel_search( true );
         p_manager->set_threads_num( 1 );
