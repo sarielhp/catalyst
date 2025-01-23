@@ -1231,7 +1231,8 @@ int  main(int   argc, char*   argv[])
     procps_init();
 
     //p_manager->set_threads_num( opt.num_threads );
-    p_manager->set_threads_num( (2 * opt.num_threads) / 3  );
+    //p_manager->set_threads_num( (2 * opt.num_threads) / 3  );
+    p_manager->set_threads_num( 13 );
     p_manager->set_program( opt.program );
     p_manager->set_work_dir( opt.work_dir );
 
