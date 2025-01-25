@@ -11,13 +11,14 @@ def replace_placeholders(content):
 
     content = content.replace("@@seed@@", str(generate_random_int(0, 9999999)))
 
-    start_ranges = [[0.0, 0.0], [0.0, 0.0], [10.0, 10.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]]
-    goal_ranges = [[-5.0, -5.0], [3.0, 3.0], [-25.0, -25.0], [0.0, 0.0], [4.0, 4.0], [0.0, 0.0]]
+    start_ranges = [[-5.0, -5.0], [3.0, 3.0], [-25.0, -25.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]]
+    goal_ranges = [[0.0, 0.0], [0.0, 0.0], [10.0, 10.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]]
+
 
     content = content.replace("@@start@@", generate_numbers_from_ranges(start_ranges))
     content = content.replace("@@goal@@", generate_numbers_from_ranges(goal_ranges))
 
-    stick_bug_size = 5.0
+    stick_bug_size = 2.0
 
     length_min = 0.0 * stick_bug_size
     length_max = 1.0 * stick_bug_size
