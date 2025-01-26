@@ -32,9 +32,9 @@ function  do_a_run() {
 
     START=$(date +%s)
 
-    echo ./catalyst $CATALYST_FLAGS $PROG work/
+    echo ./catalyst -s$SCALE $CATALYST_FLAGS $PROG work/
 
-    ./catalyst $CATALYST_FLAGS $PROG work/ >> $LOG
+    ./catalyst -s$SCALE $CATALYST_FLAGS $PROG work/ >> $LOG
 
     END=$(date +%s)
 
@@ -151,11 +151,13 @@ PROG=cat_bug/pmpl_script
 #PROG=cat_maze/pmpl_script
 TIMES=100 
 
+# Scale: Scale time by this factor
+SCALe=1000
 
 #boring_tests
 #random_tests
-#counter_tests
+counter_tests
 #wide_tests
-parallel_tests
+#parallel_tests
 
 exit -1
