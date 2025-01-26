@@ -153,7 +153,7 @@ PROG=cat_bug/pmpl_script
 TIMES=100 
 
 # Scale: Scale time by this factor
-SCALe=1000
+SCALE=1000
 
 #boring_tests
 #random_tests
