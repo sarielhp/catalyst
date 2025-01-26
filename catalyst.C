@@ -929,6 +929,7 @@ void   SManager::main_loop()
 {
     printf( "MODE               : %s\n", get_mode_str() );
     printf( "# of parallel jobs : %d\n", max_jobs_number );
+    printf( "Scale              : %d\n", scale );
     printf( "-----------------------------------------------------------\n\n" );
     fflush( stdout );
 
