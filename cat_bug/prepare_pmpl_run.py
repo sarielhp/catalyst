@@ -18,7 +18,7 @@ def replace_placeholders(content):
     content = content.replace("@@start@@", generate_numbers_from_ranges(start_ranges))
     content = content.replace("@@goal@@", generate_numbers_from_ranges(goal_ranges))
 
-    stick_bug_size = 2.0
+    stick_bug_size = 0.25
 
     length_min = 0.0 * stick_bug_size
     length_max = 1.0 * stick_bug_size
