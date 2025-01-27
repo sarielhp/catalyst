@@ -370,7 +370,7 @@ private:
     pthread_mutex_t   scheduler_awake_mutex;
     pthread_t  scheduler_thread;
     char * success_fn;
-    int  g_timer;
+    int  g_timer, scale;
 
 public:
     void  set_verbose( bool  _flag ) { f_verbose = _flag; }
@@ -410,6 +410,7 @@ public:
         f_scheduler_stop = false;
         seq_gen = NULL;
         g_timer = 0;
+        scale = 1;
         time_out = -1;
     }
 
@@ -422,6 +423,7 @@ public:
         f_success_found = f_val;
     }
 
+    void   set_scale( int  _scale ) { scale = _scale; }
     void   set_program( const char  * _prog ) { prog = _prog; }
     void   set_work_dir( const char  * _dir ) { work_dir = strdup( _dir ); }
     string   get_work_dir() { return  work_dir; }
@@ -811,12 +813,12 @@ void  SManager::spawn_single_task()
     // We run a process for one second if we are in the wide search mode...
     if  ( f_wide_search ) {
         tsk->set_id( counter_tasks_created );
-        tsk->set_time_limit( 1 );
+        tsk->set_time_limit( scale );
         tsk->set_time_delta( (int)seq_gen->next() );
         tsk->compute_next_wakeup();
         //printf( "ZZZZ\n" ); fflush( stdout );
     } else {
-        int limit = (int)seq_gen->next();
+        int limit = scale * (int)seq_gen->next();
         printf( "LIMIT: %d\n", limit );
         tsk->set_time_limit( limit );
     }
@@ -927,6 +929,7 @@ void   SManager::main_loop()
 {
     printf( "MODE               : %s\n", get_mode_str() );
     printf( "# of parallel jobs : %d\n", max_jobs_number );
+    printf( "Scale              : %d\n", scale );
     printf( "-----------------------------------------------------------\n\n" );
     fflush( stdout );
 
@@ -1093,6 +1096,8 @@ static struct argp_option options[] = {
     {"random",   'r', 0,      0,  "Random search" },
     {"timeout",  't', "Seconds", OPTION_ARG_OPTIONAL,
       "Timeout on running time of program"},
+    {"scale",  's', "Seconds", OPTION_ARG_OPTIONAL,
+      "Scale to use."},
   { 0 }
 };
 
@@ -1102,7 +1107,7 @@ struct ArgsInfo
 {
     bool  f_wide_search, f_verbose, f_boring, f_random_search;
     bool  f_parallel_search;
-    int   time_out;
+    int   time_out, scale;    
     const char *program;
     const char *work_dir;
     unsigned int  num_threads;
@@ -1114,6 +1119,7 @@ struct ArgsInfo
         time_out = -1;
         program = "";
         work_dir = "";
+        scale = 1;
         num_threads = std::thread::hardware_concurrency();
     }
 };
@@ -1156,6 +1162,14 @@ static error_t    parse_opt (int key, char *arg, struct argp_state *state)
       info.time_out = arg ? atoi(arg) : 100000;
       if   ( info.time_out < 1 ) {
           printf( "\n\n" "Error: Timeout has to be larger than 0!\n" );
+          exit( -1 );
+      }
+      break;
+
+  case  's' :
+      info.scale = arg ? atoi(arg) : 1;
+      if   ( info.scale < 1 ) {
+          printf( "\n\n" "Error: Scale has to be larger than 0!\n" );
           exit( -1 );
       }
       break;
@@ -1234,6 +1248,7 @@ int  main(int   argc, char*   argv[])
     //p_manager->set_threads_num( (2 * opt.num_threads) / 3  );
     p_manager->set_threads_num( 13 );
     p_manager->set_program( opt.program );
+    p_manager->set_scale( opt.scale );
     p_manager->set_work_dir( opt.work_dir );
 
     if   ( opt.f_boring ) {

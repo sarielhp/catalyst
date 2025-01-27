@@ -95,7 +95,7 @@
 
     <MPStrategies>
 
-      <BasicRRTStrategy label="RRT" debug="true"
+      <BasicRRTStrategy label="RRT" debug="false"
         querySampler="UniformRandomFree" samplerLabel="UniformRandom"
         nfLabel="Nearest" extenderLabel="BERO"
         growGoals="false" growthFocus="0.01" m="1"
