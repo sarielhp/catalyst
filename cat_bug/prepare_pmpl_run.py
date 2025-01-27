@@ -24,9 +24,13 @@ def replace_placeholders(content):
     length_max = 1.0 * stick_bug_size
     length_center = 0.5 * stick_bug_size
 
+    scale = 0.3
+
     content = content.replace("@@length_min@@", str(length_min))
     content = content.replace("@@length_max@@", str(length_max))
     content = content.replace("@@length_center@@", str(length_center))
+    content = content.replace("@@scale@@", str(scale))
+
 
     print("Stick bug size: ", stick_bug_size)
     return content
