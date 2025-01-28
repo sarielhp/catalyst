@@ -175,6 +175,24 @@ public:
 };
 
 
+class   SequenceRepeatVal : public AbstractSequence
+{
+private:
+    int val;
+    
+public:
+    SequenceRepeatVal( int  _val )
+    {
+        val = _val;
+    }
+
+    virtual  int  next()
+    {
+        return  val; //INT_MAX;
+    }
+};
+
+
 
 class   SequenceRandom : public AbstractSequence
 {
@@ -353,7 +371,7 @@ private:
     bool  f_done, f_verbose;
     string  success_file;
     AbstractSequence  * seq_gen;
-    int  time_out;
+    int  time_out, copy_time_out;
 
     int  time_counter;
 
@@ -375,6 +393,7 @@ private:
 public:
     void  set_verbose( bool  _flag ) { f_verbose = _flag; }
     void  set_timeout( int  t ) { time_out = t; }
+    void  set_copy_timeout( int  t ) { copy_time_out = t; }
     void  set_success_file( string s ) { success_file = s; }
     bool  is_found_success() {
         return  f_success_found;
@@ -412,6 +431,7 @@ public:
         g_timer = 0;
         scale = 1;
         time_out = -1;
+        copy_time_out = -1;
     }
 
     const char   * get_mode_str();
@@ -1094,8 +1114,10 @@ static struct argp_option options[] = {
     {"boring",   'b', 0,      0,  "Boring: Runs a single thread "
                                   "no fancy nonsense." },
     {"random",   'r', 0,      0,  "Random search" },
-    {"timeout",  't', "Seconds", OPTION_ARG_OPTIONAL,
+    {"gtimeout", 't', "Seconds", OPTION_ARG_OPTIONAL,
       "Timeout on running time of program"},
+    {"gtimeout", 'f', "Seconds", OPTION_ARG_OPTIONAL,
+      "Timeout on running time of a copy of alg."},
     {"scale",  's', "Seconds", OPTION_ARG_OPTIONAL,
       "Scale to use."},
   { 0 }
@@ -1107,7 +1129,7 @@ struct ArgsInfo
 {
     bool  f_wide_search, f_verbose, f_boring, f_random_search;
     bool  f_parallel_search;
-    int   time_out, scale;    
+    int   time_out, scale, copy_time_out;    
     const char *program;
     const char *work_dir;
     unsigned int  num_threads;
@@ -1117,6 +1139,7 @@ struct ArgsInfo
         f_random_search = f_wide_search = false;
         f_boring = f_verbose = f_parallel_search = false;
         time_out = -1;
+        copy_time_out = -1;
         program = "";
         work_dir = "";
         scale = 1;
@@ -1162,6 +1185,14 @@ static error_t    parse_opt (int key, char *arg, struct argp_state *state)
       info.time_out = arg ? atoi(arg) : 100000;
       if   ( info.time_out < 1 ) {
           printf( "\n\n" "Error: Timeout has to be larger than 0!\n" );
+          exit( -1 );
+      }
+      break;
+
+  case  'f' :
+      info.copy_time_out = arg ? atoi(arg) : 100000;
+      if   ( info.copy_time_out < 1 ) {
+          printf( "\n\n" "Error: Copy timeout has to be larger than 0!\n" );
           exit( -1 );
       }
       break;
@@ -1258,12 +1289,23 @@ int  main(int   argc, char*   argv[])
         p_manager->set_threads_num( 1 );
     }
 
+    if  ( ( opt.copy_time_out > 0 )  &&  ( !opt.f_parallel_search ) ) {
+        printf( "Error: copy timeout larger than zero can be used only with "
+                "parallel search.\n\n" );
+        exit( -1 );
+    }
+        
+    
     if  ( opt.f_wide_search ) {
         p_manager->set_wide_search( true );
         p_manager->set_seq_generator( new  SequencePlusOne() );
     } else if  ( opt.f_parallel_search ) {
         p_manager->set_parallel_search( true );
-        p_manager->set_seq_generator( new  SequenceMaxInt() );
+        if  ( opt.copy_time_out > 0 )
+            p_manager->set_seq_generator( new
+                       SequenceRepeatVal( opt.copy_time_out ) );
+        else
+            p_manager->set_seq_generator( new  SequenceMaxInt() );
     } else if  ( opt.f_random_search ) {
         p_manager->set_seq_generator( new  SequenceRandom() );
     } else {
@@ -1277,6 +1319,7 @@ int  main(int   argc, char*   argv[])
     printf( "Success file       : %s\n", p_manager->get_success_file_name() );
 
     p_manager->set_timeout( opt.time_out );
+    p_manager->set_copy_timeout( opt.copy_time_out );
 
     p_manager->main_loop();
 

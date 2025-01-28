@@ -30,6 +30,15 @@ function  do_a_run() {
     #rm -r -f work >& /dev/null
     #mkdir work
 
+    SCFLAG=""
+    if  (( $SCALE > 1 )); then
+        SCFLAG="-s$SCALE"
+    fi
+    SCFLAG=""
+    if  (( $SCALE > 1 )); then
+        SCFLAG="-s$SCALE"
+    fi
+
     START=$(date +%s)
 
     echo ./catalyst -s$SCALE $CATALYST_FLAGS $PROG work/
@@ -145,6 +154,19 @@ function  counter_tests() {
 }
 
 
+################################################################
+function  timeout_tests() {
+    LOG=logs/$(datestr)_timeout_$TIMEOUT.txt
+    CATALYST_FLAGS="-f%TIMEOUT"
+    rm -f $LOG
+    for i in $(seq 1 $TIMES); do
+        echo "LOG file: " $LOG
+        echo "Timeout search #: " $i " with timeout " $TIMEOUT
+        do_a_run
+    done
+}
+
+
 #PROG=wait_random_busy/wrb_script
 #PROG=wait_forever_99/wforever_script
 #PROG=cat_exp/pmpl_script
@@ -152,13 +174,16 @@ function  counter_tests() {
 #PROG=cat_maze/pmpl_script
 TIMES=100 
 
+TIMEOUT=60
+
 # Scale: Scale time by this factor
 SCALE=1
 #SCALE=2000
 
 #boring_tests
 #random_tests
-counter_tests
+#counter_tests
+timeout_tests
 #wide_tests
 #parallel_tests
 
