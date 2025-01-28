@@ -34,14 +34,10 @@ function  do_a_run() {
     if  (( $SCALE > 1 )); then
         SCFLAG="-s$SCALE"
     fi
-    SCFLAG=""
-    if  (( $SCALE > 1 )); then
-        SCFLAG="-s$SCALE"
-    fi
 
     START=$(date +%s)
 
-    echo ./catalyst -s$SCALE $CATALYST_FLAGS $PROG work/
+    echo ./catalyst $SCFLAG $CATALYST_FLAGS $PROG work/
 
     
     ./catalyst -s$SCALE $CATALYST_FLAGS $PROG work/ >> $LOG
