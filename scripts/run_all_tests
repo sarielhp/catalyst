@@ -170,10 +170,10 @@ function  timeout_tests() {
 #PROG=wait_random_busy/wrb_script
 #PROG=wait_forever_99/wforever_script
 #PROG=cat_exp/pmpl_script
-#PROG=cat_bug/pmpl_script
 #PROG=cat_maze/pmpl_script
-TIMES=100 
 
+PROG=cat_bug/pmpl_script
+TIMES=100
 TIMEOUT=60
 
 # Scale: Scale time by this factor
