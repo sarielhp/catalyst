@@ -829,7 +829,8 @@ void  SManager::spawn_single_task()
     Task  * tsk = new  Task();
 
     counter_tasks_created++;
-
+    printf( "# Task created: %d\n", counter_tasks_created );
+    
     // We run a process for one second if we are in the wide search mode...
     if  ( f_wide_search ) {
         tsk->set_id( counter_tasks_created );
