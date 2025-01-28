@@ -157,7 +157,7 @@ function  counter_tests() {
 ################################################################
 function  timeout_tests() {
     LOG=logs/$(datestr)_timeout_$TIMEOUT.txt
-    CATALYST_FLAGS="-f%TIMEOUT"
+    CATALYST_FLAGS="-f$TIMEOUT"
     rm -f $LOG
     for i in $(seq 1 $TIMES); do
         echo "LOG file: " $LOG
