@@ -170,7 +170,7 @@ function  timeout_tests() {
 
 PROG=cat_bug/pmpl_script
 TIMES=100
-TIMEOUT=5
+TIMEOUT=15
 
 # Scale: Scale time by this factor
 SCALE=1
