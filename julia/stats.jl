@@ -2,27 +2,32 @@
 using DelimitedFiles
 using Statistics
 
-function  (@main)(ARGS)
-    lines = readlines( ARGS[ 1 ])
+function  read_file_w_comments_floats( fl::String )
+    if  ( ! isfile( fl ) )
+        println( "\n\nError: File [", fl, "] does not exist?\n\n" );
+        exit( -1 );
+    end
+    lines = readlines( fl )
 
     arr = Vector{Float64}();
 
     for  line ∈ lines
-        ls = strip( lien );
-        if  ( length( ls ) == 0 )
-            continue;
-        end
-        if  ( ls.first == '#' )
-            continue;
-        end
+        ls = strip( line );
+        if  ( length( ls ) == 0 ) continue end;
+        if  ( ls[1] == '#' )   continue end;
 
-        arr.push!( ls->parse.(Float64, s) );
+        push!( arr, parse.(Float64, ls) );
     end
 
-    if length( arr ) == 0
-        exit( -1 );
-    end
-#    println( arr );
+    return  arr;
+end
+
+
+function  stats_file( fl::String )
+#    println( "FL: ", fl );
+    arr = read_file_w_comments_floats( fl )
+    if  ( length( arr ) == 0 )  return  end
+
     println( "" );
     println( "Filename : ", ARGS[ 1 ] );
     println( "#        : ", length(arr) );
@@ -34,5 +39,13 @@ function  (@main)(ARGS)
     end
     println( "Minimum  : ", minimum( arr ) );
     println( "Maximum  : ", maximum( arr ) );
-#    println( "Variance : ", Statistics.var( arr ) );
+end
+
+function  (@main)(ARGS)
+    for  arg ∈ ARGS
+        stats_file( arg );
+    end
+    
+
+    return  0;
 end

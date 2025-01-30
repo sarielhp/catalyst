@@ -59,6 +59,26 @@ function  sfloat( num::Float64 )
     return  s;
 end
 
+function  read_file_w_comments_floats( fl::String )
+    if  ( ! isfile( fl ) )
+        println( "\n\nError: File [", fl, "] does not exist?\n\n" );
+        exit( -1 );
+    end
+    lines = readlines( fl )
+
+    arr = Vector{Float64}();
+
+    for  line ∈ lines
+        ls = strip( line );
+        if  ( length( ls ) == 0 ) continue end;
+        if  ( ls[1] == '#' )   continue end;
+
+        push!( arr, parse.(Float64, ls) );
+    end
+
+    return  arr;
+end
+
 function  (@main)(ARGS)
 
     if  length( ARGS ) == 0
@@ -80,9 +100,8 @@ function  (@main)(ARGS)
         CL_MIN, CL_MAX );
 
     for  s ∈ ARGS
-        arr = open( s ) do f
-            readlines(f) |> (s->parse.(Float64, s))
-        end
+        arr = read_file_w_comments_floats( s )
+
         df_add_row( df );
 
         i = nrow( df );
