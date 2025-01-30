@@ -33,7 +33,6 @@
 
     <DistanceMetrics>
       <Euclidean label="euclidean"/>
-      <ScaledEuclidean label="ScaledEuclidean" scale="@@scale@@"/>
     </DistanceMetrics>
 
     <ValidityCheckers>
