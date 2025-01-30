@@ -1296,6 +1296,12 @@ int  main(int   argc, char*   argv[])
     //p_manager->set_threads_num( (2 * opt.num_threads) / 3  );
     p_manager->set_threads_num( 12 );
     p_manager->set_program( opt.program );
+
+    if  ( ! is_file_exists( opt.program ) ) {
+        fprintf( stderr, "\n\n\n" "Error: Program not found: %s\n\n\n", opt.program );
+        exit( -1 );
+    }
+
     p_manager->set_scale( opt.scale );
     p_manager->set_work_dir( opt.work_dir );
 

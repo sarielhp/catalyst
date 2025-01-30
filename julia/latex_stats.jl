@@ -115,5 +115,5 @@ function  (@main)(ARGS)
     end
 
     write_latex_table( "out/results.tex" , df );
-
+    println( "Created file: ", "out/results.tex" );
 end
