@@ -1,11 +1,10 @@
 #! /bin/bash
 
-if  [[ "$USER" -eq "sariel" ]]; then
-    PPLMP=/home/sariel/prog/25/pmpl/build/ppl_mp
-else
+PPLMP=/home/sariel/prog/25/pmpl/build/ppl_mp
+if  [[ ! -e $PPLMP ]]; then
     PPLMP=/home/stav/mptools/src/pmpl
 fi
-PPLMP=/home/stav/mptools/src/pmpl
+
 
 # $1: Work directory
 # $2: Name of success file
@@ -46,6 +45,8 @@ cd $1
 echo "----------------------------------------------"
 pwd
 echo "----------------------------------------------"
+
+echo "### Cat bug *no scale*"
 
 #trap "echo received sigterm" SIGTERM
 
