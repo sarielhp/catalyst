@@ -3,9 +3,22 @@ using DelimitedFiles
 using Statistics
 
 function  (@main)(ARGS)
-    arr = open( ARGS[1] ) do f
-        readlines(f) |> (s->parse.(Float64, s))
+    lines = readlines( ARGS[ 1 ])
+
+    arr = Vector{Float64}();
+
+    for  line ∈ lines
+        ls = strip( lien );
+        if  ( length( ls ) == 0 )
+            continue;
+        end
+        if  ( ls.first == '#' )
+            continue;
+        end
+
+        arr.push!( ls->parse.(Float64, s) );
     end
+
     if length( arr ) == 0
         exit( -1 );
     end
@@ -15,7 +28,7 @@ function  (@main)(ARGS)
     println( "#        : ", length(arr) );
 #    println( typeof( arr ) );
     println( "Mean     : ", mean( arr ) );
-    if  ( length( arr ) > 1 ) 
+    if  ( length( arr ) > 1 )
         println( "Median   : ", median( arr ) );
         println( "StdDev   : ", Statistics.std( arr ) );
     end
