@@ -1,0 +1,45 @@
+#! /bin/bash
+
+if  (( $# < 1 )); then
+    echo "Wrong number of parameters!"
+    exit
+fi
+
+function  fanalyze() {
+    INP=$1
+
+
+    if  [[ ! -e $INP ]]; then
+        if  [[ -e logs/$INP ]]; then
+            INP=logs/$INP
+        fi
+    fi
+
+    if  [[ ! -e $INP ]]; then
+        echo ""
+        echo "Error:  File does not exist!"
+        echo "$INP"
+        echo ""
+        exit
+    fi
+    BNAME=$(basename $INP)
+    BDIR=$(dirname $INP)
+    #echo $BDIR"   :  "$BNAME
+
+    OUT=results/$BNAME
+
+    if  [[ $INP -nt $OUT ]]; then
+        scripts/extract_comments $INP > $OUT
+        scripts/extract_runtimes $INP >> $OUT
+
+        echo "Created $OUT"
+    fi
+
+    echo julia/stats.jl $OUT
+    julia/stats.jl $OUT
+}
+
+for var in "$@"
+do
+    fanalyze "$var"
+done

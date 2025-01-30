@@ -1,0 +1,12 @@
+#! /bin/bash
+
+TFL=`mktemp`
+grep "##" $1 \
+    | grep -v "\#\# Task created" \
+    | grep -v "\#\# SEED" >& $TFL
+
+grep "^# " $1  >> $TFL
+
+LC_ALL=C
+cat $TFL  | sort -r | uniq
+

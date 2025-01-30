@@ -179,7 +179,7 @@ class   SequenceRepeatVal : public AbstractSequence
 {
 private:
     int val;
-    
+
 public:
     SequenceRepeatVal( int  _val )
     {
@@ -578,7 +578,7 @@ int pr_times( char * outbuf,
     ux = tx / Hertz;
 
     return snprintf(outbuf, STRLEN, "%3u:%02u", ux/60U, ux % 60U);
-    
+
     //return snprintf(outbuf, STRLEN, "%lu", tx);
 }
 
@@ -589,7 +589,7 @@ void  report_info( pid_t  pid )
     unsigned pidlist[10];
     proc_t *buf;
     enum pids_select_type which = PIDS_SELECT_PID;
-    
+
     pidlist[ 0 ] = pid;
     //printf( "PID: %d\n", pid ); fflush( stdout );
     pidread = procps_pids_select(Pids_info, pidlist, 1, which);
@@ -607,7 +607,7 @@ void  report_info( pid_t  pid )
         pr_times( str, buf );
         //printf( "PROCPS TIME: %s\n", str );
     }
-        
+
 
 }
 
@@ -830,7 +830,7 @@ void  SManager::spawn_single_task()
 
     counter_tasks_created++;
     printf( "## Task created: %d\n", counter_tasks_created );
-    
+
     // We run a process for one second if we are in the wide search mode...
     if  ( f_wide_search ) {
         tsk->set_id( counter_tasks_created );
@@ -948,9 +948,9 @@ void  SManager::prepare_to_run()
 
 void   SManager::main_loop()
 {
-    printf( "MODE               : %s\n", get_mode_str() );
+    printf( "# MODE             : %s\n", get_mode_str() );
     printf( "# of parallel jobs : %d\n", max_jobs_number );
-    printf( "Scale              : %d\n", scale );
+    printf( "# Time scale       : %d\n", scale );
     printf( "-----------------------------------------------------------\n\n" );
     fflush( stdout );
 
@@ -1068,7 +1068,7 @@ void  Task::launch()
 
     // Spawn a new process
     //printf( "New process started!\n" );
-    printf( "CMD: %s\n", command.c_str() );
+    printf( "## PROCESS SPAWN  : %s\n", command.c_str() );
     if (posix_spawn(&pid, command.c_str(), NULL, &attr, argv, NULL) != 0) {
         perror("spawn failed");
         exit(EXIT_FAILURE);
@@ -1130,7 +1130,7 @@ struct ArgsInfo
 {
     bool  f_wide_search, f_verbose, f_boring, f_random_search;
     bool  f_parallel_search;
-    int   time_out, scale, copy_time_out;    
+    int   time_out, scale, copy_time_out;
     const char *program;
     const char *work_dir;
     unsigned int  num_threads;
@@ -1253,11 +1253,27 @@ void   parse_command_line( ArgsInfo  & info, int  argc, char  ** argv )
 
 
 ////////////////////////////////////////////////////////////////////
+string  command_line( int   argc, char*   argv[] )
+{
+    string  s = "";
+
+    for ( auto i = 0; i < argc; i++ ) {
+        if  ( i > 0 )
+            s = s + " ";
+        s = s + argv[ i ];
+    }
+
+    return  s;
+}
+
 
 int  main(int   argc, char*   argv[])
 {
     ArgsInfo  opt;
 
+    string cmd = command_line( argc, argv );
+    printf( "### %s\n###\n", cmd.c_str() );
+    
     opt.init();
 
     parse_command_line( opt, argc, argv );
@@ -1295,8 +1311,8 @@ int  main(int   argc, char*   argv[])
                 "parallel search.\n\n" );
         exit( -1 );
     }
-        
-    
+
+
     if  ( opt.f_wide_search ) {
         p_manager->set_wide_search( true );
         p_manager->set_seq_generator( new  SequencePlusOne() );
@@ -1316,8 +1332,8 @@ int  main(int   argc, char*   argv[])
 
     p_manager->prepare_to_run();
 
-    printf( "Work directory     : %s\n", p_manager->get_work_dir().c_str() );
-    printf( "Success file       : %s\n", p_manager->get_success_file_name() );
+    printf( "# Work directory   : %s\n", p_manager->get_work_dir().c_str() );
+    printf( "# Success file     : %s\n", p_manager->get_success_file_name() );
 
     p_manager->set_timeout( opt.time_out );
     p_manager->set_copy_timeout( opt.copy_time_out );
