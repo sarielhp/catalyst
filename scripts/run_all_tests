@@ -35,14 +35,21 @@ function  do_a_run() {
         SCFLAG="-s$SCALE"
     fi
 
+    if  [[ "$GTIMEOUT" == "" ]]; then
+        GTOUT=""
+    else
+        GTOUT="-t$GTIMEOUT"
+        echo "#### Global timeout: " $GTIMEOUT >> $LOG
+    fi
+
     START=$(date +%s)
 
     echo "=-=-=-=-=-"
-    echo ./catalyst $SCFLAG $CATALYST_FLAGS $PROG work/
+    echo ./catalyst $GTOUT $SCFLAG $CATALYST_FLAGS $PROG work/
     echo ""
-    
 
-    ./catalyst -s$SCALE $CATALYST_FLAGS $PROG work/ >> $LOG
+
+    ./catalyst $GTOUT -s$SCALE $CATALYST_FLAGS $PROG work/ >> $LOG
 
     END=$(date +%s)
 
@@ -132,6 +139,7 @@ function  boring_tests() {
     LOG=logs/$(datestr)_single_thread_boring_search.txt
     SEARCH="Boring single thread search"
     CATALYST_FLAGS="-b"
+
     log_start
     main_loop
 }
@@ -177,6 +185,10 @@ TIMES=100
 # Scale: Scale time by this factor
 SCALE=1
 #SCALE=2000
+
+# Global timeout
+GTIMEOUT=3000
+
 
 boring_tests
 #random_tests
