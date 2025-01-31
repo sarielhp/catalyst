@@ -35,7 +35,9 @@
 #include  <random>
 #include  <chrono>
 
+#ifdef PROCPS_COMPILR
 #include <libproc2/pids.h>
+#endif
 
 /////////////////////////////////////////////////////////////
 using namespace std;
