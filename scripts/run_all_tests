@@ -178,9 +178,9 @@ TIMES=100
 SCALE=1
 #SCALE=2000
 
-#boring_tests
+boring_tests
 #random_tests
-counter_tests
+#counter_tests
 #timeout_tests
 #wide_tests
 #parallel_tests

@@ -1272,7 +1272,6 @@ int  main(int   argc, char*   argv[])
     ArgsInfo  opt;
 
     string cmd = command_line( argc, argv );
-    printf( "### %s\n###\n", cmd.c_str() );
     
     opt.init();
 
@@ -1337,6 +1336,8 @@ int  main(int   argc, char*   argv[])
     p_manager->set_verbose( opt.f_verbose );
 
     p_manager->prepare_to_run();
+
+    printf( "### %s\n###\n", cmd.c_str() );
 
     printf( "# Work directory   : %s\n", p_manager->get_work_dir().c_str() );
     printf( "# Success file     : %s\n", p_manager->get_success_file_name() );
