@@ -27,7 +27,7 @@ def replace_placeholders(content):
     length_max = 1.0 * stick_bug_size
     length_center = 0.5 * stick_bug_size
 
-    scale = 0.95
+    scale = 0.99
 
     print( "## SCALE (coordinates) ", scale );
     content = content.replace("@@length_min@@", str(length_min))

@@ -55,7 +55,7 @@ using DelimitedFiles
 using Statistics
 
 function  sfloat( num::Float64 )
-    s = @sprintf( "%.3f", num );
+    s = @sprintf( "%.2f", num );
     return  s;
 end
 
@@ -79,6 +79,23 @@ function  read_file_w_comments_floats( fl::String )
     return  arr;
 end
 
+# Stolen from the internet...
+function longest_common_prefix(strs::Vector{String})::String
+    s1, s2 = minimum(strs), maximum(strs)
+    pos = findfirst(i -> s1[i] != s2[i], 1:length(s1))
+    return isnothing(pos) ? s1 : s1[1:(pos - 1)]
+end
+
+# Not efficient, but fun...
+function longest_common_suffix(strs::Vector{String})::String
+    revs = Vector{String}();
+    for  s ∈ strs
+        push!( revs, reverse( s ) )
+    end
+    suff = longest_common_prefix( revs );
+    return  reverse( suff );
+end
+
 function  (@main)(ARGS)
 
     if  length( ARGS ) == 0
@@ -96,7 +113,9 @@ function  (@main)(ARGS)
     CL_MIN = "Min";
     CL_MAX = "Max";
 
-    add_col( df, CL_SIMULATION, CL_RUNS, CL_MEAN, CL_MEDIAN, CL_STDDEV,
+    add_col( df, CL_SIMULATION)
+    add_col( df, CL_RUNS )
+    add_col( df,  CL_MEAN, CL_MEDIAN, CL_STDDEV,
         CL_MIN, CL_MAX );
 
     for  s ∈ ARGS
@@ -112,6 +131,20 @@ function  (@main)(ARGS)
         df[ i, CL_STDDEV ] = sfloat( Statistics.std( arr ) );
         df[ i, CL_MIN    ] = sfloat( minimum( arr ) );
         df[ i, CL_MAX    ] = sfloat( maximum( arr ) );
+    end
+
+    pref = longest_common_prefix( df[ :, CL_SIMULATION ] );
+    suff = longest_common_suffix( df[ :, CL_SIMULATION ] );
+    k = length( pref );
+    k_suff = length( suff );
+    for  i  ∈ 1:nrow( df )
+        df[ i, CL_SIMULATION ] = chop(  df[ i, CL_SIMULATION ], head=k, tail=k_suff );
+    end
+
+    runs_num = length( unique( sort( df[ :, CL_RUNS ] ) ) );
+    println( "runs_num = ", runs_num );
+    if  runs_num == 1
+        select!(df, Not([CL_RUNS]))
     end
 
     write_latex_table( "out/results.tex" , df );

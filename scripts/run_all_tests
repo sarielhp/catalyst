@@ -169,8 +169,8 @@ function  timeout_tests() {
 #PROG=wait_forever_99/wforever_script
 #PROG=cat_exp/pmpl_script
 #PROG=cat_maze/pmpl_script
-#PROG=cat_bug/pmpl_script
-PROG=cat_bug_no_scale/pmpl_script
+PROG=cat_bug/pmpl_script
+#PROG=cat_bug_no_scale/pmpl_script
 TIMES=100
 #TIMEOUT=15
 
