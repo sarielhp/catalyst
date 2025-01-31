@@ -19,8 +19,10 @@
 #include  <stdarg.h>
 #include  <signal.h>
 
-
+#ifdef PROCPS_COMPILR
 #include <libproc2/misc.h>
+#endif
+
 #include  <sys/types.h>
 #include  <sys/stat.h>
 
@@ -485,6 +487,8 @@ void  SManager::check_for_success()
 ////////////////////////////////////////////////////////////////////////////////
 /// Copied shameless from ps source code...
 
+#ifdef PROCPS_COMPILR
+
 #define PIDSITEMS  70
 #define proc_t  struct pids_stack
 
@@ -492,6 +496,7 @@ struct pids_info *Pids_info = NULL;   // our required <pids> context
 enum pids_item *Pids_items;           // allocated as PIDSITEMS
 int Pids_index;                       // actual number of active enums
 long Hertz;
+
 
 void procps_init(void)
 {
@@ -610,6 +615,7 @@ void  report_info( pid_t  pid )
 
 
 }
+#endif  // PROCPS
 
 
 void  SManager::check_for_done_tasks()
@@ -618,8 +624,10 @@ void  SManager::check_for_done_tasks()
     for  ( int  ind  = active_tasks.size() - 1; ind >= 0; ind-- ) {
         Task  * p_task = active_tasks[ ind ];
 
+        #ifdef PROCPS_COMPILE
         report_info( p_task->get_child_pid() );
-
+        #endif
+        
         if  ( p_task->is_done() ) {
             if ( p_task->is_successful() )
                 f_success_found = true;
@@ -1271,7 +1279,6 @@ int  main(int   argc, char*   argv[])
 {
     ArgsInfo  opt;
 
-    string cmd = command_line( argc, argv );
     
     opt.init();
 
@@ -1289,8 +1296,10 @@ int  main(int   argc, char*   argv[])
     SManagerPtr p_manager = new SManager();
     assert( p_manager != NULL );
 
+#ifdef PROCPS_COMPILE
     procps_init();
-
+#endif
+    
     //p_manager->set_threads_num( opt.num_threads );
     //p_manager->set_threads_num( (2 * opt.num_threads) / 3  );
     p_manager->set_threads_num( 12 );
@@ -1337,6 +1346,7 @@ int  main(int   argc, char*   argv[])
 
     p_manager->prepare_to_run();
 
+    string cmd = command_line( argc, argv );
     printf( "### %s\n###\n", cmd.c_str() );
 
     printf( "# Work directory   : %s\n", p_manager->get_work_dir().c_str() );
