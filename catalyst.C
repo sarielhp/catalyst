@@ -629,7 +629,7 @@ void  SManager::check_for_done_tasks()
         #ifdef PROCPS_COMPILE
         report_info( p_task->get_child_pid() );
         #endif
-        
+
         if  ( p_task->is_done() ) {
             if ( p_task->is_successful() )
                 f_success_found = true;
@@ -1281,7 +1281,6 @@ int  main(int   argc, char*   argv[])
 {
     ArgsInfo  opt;
 
-    
     opt.init();
 
     parse_command_line( opt, argc, argv );
@@ -1301,10 +1300,11 @@ int  main(int   argc, char*   argv[])
 #ifdef PROCPS_COMPILE
     procps_init();
 #endif
-    
+
     //p_manager->set_threads_num( opt.num_threads );
     //p_manager->set_threads_num( (2 * opt.num_threads) / 3  );
-    p_manager->set_threads_num( 12 );
+    p_manager->set_threads_num( (3 * opt.num_threads) / 4  );
+    //p_manager->set_threads_num( 12 );
     p_manager->set_program( opt.program );
 
     if  ( ! is_file_exists( opt.program ) ) {
