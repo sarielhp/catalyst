@@ -39,6 +39,8 @@
 #include <libproc2/pids.h>
 #endif
 
+
+/////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
 using namespace std;
 
@@ -227,6 +229,45 @@ public:
             num = (num << 1) + coin_flip();
 
         return  num;
+    }
+};
+
+
+
+#define  PI_SQ_OVER_6  0.6079271018540267
+
+// Basel distribution: 
+// Returns the value i with probability proportional to 1/i^2....
+class   SequenceRBasel : public AbstractSequence
+{
+private:
+    std::random_device rd; // Hardware-based random number generator
+    std::uniform_real_distribution<>  distribution;
+    std::mt19937 generator;
+
+    double    get_real_sample() {
+        return   distribution( generator ) ;
+    }
+
+public:
+    SequenceRBasel()
+    {
+        generator = std::mt19937(rd()); // Mersenne Twister engine seeded with rd()
+        distribution  =  std::uniform_real_distribution<>( 0.0, 1.0 );
+    }
+
+    virtual  int  next()
+    {
+        double  val = get_real_sample();
+        double  sum;
+        
+        int  i = 1;
+        sum = PI_SQ_OVER_6;
+        while  ( sum < val ) {
+            i = i + 1;
+            sum += PI_SQ_OVER_6 / ( (double)( i * i  ) );
+        }
+        return  i;
     }
 };
 
@@ -1112,7 +1153,7 @@ static char doc[] =
 static char args_doc[] = "PROG   WORK-DIR";
 
 const char *argp_program_version =
-  "catalyst 0.4";
+  "catalyst 0.5";
 const char *argp_program_bug_address =
   "<sariel@illinois.edu>";
 
@@ -1125,6 +1166,7 @@ static struct argp_option options[] = {
     {"boring",   'b', 0,      0,  "Boring: Runs a single thread "
                                   "no fancy nonsense." },
     {"random",   'r', 0,      0,  "Random search" },
+    {"rbasel",   'R', 0,      0,  "Random search using Basel distribution" },
     {"gtimeout", 't', "Seconds", OPTION_ARG_OPTIONAL,
       "Timeout on running time of program"},
     {"gtimeout", 'f', "Seconds", OPTION_ARG_OPTIONAL,
@@ -1139,7 +1181,7 @@ static struct argp_option options[] = {
 struct ArgsInfo
 {
     bool  f_wide_search, f_verbose, f_boring, f_random_search;
-    bool  f_parallel_search;
+    bool  f_parallel_search, f_basel;
     int   time_out, scale, copy_time_out;
     const char *program;
     const char *work_dir;
@@ -1148,7 +1190,7 @@ struct ArgsInfo
     void init() {
         /* Default values. */
         f_random_search = f_wide_search = false;
-        f_boring = f_verbose = f_parallel_search = false;
+        f_boring = f_verbose = f_parallel_search = f_basel = false;
         time_out = -1;
         copy_time_out = -1;
         program = "";
@@ -1178,6 +1220,11 @@ static error_t    parse_opt (int key, char *arg, struct argp_state *state)
 
   case 'r':
       info.f_random_search = true;
+      break;
+
+  case 'R':
+      info.f_random_search = true;
+      info.f_basel = true;
       break;
 
   case 'v':
@@ -1281,6 +1328,14 @@ int  main(int   argc, char*   argv[])
 {
     ArgsInfo  opt;
 
+    /*
+    SequenceRBasel  sq;
+
+    for  ( int i = 0; i < 100; i++ ) {
+        printf( "i: %d   : %d\n", i, sq.next() );
+        }*/
+
+    
     opt.init();
 
     parse_command_line( opt, argc, argv );
@@ -1340,7 +1395,10 @@ int  main(int   argc, char*   argv[])
         else
             p_manager->set_seq_generator( new  SequenceMaxInt() );
     } else if  ( opt.f_random_search ) {
-        p_manager->set_seq_generator( new  SequenceRandom() );
+        if  ( opt.f_basel ) 
+            p_manager->set_seq_generator( new  SequenceRBasel() );
+        else
+            p_manager->set_seq_generator( new  SequenceRandom() );
     } else {
         p_manager->set_seq_generator( new  SequenceCounter() );
     }
