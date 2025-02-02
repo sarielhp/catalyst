@@ -258,14 +258,18 @@ public:
 
     virtual  int  next()
     {
-        double  val = get_real_sample();
-        double  sum;
-
+        long double  val = get_real_sample();
+        long double  sum;
+        
+        //val = 0.9999999;
+        //printf( "val: %Lg\n", val );
         int  i = 1;
         sum = PI_SQ_OVER_6;
         while  ( sum < val ) {
             i = i + 1;
-            sum += PI_SQ_OVER_6 / ( (double)( i * i  ) );
+            long double ix = i;
+            sum += PI_SQ_OVER_6 / ( ix  * ix  );
+            //printf( "Diff: %Lg\n", val- sum );
         }
         return  i;
     }
@@ -1332,11 +1336,12 @@ int  main(int   argc, char*   argv[])
     /*
     SequenceRBasel  sq;
 
-    for  ( int i = 0; i < 100; i++ ) {
+    for  ( int i = 0; i < 1; i++ ) {
         printf( "i: %d   : %d\n", i, sq.next() );
-        }*/
-
-
+    }
+    exit( -1 );
+    */
+    
     opt.init();
 
     parse_command_line( opt, argc, argv );
