@@ -13,8 +13,8 @@ def replace_placeholders(content):
     content = content.replace("@@seed@@", sseed)
     print( "## SEED ", sseed )
     
-    start_ranges = [[-33.0, 33.0], [-33.0, -30.0], [-1.0, 1.0]]
-    goal_ranges = [[-33.0, 33.0], [30.0, 33.0], [-1.0, 1.0]]
+    start_ranges = [[-33.0, 33.0], [30.0, 33.0], [-1.0, 1.0]]
+    goal_ranges = [[-33.0, 33.0], [-33.0, -30.0], [-1.0, 1.0]]
 
     content = content.replace("@@start@@", generate_numbers_from_ranges(start_ranges))
     content = content.replace("@@goal@@", generate_numbers_from_ranges(goal_ranges))
