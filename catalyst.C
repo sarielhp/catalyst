@@ -236,7 +236,7 @@ public:
 
 #define  PI_SQ_OVER_6  0.6079271018540267
 
-// Basel distribution: 
+// Basel distribution:
 // Returns the value i with probability proportional to 1/i^2....
 class   SequenceRBasel : public AbstractSequence
 {
@@ -260,7 +260,7 @@ public:
     {
         double  val = get_real_sample();
         double  sum;
-        
+
         int  i = 1;
         sum = PI_SQ_OVER_6;
         while  ( sum < val ) {
@@ -421,7 +421,7 @@ private:
     int  time_counter;
 
     /// Wide search implementation
-    bool  f_wide_search, f_parallel_search, f_random_search;
+    bool  f_wide_search, f_parallel_search, f_random_search, f_basel;
 
     int   max_jobs_number;
     bool  f_scheduler_stop;
@@ -469,7 +469,7 @@ public:
         success_fn = NULL;
         f_done = false;
         counter_tasks_created = 0;
-        f_verbose = f_success_found = false;
+        f_verbose = f_success_found = f_basel = false;
         max_jobs_number = 1;
         f_scheduler_stop = false;
         seq_gen = NULL;
@@ -484,9 +484,8 @@ public:
     void wakeup_thread() {
     }
 
-    void set_success( bool  f_val ) {
-        f_success_found = f_val;
-    }
+    void set_success( bool  f_val ) { f_success_found = f_val; }
+    void set_basel  ( bool  f_val ) { f_basel = f_val; }
 
     void   set_scale( int  _scale ) { scale = _scale; }
     void   set_program( const char  * _prog ) { prog = _prog; }
@@ -1002,6 +1001,8 @@ void   SManager::main_loop()
     printf( "# MODE             : %s\n", get_mode_str() );
     printf( "# of parallel jobs : %d\n", max_jobs_number );
     printf( "# Time scale       : %d\n", scale );
+    if  ( ( f_random_search )  &&  ( f_basel ) )
+        printf( "## Basel distribution  (Prob[X=i] ≈ 1/i^2)\n" );
     printf( "-----------------------------------------------------------\n\n" );
     fflush( stdout );
 
@@ -1335,7 +1336,7 @@ int  main(int   argc, char*   argv[])
         printf( "i: %d   : %d\n", i, sq.next() );
         }*/
 
-    
+
     opt.init();
 
     parse_command_line( opt, argc, argv );
@@ -1395,9 +1396,10 @@ int  main(int   argc, char*   argv[])
         else
             p_manager->set_seq_generator( new  SequenceMaxInt() );
     } else if  ( opt.f_random_search ) {
-        if  ( opt.f_basel ) 
+        if  ( opt.f_basel ) {
             p_manager->set_seq_generator( new  SequenceRBasel() );
-        else
+            p_manager->set_basel( true );
+        } else
             p_manager->set_seq_generator( new  SequenceRandom() );
     } else {
         p_manager->set_seq_generator( new  SequenceCounter() );
