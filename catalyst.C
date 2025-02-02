@@ -1399,6 +1399,7 @@ int  main(int   argc, char*   argv[])
         if  ( opt.f_basel ) {
             p_manager->set_seq_generator( new  SequenceRBasel() );
             p_manager->set_basel( true );
+            printf( "# BASEL\n" );
         } else
             p_manager->set_seq_generator( new  SequenceRandom() );
     } else {
