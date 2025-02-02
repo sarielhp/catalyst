@@ -190,8 +190,8 @@ SCALE=1
 GTIMEOUT=3000
 
 
-boring_tests
-#random_tests
+#boring_tests
+random_tests
 #counter_tests
 #timeout_tests
 #wide_tests
