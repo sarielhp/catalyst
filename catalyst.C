@@ -1396,10 +1396,10 @@ int  main(int   argc, char*   argv[])
         else
             p_manager->set_seq_generator( new  SequenceMaxInt() );
     } else if  ( opt.f_random_search ) {
+        p_manager->set_random_search( true );
         if  ( opt.f_basel ) {
             p_manager->set_seq_generator( new  SequenceRBasel() );
             p_manager->set_basel( true );
-            printf( "# BASEL\n" );
         } else
             p_manager->set_seq_generator( new  SequenceRandom() );
     } else {
