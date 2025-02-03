@@ -1167,17 +1167,17 @@ const char *argp_program_bug_address =
 
 /* The options we understand. */
 static struct argp_option options[] = {
-    {"wide",     'a', 0,      0,  "Wide search" },
-    {"parallel", 'p', 0,      0,  "Parallel search" },
-    {"verbose",  'v', 0,      0,  "Verbose" },
-    {"boring",   'b', 0,      0,  "Boring: Runs a single thread "
+    {"wide",        'a', 0,      0,  "Wide search" },
+    {"parallel",    'p', 0,      0,  "Parallel search" },
+    {"verbose",     'v', 0,      0,  "Verbose" },
+    {"boring",      'b', 0,      0,  "Boring: Runs a single thread "
                                   "no fancy nonsense." },
-    {"random",   'r', 0,      0,  "Random search" },
-    {"rbasel",   'R', 0,      0,  "Random search using Basel distribution" },
-    {"gtimeout", 't', "Seconds", OPTION_ARG_OPTIONAL,
-      "Timeout on running time of program"},
-    {"gtimeout", 'f', "Seconds", OPTION_ARG_OPTIONAL,
-      "Timeout on running time of a copy of alg."},
+    {"random",      'r', 0,      0,  "Random search" },
+    {"rbasel",      'R', 0,      0,  "Random search using Basel distribution" },
+    {"gtimeout",    't', "Seconds", OPTION_ARG_OPTIONAL,
+      "Timeout on OVERALL running time of simulation."},
+    {"copytimeout", 'c', "Seconds", OPTION_ARG_OPTIONAL,
+      "Timeout on running time of each COPY of alg."},
     {"scale",  's', "Seconds", OPTION_ARG_OPTIONAL,
       "Scale to use."},
   { 0 }
@@ -1254,7 +1254,7 @@ static error_t    parse_opt (int key, char *arg, struct argp_state *state)
       }
       break;
 
-  case  'f' :
+  case  'c' :
       info.copy_time_out = arg ? atoi(arg) : 100000;
       if   ( info.copy_time_out < 1 ) {
           printf( "\n\n" "Error: Copy timeout has to be larger than 0!\n" );
