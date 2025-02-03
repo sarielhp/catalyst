@@ -162,9 +162,9 @@ function  counter_tests() {
 
 
 ################################################################
-function  timeout_tests() {
-    LOG=logs/$(datestr)_timeout_$TIMEOUT.txt
-    CATALYST_FLAGS="-p -f$TIMEOUT"
+function  copy_timeout_tests() {
+    LOG=logs/$(datestr)_copy_timeout_$TIMEOUT.txt
+    CATALYST_FLAGS="-p -c$TIMEOUT"
     rm -f $LOG
     for i in $(seq 1 $TIMES); do
         echo "LOG file: " $LOG
@@ -192,9 +192,10 @@ GTIMEOUT=3000
 
 
 #boring_tests
-random_tests
+#random_tests
 #counter_tests
-#timeout_tests
+TIMEOUT=4
+copy_timeout_tests
 #wide_tests
 #parallel_tests
 
