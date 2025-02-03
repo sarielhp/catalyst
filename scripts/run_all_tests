@@ -82,7 +82,8 @@ function datestr() {
 function  random_tests() {
     LOG=logs/$(datestr)_random_search.txt
     #echo $LOG
-    CATALYST_FLAGS="-R"
+    CATALYST_FLAGS="-r"
+    CATALYST_FLAGS="-R" # Zeta(2) distribution
     rm -f $LOG
     for i in  $(seq 1 $TIMES); do
         printf "\n\n\n\n==================================================\n"
