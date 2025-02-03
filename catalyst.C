@@ -271,7 +271,7 @@ public:
             sum += PI_SQ_OVER_6 / ( ix  * ix  );
             //printf( "Diff: %Lg\n", val- sum );
         }
-        return  i;
+        return  i + 1;
     }
 };
 
