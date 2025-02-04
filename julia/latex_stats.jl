@@ -96,6 +96,24 @@ function longest_common_suffix(strs::Vector{String})::String
     return  reverse( suff );
 end
 
+function  remove_above( arr, timeout )
+    len = length( arr );
+    filter!( e -> e <= timeout, arr );
+    return  len - length( arr );
+end
+
+function  is_boring_column( df, column )
+    runs_num = length( unique( sort( df[ :, column ] ) ) );
+    return  ( runs_num == 1 );
+end
+function  rm_boring_column( df, column )
+#    println( "RM ", column );
+#    println( df );
+    if  ( is_boring_column( df, column ) )
+        select!(df, Not([column]))
+    end
+end
+
 function  (@main)(ARGS)
 
     if  length( ARGS ) == 0
@@ -107,6 +125,8 @@ function  (@main)(ARGS)
 
     CL_SIMULATION = "Simulation";
     CL_RUNS = "Runs";
+    CL_SUCC_RUNS = "Successful";
+    CL_FAIL_RUNS = "Timeouts";
     CL_MEAN = "Mean";
     CL_MEDIAN = "Median";
     CL_STDDEV = "Std Dev";
@@ -115,22 +135,27 @@ function  (@main)(ARGS)
 
     add_col( df, CL_SIMULATION)
     add_col( df, CL_RUNS )
+    add_col( df, CL_SUCC_RUNS, CL_FAIL_RUNS );
     add_col( df,  CL_MEAN, CL_MEDIAN, CL_STDDEV,
         CL_MIN, CL_MAX );
 
     for  s ∈ ARGS
         arr = read_file_w_comments_floats( s )
+        failures = remove_above( arr, 3000 );
 
         df_add_row( df );
 
         i = nrow( df );
         df[ i, CL_SIMULATION ] = s;
-        df[ i, CL_RUNS   ] = string( length( arr ) );
-        df[ i, CL_MEAN   ] = sfloat( mean( arr ) );
-        df[ i, CL_MEDIAN ] = sfloat( median( arr ) );
-        df[ i, CL_STDDEV ] = sfloat( Statistics.std( arr ) );
-        df[ i, CL_MIN    ] = sfloat( minimum( arr ) );
-        df[ i, CL_MAX    ] = sfloat( maximum( arr ) );
+        df[ i, CL_RUNS       ] = string( length( arr ) + failures );
+        df[ i, CL_SUCC_RUNS  ] = string( length( arr ) );
+        df[ i, CL_FAIL_RUNS  ] = string( failures );
+        df[ i, CL_RUNS       ]  = string( length( arr ) + failures );
+        df[ i, CL_MEAN       ] = sfloat( mean( arr ) );
+        df[ i, CL_MEDIAN     ] = sfloat( median( arr ) );
+        df[ i, CL_STDDEV     ] = sfloat( Statistics.std( arr ) );
+        df[ i, CL_MIN        ] = sfloat( minimum( arr ) );
+        df[ i, CL_MAX        ] = sfloat( maximum( arr ) );
     end
 
     pref = longest_common_prefix( df[ :, CL_SIMULATION ] );
@@ -141,11 +166,10 @@ function  (@main)(ARGS)
         df[ i, CL_SIMULATION ] = chop(  df[ i, CL_SIMULATION ], head=k, tail=k_suff );
     end
 
-    runs_num = length( unique( sort( df[ :, CL_RUNS ] ) ) );
-    println( "runs_num = ", runs_num );
-    if  runs_num == 1
-        select!(df, Not([CL_RUNS]))
-    end
+
+    rm_boring_column( df, CL_RUNS );
+    rm_boring_column( df, CL_SUCC_RUNS );
+    rm_boring_column( df, CL_FAIL_RUNS );
 
     write_latex_table( "out/results.tex" , df );
     println( "Created file: ", "out/results.tex" );

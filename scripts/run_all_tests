@@ -191,11 +191,11 @@ SCALE=1
 GTIMEOUT=3000
 
 
-#boring_tests
+boring_tests
 #random_tests
 #counter_tests
-TIMEOUT=4
-copy_timeout_tests
+#TIMEOUT=3
+#copy_timeout_tests
 #wide_tests
 #parallel_tests
 
