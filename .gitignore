@@ -1,4 +1,5 @@
 versions/
-#results/
+results/
 logs/
+out/
 # DEL_THIS_LINE 10225
