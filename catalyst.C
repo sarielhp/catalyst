@@ -305,6 +305,7 @@ private:
     int  time_limit, id;
     pid_t pid;
 
+    int  total_runtime;
 
     // The wide search implementation
     int  next_wakeup;  // next_wakeup = current_wakeup + time_delta
@@ -320,8 +321,10 @@ public:
         f_done = f_success = false;
         next_wakeup = 0;
         time_delta = 0;
+        total_runtime = 0;
     }
 
+    int   runtime() { return  total_runtime; }
     void   set_time_delta( int  _dlt ) { time_delta = _dlt; }
     void   set_id( int  _id ) { id = _id; }
     int    process_status();
@@ -340,6 +343,11 @@ public:
     void  compute_next_wakeup() {
         assert( time_delta > 0 );
         next_wakeup += time_delta;
+    }
+
+    void  update_total_runtime()
+    {
+        total_run_time += duration();
     }
 
     bool  is_successful() { return  f_success; }
@@ -422,13 +430,14 @@ private:
     bool  f_done, f_verbose;
     string  success_file;
     AbstractSequence  * seq_gen;
-    int  time_out, copy_time_out;
+    int  time_out, copy_time_out, max_suspends;
 
     int  time_counter;
 
     /// Wide search implementation
     bool  f_wide_search, f_parallel_search, f_random_search, f_basel;
-
+    bool  f_combined_search;
+    
     int   max_jobs_number;
     bool  f_scheduler_stop;
         //deque_tasks  tasks;
@@ -475,8 +484,10 @@ public:
         success_fn = NULL;
         f_done = false;
         counter_tasks_created = 0;
-        f_verbose = f_success_found = f_basel = false;
+        f_combined_search = f_verbose = f_success_found = f_basel = false;
         max_jobs_number = 1;
+        max_suspends = 0;
+        
         f_scheduler_stop = false;
         seq_gen = NULL;
         g_timer = 0;
@@ -507,7 +518,7 @@ public:
     bool  is_parallel() {
         return  max_jobs_number > 1;
     }
-    void  set_threads_num( int  n ) { max_jobs_number = n; }
+    void  set_threads_num( int  n ) { max_suspends = max_jobs_number = n; }
     void  spawn_single_task();
     void  spawn_tasks();
     void  check_for_done_tasks();
@@ -852,9 +863,6 @@ void   SManager::handle_expired_tasks()
         if   ( f_success_found  ||  ( ! f_wide_search ) ) {
             count++;
             kill_process( cpid );
-
-            check_for_success();
-
             p_task->set_done( true );
             continue;
         }
@@ -864,8 +872,28 @@ void   SManager::handle_expired_tasks()
         // f_success_found == false  &&  f_wide_search = true
         assert( ! f_success_found );
         assert( p_task->is_expired() );
-        assert( f_wide_search );
-        ///printf( "Suspending process!\n" );
+        assert( f_wide_search  ||  f_combined_search );
+
+        p_task->update_total_runtime();
+        if  ( f_wide_search ) {
+            suspend_process( ind );
+            continue;
+        }
+
+        /// Unimportant - should be killed...
+        if   ( p_task->runtime() <= min_suspend_runtime ) {
+            kill_process( cpid );
+            p_task->set_done( true );
+            continue;
+        }
+ 
+            // A combined search. Should we kill it, or should we suspend it?
+        if  ( suspended_tasks.size() < max_suspends ) {
+            suspend_process( ind );
+            continue;
+        }
+
+        kill_min_suspended_task();
         suspend_process( ind );
     }
     if  ( count > 0 )
