@@ -1,0 +1,8 @@
+
+julia/latex_stats.jl \
+        results/cat_bug_boring.txt \
+        results/cat_bug_parallel.txt \
+        results/cat_bug_random.txt \
+        results/cat_bug_random_zeta_2.txt \
+        results/cat_bug_wide_search.txt \
+        results/cat_bug_scale_0_99.txt
