@@ -4,6 +4,7 @@ using TimerOutputs
 using Printf
 using CSV, DataFrames
 using PrettyTables
+using LaTeXStrings
 
 
 function  df_add_row( df::DataFrame )
@@ -125,8 +126,8 @@ function  (@main)(ARGS)
 
     CL_SIMULATION = "Simulation";
     CL_RUNS = "Runs";
-    CL_SUCC_RUNS = "Successful";
-    CL_FAIL_RUNS = "Timeouts";
+    CL_SUCC_RUNS = "# Succ";
+    CL_FAIL_RUNS = "# Fails";
     CL_MEAN = "Mean";
     CL_MEDIAN = "Median";
     CL_STDDEV = "Std Dev";
@@ -150,7 +151,7 @@ function  (@main)(ARGS)
         df[ i, CL_RUNS       ] = string( length( arr ) + failures );
         df[ i, CL_SUCC_RUNS  ] = string( length( arr ) );
         if  ( failures > 0 )
-            df[ i, CL_FAIL_RUNS  ] = "\\TFailX{" * string( failures ) * "}";
+            df[ i, CL_FAIL_RUNS  ] = L"$\TFailX{" * string( failures ) * "}");
         else
             df[ i, CL_FAIL_RUNS  ] = string( failures );
         end
