@@ -149,7 +149,11 @@ function  (@main)(ARGS)
         df[ i, CL_SIMULATION ] = s;
         df[ i, CL_RUNS       ] = string( length( arr ) + failures );
         df[ i, CL_SUCC_RUNS  ] = string( length( arr ) );
-        df[ i, CL_FAIL_RUNS  ] = string( failures );
+        if  ( failures > 0 )
+            df[ i, CL_FAIL_RUNS  ] = "\\TFailX{" * string( failures ) * "}";
+        else
+            df[ i, CL_FAIL_RUNS  ] = string( failures );
+        end
         df[ i, CL_RUNS       ]  = string( length( arr ) + failures );
         df[ i, CL_MEAN       ] = sfloat( mean( arr ) );
         df[ i, CL_MEDIAN     ] = sfloat( median( arr ) );
