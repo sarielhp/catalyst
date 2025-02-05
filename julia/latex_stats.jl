@@ -37,8 +37,18 @@ function  get_output_table( filename::String )
     return  df;
 end
 
+function  int_from_str( a::String )
+    if  tryparse(Int64, a) == nothing
+        return  0;
+    end
+
+    return    tryparse(Int64, a);
+end
+
 
 function  write_latex_table( out_name, df::DataFrame )
+    hc = LatexHighlighter( (d,i,j) -> ( (j==3)  &&  ( int_from_str( d ) > 0 ) ),
+                           ["textbf"] )
     ha = LatexHighlighter((d,i,j)->i % 2 != 0,
                           ["cellcolor{lightgray}","texttt"])
     hb = LatexHighlighter((d,i,j)->i % 2 == 0,
@@ -46,7 +56,7 @@ function  write_latex_table( out_name, df::DataFrame )
 
     iox = open( out_name, "w" );
     pretty_table( iox, df, header = names( df ), backend = Val(:latex),
-                  highlighters = (ha, hb));
+                  highlighters = (hc, ha, hb ) );
 
     close( iox );
 end
@@ -150,13 +160,7 @@ function  (@main)(ARGS)
         df[ i, CL_SIMULATION ] = s;
         df[ i, CL_RUNS       ] = string( length( arr ) + failures );
         df[ i, CL_SUCC_RUNS  ] = string( length( arr ) );
-        if  ( failures > 0 )
-            st =  raw"\TFailX{%$failures)}";
-            println( "STRING: [", st, "]" );
-            df[ i, CL_FAIL_RUNS  ] = st;
-        else
-            df[ i, CL_FAIL_RUNS  ] = string( failures );
-        end
+        df[ i, CL_FAIL_RUNS  ] = string( failures );
         df[ i, CL_RUNS       ]  = string( length( arr ) + failures );
         df[ i, CL_MEAN       ] = sfloat( mean( arr ) );
         df[ i, CL_MEDIAN     ] = sfloat( median( arr ) );
