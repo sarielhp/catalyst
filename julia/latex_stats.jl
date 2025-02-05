@@ -151,7 +151,7 @@ function  (@main)(ARGS)
         df[ i, CL_RUNS       ] = string( length( arr ) + failures );
         df[ i, CL_SUCC_RUNS  ] = string( length( arr ) );
         if  ( failures > 0 )
-            df[ i, CL_FAIL_RUNS  ] = L"$\TFailX{" * string( failures ) * "}");
+            df[ i, CL_FAIL_RUNS  ] = L"\TFailX{$failures}";
         else
             df[ i, CL_FAIL_RUNS  ] = string( failures );
         end
