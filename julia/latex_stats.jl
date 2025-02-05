@@ -47,8 +47,12 @@ end
 
 
 function  write_latex_table( out_name, df::DataFrame )
-    hc = LatexHighlighter( (d,i,j) -> ( (j==4)  &&  ( int_from_str( d[ i, j ] ) > 0 ) ),
+    hca = LatexHighlighter( (d,i,j) -> ( (i % 2 != 0)  &&  ( j == 4 )
+                                        &&  ( int_from_str( d[ i, j ] ) > 0 ) ),
                            ["cellcolor{lightgray}", "FailX"] )
+    hcb = LatexHighlighter( (d,i,j) -> ( (i % 2 == 0)  &&  ( j == 4 )
+                                        &&  ( int_from_str( d[ i, j ] ) > 0 ) ),
+                                                   ["FailX"] )
     ha = LatexHighlighter((d,i,j)->i % 2 != 0,
                           ["cellcolor{lightgray}","texttt"])
     hb = LatexHighlighter((d,i,j)->i % 2 == 0,
@@ -56,7 +60,7 @@ function  write_latex_table( out_name, df::DataFrame )
 
     iox = open( out_name, "w" );
     pretty_table( iox, df, header = names( df ), backend = Val(:latex),
-                  highlighters = (hc, ha, hb, hc ) );
+                  highlighters = (hca, hcb, ha, hb ) );
 
     close( iox );
 end
