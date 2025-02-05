@@ -56,7 +56,7 @@ function  write_latex_table( out_name, df::DataFrame )
 
     iox = open( out_name, "w" );
     pretty_table( iox, df, header = names( df ), backend = Val(:latex),
-                  highlighters = (hc, ha, hb ) );
+                  highlighters = (hc, ha, hb, hc ) );
 
     close( iox );
 end
