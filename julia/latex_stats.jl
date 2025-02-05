@@ -47,7 +47,7 @@ end
 
 
 function  write_latex_table( out_name, df::DataFrame )
-    hc = LatexHighlighter( (d,i,j) -> ( (j==3)  &&  ( int_from_str( d ) > 0 ) ),
+    hc = LatexHighlighter( (d,i,j) -> ( (j==3)  &&  ( int_from_str( d[ i, j ] ) > 0 ) ),
                            ["textbf"] )
     ha = LatexHighlighter((d,i,j)->i % 2 != 0,
                           ["cellcolor{lightgray}","texttt"])
