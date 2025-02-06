@@ -2,10 +2,13 @@
 
 echo "# $0 $1 $2"
 
+
+HOME=$(eval echo ~$USER)
+
 if  [[ "$USER" -eq "sariel" ]]; then
-    PPLMP=/home/sariel/prog/25/pmpl/build/ppl_mp
+    PPLMP=$HOME/prog/25/pmpl/build/ppl_mp
 else
-    PPLMP=/home/stav/mptools/src/pmpl
+    PPLMP=$HOME/mptools/src/pmpl
 fi
 
 # $1: Work directory

@@ -260,7 +260,7 @@ public:
     {
         long double  val = get_real_sample();
         long double  sum;
-        
+
         //val = 0.9999999;
         //printf( "val: %Lg\n", val );
         int  i = 1;
@@ -340,14 +340,14 @@ public:
 
     void  set_time_limit( int  _limit ) { time_limit = _limit; }
 
-    void  compute_next_wakeup() {
-        assert( time_delta > 0 );
-        next_wakeup += time_delta;
+    void  compute_next_wakeup( int  delta ) {
+        assert( delta > 0 );
+        next_wakeup += delta;
     }
 
     void  update_total_runtime()
     {
-        total_run_time += duration();
+        total_runtime += duration();
     }
 
     bool  is_successful() { return  f_success; }
@@ -430,14 +430,14 @@ private:
     bool  f_done, f_verbose;
     string  success_file;
     AbstractSequence  * seq_gen;
-    int  time_out, copy_time_out, max_suspends;
+    int  time_out, copy_time_out, max_suspends, min_sus_runtime;
 
     int  time_counter;
 
     /// Wide search implementation
     bool  f_wide_search, f_parallel_search, f_random_search, f_basel;
     bool  f_combined_search;
-    
+
     int   max_jobs_number;
     bool  f_scheduler_stop;
         //deque_tasks  tasks;
@@ -452,6 +452,7 @@ private:
 
 public:
     void  set_verbose( bool  _flag ) { f_verbose = _flag; }
+    void  set_combined_search( bool  _flag ) { f_combined_search = _flag; }
     void  set_timeout( int  t ) { time_out = t; }
     void  set_copy_timeout( int  t ) { copy_time_out = t; }
     void  set_success_file( string s ) { success_file = s; }
@@ -462,10 +463,15 @@ public:
         seq_gen = _seq_gen;
     }
 
+
     void  set_wide_search( bool  flag ) { f_wide_search = flag; }
     void  set_random_search( bool  flag ) { f_random_search = flag; }
     void  set_parallel_search( bool  flag ) { f_parallel_search = flag; }
 
+    void  kill_min_suspended_task();
+    void  update_min_suspended_runtime();
+    void  resume_sus_process( int  pos, int  new_time_limit );
+    int   get_suspended_task_to_wake( int  time_limit );
 
     void  check_for_success();
 
@@ -487,7 +493,8 @@ public:
         f_combined_search = f_verbose = f_success_found = f_basel = false;
         max_jobs_number = 1;
         max_suspends = 0;
-        
+        min_sus_runtime = 0;
+
         f_scheduler_stop = false;
         seq_gen = NULL;
         g_timer = 0;
@@ -519,6 +526,7 @@ public:
         return  max_jobs_number > 1;
     }
     void  set_threads_num( int  n ) { max_suspends = max_jobs_number = n; }
+    void  set_max_suspends_num( int  n ) { max_suspends = n; }
     void  spawn_single_task();
     void  spawn_tasks();
     void  check_for_done_tasks();
@@ -762,7 +770,7 @@ void   SManager::suspend_process( int  ind )
     // them sorted by wakeup time.
     active_tasks.erase( active_tasks.begin() + ind );
 
-    p_task->compute_next_wakeup();
+    
     suspended_tasks.push_back( p_task );
     push_heap( suspended_tasks.begin(), suspended_tasks.end(),
                TaskComparatorByWakeup() );
@@ -793,6 +801,30 @@ void   SManager::resume_first_process()
               TaskComparatorByWakeup() );
     suspended_tasks.pop_back();
     verify_suspended_tasks_heap();
+}
+
+
+
+
+
+void   SManager::resume_sus_process( int  pos, int  new_time_limit )
+{
+    assert( f_combined_search );
+    assert( (int)suspended_tasks.size() > pos );
+
+    Task * p_task = suspended_tasks[ pos ];
+
+    // Update the start time of the process
+    p_task->record_start_time();
+    p_task->set_time_limit( new_time_limit - p_task->runtime() );
+
+    //----------------------------------------------------
+    // Suspending the process: Low level stuff
+    send_signal( p_task->get_child_pid(), SIGCONT, "SIGCONT" );
+
+    /// Moving it from suspend to resumed tasks...
+    active_tasks.push_back( p_task );
+    suspended_tasks.erase( suspended_tasks.begin() + pos );
 }
 
 
@@ -834,6 +866,50 @@ void   SManager::kill_all_tasks()
         printf( "Killed %d processes\n", count );
 }
 
+void   SManager::kill_min_suspended_task()
+{
+    assert( f_combined_search );  // should only be called in combined mode...
+
+    if  ( suspended_tasks.size() == 0 )
+        return;
+    auto min_pos = 0;
+    auto min_val = suspended_tasks[ 0 ]->runtime();
+    for  ( int  i = 1; i < (int)suspended_tasks.size(); i++ ) {
+        auto new_val = suspended_tasks[ i ]->runtime();
+        if  ( new_val < min_val )  {
+            min_val = new_val;
+            min_pos = i;
+        }
+    }
+
+    Task  * p_task = suspended_tasks[ min_pos ];
+    pid_t   cpid = p_task->get_child_pid();
+
+    /// First resume it...
+    /// ... then kill it.
+    send_signal( cpid, SIGCONT, "SIGCONT" );
+    send_signal( cpid, SIGKILL, "SIGKILL" );
+
+    //kill_process( p_task->get_child_pid() );
+    suspended_tasks.erase( suspended_tasks.begin() + min_pos );
+}
+
+
+void     SManager::update_min_suspended_runtime()
+{
+    if  ( (int)suspended_tasks.size() < ( max_suspends - 1 ) )
+        return;
+
+    auto min_val = suspended_tasks[ 0 ]->runtime();
+    for  ( int  i = 1; i < (int)suspended_tasks.size(); i++ ) {
+        auto new_val = suspended_tasks[ i ]->runtime();
+        if  ( new_val < min_val )
+            min_val = new_val;
+    }
+    if  ( min_val > min_sus_runtime )
+        min_sus_runtime = 1+min_val;
+}
+
 
 void   SManager::handle_expired_tasks()
 {
@@ -860,7 +936,8 @@ void   SManager::handle_expired_tasks()
             f_success_found = true;
 
         pid_t cpid = p_task->get_child_pid();
-        if   ( f_success_found  ||  ( ! f_wide_search ) ) {
+        if   ( f_success_found
+               ||  ( ( ! f_wide_search )  &&  ( ! f_combined_search ) ) ) {
             count++;
             kill_process( cpid );
             p_task->set_done( true );
@@ -881,23 +958,42 @@ void   SManager::handle_expired_tasks()
         }
 
         /// Unimportant - should be killed...
-        if   ( p_task->runtime() <= min_suspend_runtime ) {
+        if   ( p_task->runtime() <= min_sus_runtime ) {
             kill_process( cpid );
             p_task->set_done( true );
             continue;
         }
- 
-            // A combined search. Should we kill it, or should we suspend it?
-        if  ( suspended_tasks.size() < max_suspends ) {
+
+        // A combined search. Should we kill it, or should we suspend it?
+        if  ( (int)suspended_tasks.size() < (int)max_suspends ) {
             suspend_process( ind );
+            update_min_suspended_runtime();
             continue;
         }
 
         kill_min_suspended_task();
         suspend_process( ind );
+        update_min_suspended_runtime();
     }
     if  ( count > 0 )
         printf( "Killed %d processes\n", count );
+}
+
+
+int   SManager::get_suspended_task_to_wake( int  time_limit )
+{
+    int   pos = -1;
+    int   rt = -1;
+    for ( unsigned  k = 0; k < suspended_tasks.size(); k++ ) {
+        auto p_task = suspended_tasks[ k ];
+        if  ( p_task->runtime() >= time_limit )
+            continue;
+        if  ( p_task->runtime() > rt ) {
+            rt = p_task->runtime();
+            pos = k;
+        }
+    }
+    return  pos;
 }
 
 
@@ -909,7 +1005,17 @@ void  SManager::spawn_single_task()
     if  ( (int)( active_tasks.size() ) >= max_jobs_number )
         return;
 
-    //printf( "New task created!\n" );
+
+    int  time_limit = scale * (int)seq_gen->next();
+
+    if   ( f_combined_search ) {
+        int  pos = get_suspended_task_to_wake( time_limit );
+        if  ( pos >= 0 ) {
+            resume_sus_process( pos, time_limit );
+        }
+    }
+
+
     Task  * tsk = new  Task();
 
     counter_tasks_created++;
@@ -919,13 +1025,12 @@ void  SManager::spawn_single_task()
     if  ( f_wide_search ) {
         tsk->set_id( counter_tasks_created );
         tsk->set_time_limit( scale );
-        tsk->set_time_delta( (int)seq_gen->next() );
-        tsk->compute_next_wakeup();
+        tsk->set_time_delta( time_limit );
+        tsk->compute_next_wakeup( time_limit );
         //printf( "ZZZZ\n" ); fflush( stdout );
     } else {
-        int limit = scale * (int)seq_gen->next();
-        printf( "LIMIT: %d\n", limit );
-        tsk->set_time_limit( limit );
+        printf( "LIMIT: %d\n", time_limit );
+        tsk->set_time_limit( time_limit );
     }
     tsk->set_manager( this );
 
@@ -1033,6 +1138,9 @@ void  SManager::prepare_to_run()
 void   SManager::main_loop()
 {
     printf( "# MODE             : %s\n", get_mode_str() );
+    if  ( f_combined_search )
+        printf( "# Combined mode!\n" );
+        
     printf( "# of parallel jobs : %d\n", max_jobs_number );
     printf( "# Time scale       : %d\n", scale );
     if  ( ( f_random_search )  &&  ( f_basel ) )
@@ -1046,7 +1154,20 @@ void   SManager::main_loop()
     do {
         int  curr_time = (int)( time( NULL ) - start_time );
         printf( "Current time: %d\n", curr_time );
-        fflush( stdout );
+        if  ( ( curr_time & 0xf ) == 0 ) {
+            fflush( stdout );
+        }
+        /*
+        printf( "# Suspended: %d  active: %d\n",
+                (int)suspended_tasks.size(),
+                (int)active_tasks.size() );
+        */
+        /*
+        printf( "#X" );
+        for  ( int i = 0; i < (int)suspended_tasks.size(); i++ )
+            printf( "%d ", suspended_tasks[ i ]->runtime() );
+        printf( "\n" );
+        */
 
         if  ( ( time_out > 0 )  &&  ( curr_time > time_out ) ) {
             printf( "\n\n\n" "Timeout exceeded! Exiting... \n\n\n" );
@@ -1201,6 +1322,7 @@ static struct argp_option options[] = {
     {"boring",      'b', 0,      0,  "Boring: Runs a single thread "
                                   "no fancy nonsense." },
     {"random",      'r', 0,      0,  "Random search" },
+    {"combined",    'm', 0,      0,  "Combined search" },
     {"rbasel",      'R', 0,      0,  "Random search using Basel distribution" },
     {"gtimeout",    't', "Seconds", OPTION_ARG_OPTIONAL,
       "Timeout on OVERALL running time of simulation."},
@@ -1216,6 +1338,7 @@ static struct argp_option options[] = {
 struct ArgsInfo
 {
     bool  f_wide_search, f_verbose, f_boring, f_random_search;
+    bool  f_combined_search;
     bool  f_parallel_search, f_basel;
     int   time_out, scale, copy_time_out;
     const char *program;
@@ -1226,6 +1349,7 @@ struct ArgsInfo
         /* Default values. */
         f_random_search = f_wide_search = false;
         f_boring = f_verbose = f_parallel_search = f_basel = false;
+        f_combined_search = false;
         time_out = -1;
         copy_time_out = -1;
         program = "";
@@ -1255,6 +1379,10 @@ static error_t    parse_opt (int key, char *arg, struct argp_state *state)
 
   case 'r':
       info.f_random_search = true;
+      break;
+
+  case 'm':
+      info.f_combined_search = true;
       break;
 
   case 'R':
@@ -1359,6 +1487,14 @@ string  command_line( int   argc, char*   argv[] )
 }
 
 
+void  error( const char  * err )
+{
+    printf( "\n\n" "Error: [%s]\n\n", err );
+    fprintf( stderr, "\n\n" "Error: [%s]\n\n", err );
+    exit( -1 );
+}
+
+
 int  main(int   argc, char*   argv[])
 {
     ArgsInfo  opt;
@@ -1371,7 +1507,7 @@ int  main(int   argc, char*   argv[])
     }
     exit( -1 );
     */
-    
+
     opt.init();
 
     parse_command_line( opt, argc, argv );
@@ -1395,6 +1531,8 @@ int  main(int   argc, char*   argv[])
     //p_manager->set_threads_num( opt.num_threads );
     //p_manager->set_threads_num( (2 * opt.num_threads) / 3  );
     p_manager->set_threads_num( (3 * opt.num_threads) / 4  );
+    p_manager->set_max_suspends_num( 4*opt.num_threads );
+
     //p_manager->set_threads_num( 12 );
     p_manager->set_program( opt.program );
 
@@ -1419,7 +1557,12 @@ int  main(int   argc, char*   argv[])
         exit( -1 );
     }
 
-
+    if  ( opt.f_combined_search ) {
+        if  ( opt.f_wide_search )
+            error( "Combined search and wide search are not compatible." );
+        p_manager->set_combined_search( true );
+    }
+        
     if  ( opt.f_wide_search ) {
         p_manager->set_wide_search( true );
         p_manager->set_seq_generator( new  SequencePlusOne() );
