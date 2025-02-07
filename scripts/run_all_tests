@@ -23,6 +23,16 @@ function  f_kill_grep() {
 }
 
 
+function  log_start() {
+    rm -f $LOG
+    echo "### $SEARCH" >> $LOG
+    echo "### -------------------------------------" >> $LOG
+    echo "### LOG     : $LOG" >> $LOG
+    echo "### PROG    : $PROG" >> $LOG
+    echo "### TIMES   : $TIMES" >> $LOG
+    echo "### FLAGS   : $CATALYST_FLAGS" >> $LOG
+    echo "### -------------------------------------" >> $LOG
+}
 
 
 function  do_a_run() {
@@ -93,8 +103,22 @@ function  random_tests() {
     done
 }
 
+function  random_zeta_2_tests() {
+    LOG=$DLOG/random_zeta_2__$(datestr).txt
+    #echo $LOG
+    CATALYST_FLAGS="-r"
+    CATALYST_FLAGS="-R" # Zeta(2) distribution
+    rm -f $LOG
+    for i in  $(seq 1 $TIMES); do
+        printf "\n\n\n\n==================================================\n"
+        echo "LOG file: " $LOG
+        echo "Random search # : " $i
+        do_a_run
+    done
+}
+
 function  wide_tests() {
-    LOG=logs/$(datestr)_wide_search.txt
+    LOG=$DLOG/wide__$(datestr).txt
     CATALYST_FLAGS="-a"
     rm -f $LOG
     for i in  $(seq 1 $TIMES); do
@@ -106,7 +130,7 @@ function  wide_tests() {
 
 function  parallel_tests() {
     ################################################################
-    LOG=logs/$(datestr)_parallel_search.txt
+    LOG=$DLOG/parallel_$(datestr).txt
     CATALYST_FLAGS="-p"
     rm -f $LOG
     for i in $(seq 1 $TIMES); do
@@ -116,16 +140,6 @@ function  parallel_tests() {
     done
 }
 
-function  log_start() {
-    rm -f $LOG
-    echo "### $SEARCH" >> $LOG
-    echo "### -------------------------------------" >> $LOG
-    echo "### LOG     : $LOG" >> $LOG
-    echo "### PROG    : $PROG" >> $LOG
-    echo "### TIMES   : $TIMES" >> $LOG
-    echo "### FLAGS   : $CATALYST_FLAGS" >> $LOG
-    echo "### -------------------------------------" >> $LOG
-}
 
 function  main_loop() {
     for i in $(seq 1 $TIMES); do
@@ -137,7 +151,7 @@ function  main_loop() {
 
 function  boring_tests() {
     ################################################################
-    LOG=logs/$(datestr)_single_thread_boring_search.txt
+    LOG=$DLOG/single_thread__$(datestr).txt
     SEARCH="Boring single thread search"
     CATALYST_FLAGS="-b"
 
@@ -150,9 +164,11 @@ function  boring_tests() {
 
 ################################################################
 function  counter_combined_tests() {
-    LOG=logs/$(datestr)_counter_comb_search.txt
+    LOG=$DLOG/count_comb__$(datestr).txt
     CATALYST_FLAGS="-m"
     rm -f $LOG
+    log_start
+
     for i in $(seq 1 $TIMES); do
         echo "LOG file: " $LOG
         echo "Counter comb search #: " $i
@@ -176,7 +192,7 @@ function  counter_tests() {
 
 ################################################################
 function  copy_timeout_tests() {
-    LOG=logs/$(datestr)_copy_timeout_$TIMEOUT.txt
+    LOG=$DLOG/copy_timeout_$TIMEOUT__$(datestr).txt
     CATALYST_FLAGS="-p -c$TIMEOUT"
     rm -f $LOG
     for i in $(seq 1 $TIMES); do
@@ -186,13 +202,17 @@ function  copy_timeout_tests() {
     done
 }
 
+BPROG=pmpl_script
 
-#PROG=wait_random_busy/wrb_script
-#PROG=wait_forever_99/wforever_script
-#PROG=cat_exp/pmpl_script
-#PROG=cat_maze/pmpl_script
-PROG=cat_bug/pmpl_script
-#PROG=cat_bug_no_scale/pmpl_script
+#INST==wait_random_busy
+#INST=wait_forever_99
+#INST=cat_exp
+#INST=cat_bug_no_scale
+
+INST=cat_maze
+
+PROG=$INST/$BPROG
+DLOG=logs/$INST/
 TIMES=100
 #TIMEOUT=15
 
@@ -204,13 +224,16 @@ SCALE=1
 GTIMEOUT=3000
 
 
+###################################################
+mkdir -p $DLOG >& /dev/null
+
 #boring_tests
 #random_tests
 #counter_tests
-#counter_combined_tests
+counter_combined_tests
 #TIMEOUT=3
 #copy_timeout_tests
 #wide_tests
-parallel_tests
+#parallel_tests
 
 exit -1
