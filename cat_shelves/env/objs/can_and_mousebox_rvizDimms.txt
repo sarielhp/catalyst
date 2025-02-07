@@ -1,0 +1,29 @@
+these are the EXACT dimensions you need to input to rviz if you want to set up 
+the shelf with mousebox in front of paint can in the center experiment.
+
+Shelf:
+x: 0.55 m
+y: 0.23 m
+z: -0.05 m
+
+x rotation: 0 rad
+y rotation: 0 rad
+z rotation: -1.57 rad
+
+Paint can
+x: 0.81 m
+y: -0.07 m
+z: 0.31 m
+
+x rotation: 0 rad
+y rotation: 0 rad
+z rotation: 0 rad
+
+Mouse box
+x: 0.66 m
+y: -0.07 m
+z: 0.31 m
+
+x rotation: 0 rad
+y rotation: 0 rad
+z rotation: 0 rad
