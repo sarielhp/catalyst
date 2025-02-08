@@ -42,16 +42,15 @@ echo cmd:$*
 
 cd $1
 
-echo "----------------------------------------------"
-pwd
-echo "----------------------------------------------"
+#echo "----------------------------------------------"
+echo "PWD: " `pwd`
+#echo "----------------------------------------------"
 
 #trap "echo received sigterm" SIGTERM
 
 python3 $BDIR/prepare_pmpl_run.py
 
 $PPLMP -f CatExperiment.xml
-
 
 # Check if run was successful
 # In this case - a file with .stat exists in the directory...

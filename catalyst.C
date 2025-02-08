@@ -1262,7 +1262,6 @@ void  Task::launch()
     char * prog_name = strdup(  command.c_str() );
     char * prog_dir = strdup( dir.c_str() );
     char * success_fn = p_manager->get_success_file_name();
-    printf( "SUCC: [%s]\n", success_fn );
 
     char *argv[] = { prog_name, prog_dir, success_fn, NULL};
     posix_spawnattr_t attr;

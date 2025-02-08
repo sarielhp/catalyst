@@ -36,7 +36,7 @@ function  log_start() {
 
 
 function  do_a_run() {
-    echo "Running (might take a while)..."
+    echo "=== Starting a run..."
     #rm -r -f work >& /dev/null
     #mkdir work
 
@@ -54,12 +54,9 @@ function  do_a_run() {
 
     START=$(date +%s)
 
-    echo "=-=-=-=-=-"
     echo ./catalyst $GTOUT $SCFLAG $CATALYST_FLAGS $PROG work/
-    echo ""
 
-
-    ./catalyst $GTOUT -s$SCALE $CATALYST_FLAGS $PROG work/ >> $LOG
+         ./catalyst $GTOUT $SCFLAG $CATALYST_FLAGS $PROG work/ >> $LOG
 
     END=$(date +%s)
 
