@@ -1,0 +1,38 @@
+#! /bin/bash
+
+if  [[ $# == 0 ]]; then
+    echo "compress [LOG FILE]"
+    exit -1
+fi
+
+if  [[ ! -e $1 ]]; then
+    echo "Error: Unable to read file: " $1
+    exit -1
+fi
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+#echo $SCRIPT_DIR
+
+FOUT="logs_final/"$(realpath  --relative-to=logs/ $1)
+FDIR=$(dirname $FOUT );
+
+FOUTA=$FOUT".bak"
+
+mkdir -p $FDIR >& /dev/null
+
+grep -e "^#" -e "RUNTIME" $1 > $FOUT
+
+#echo "Out directory : " $FDIR
+
+replacer "# RUNTIME" "RUNTIME" $FOUT
+grep -v "## Task created:" $FOUT > $FOUTA
+grep -v "## SEED" $FOUTA > $FOUT
+mv $FOUT $FOUTA
+grep -v pmpl_script $FOUTA > $FOUT
+
+rm $FOUTA >& /dev/null
+
+julia/remove_all_dup_comments.jl $FOUT
+
+echo "Out filename  : " $FOUT
+

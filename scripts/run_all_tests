@@ -36,7 +36,7 @@ function  f_kill_grep() {
 
 
 function  do_a_run() {
-    echo "#######################################################" >> $LOG
+    #echo "#######################################################" >> $LOG
     echo "=== Starting a run..."
     WDIR=/scratch.local/sariel/work/
     mkdir -p $WDIR >& /dev/null
@@ -51,7 +51,8 @@ function  do_a_run() {
 
     # Mark the beginning of a new run in the log file.
     echo "RUN_START" >> $LOG
-    echo "# date " >> $LOG
+    echo "# START TIME: "`date` >> $LOG
+    echo "# Host : "`hostname` >> $LOG
 
     echo ""
     echo "Work directory : " $WDIR
@@ -100,12 +101,12 @@ function  do_a_run() {
     f_kill_grep ppl_mp
 
     echo RUNTIME: $DIFF
-    echo "# " >> $LOG
-    echo "# ---------------------------------------------------" >> $LOG
+    #echo "# " >> $LOG
+    #echo "# ---------------------------------------------------" >> $LOG
     echo "# RUNTIME: $DIFF " >> $LOG
     echo "#" >> $LOG
     echo "" >> $LOG
-    echo "# "`date`  >> $LOG
+    echo "# END   TIME: "`date`  >> $LOG
 
     # echo "Is there a success file?"
     if  [[ -e "$SUCCFILE" ]]; then
@@ -139,16 +140,20 @@ function  log_start() {
     echo "### TIMES   : $TIMES" >> $LOG
     echo "### FLAGS   : $CATALYST_FLAGS" >> $LOG
     echo "### -------------------------------------" >> $LOG
+    lscpu | sed '1,/Vulner/!d' | grep -iv flags: |  sed 's/^/### /g' >> $LOG
+    echo "###-----------------------------------------------------" >> $LOG
 }
 
 
 function  main_loop() {
     LOG=$DLOG/$LOGFL
     log_start
+    echo "LOG file: " $LOG
     for i in $(seq 1 $TIMES); do
-        echo "LOG file: " $LOG
-        echo "$SEARCH # : " $i
-        do_a_run
+        echo -n "####################" >> $LOG
+        echo "################################################## " $i >> $LOG
+        echo "$SEARCH # : " $i >> $LOG
+        do_a_run $1
     done
 }
 
@@ -192,17 +197,11 @@ function  wide_tests() {
 function  parallel_tests() {
     ################################################################
     LOGFL=parallel_$(datestr).txt
-    LOG=$DLOG/$LOGFL
     CATALYST_FLAGS="-p"
-    rm -f $LOG
-    for i in $(seq 1 $TIMES); do
-        echo "LOG file: " $LOG
-        echo "Parallel search # : " $i
-        do_a_run
-    done
+    SEARCH="Parallel search"
+    
+    main_loop
 }
-
-
 
 
 ################################################################

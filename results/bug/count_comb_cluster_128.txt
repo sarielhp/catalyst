@@ -1,0 +1,119 @@
+#### Global timeout:  3000
+### TIMES   : 100
+### LOG     : logs/bug//count_comb__02_07_25__23_53_34.txt
+### FLAGS   : -m
+### -------------------------------------
+###
+## Task ____________
+## Task BasicRRTStrategy::RRT::Initialize: 0 sec
+## Task Automatically computed position resolution as 0.0025
+## STICK BUG SIZE  0.25
+## SCALE (coordinates)  0.99
+## PROCESS SPAWN  :BasicRRTStrategy::RRT::Initialize: 0 sec
+## PROCESS SPAWN  :BasicRRTStrategy::RRT
+# of parallel jobs : 96
+# Work directory   : /scratch.local/sariel/work/
+# Time scale       : 1
+# Success file     : /scratch.local/sariel/work/success.txt
+# MODE             : Counter search
+# Combined mode!
+9
+5
+23
+46
+24
+16
+30
+5
+24
+53
+5
+5
+16
+5
+4
+70
+11
+38
+9
+15
+26
+38
+7
+9
+113
+5
+5
+6
+29
+6
+39
+73
+87
+66
+6
+43
+17
+33
+9
+24
+6
+133
+171
+39
+9
+24
+5
+25
+6
+82
+11
+6
+5
+16
+5
+44
+18
+10
+17
+38
+50
+24
+23
+35
+9
+22
+30
+127
+22
+5
+4
+6
+37
+31
+142
+23
+83
+7
+23
+9
+16
+4
+6
+7
+50
+58
+51
+19
+18
+10
+17
+17
+29
+10
+29
+67
+109
+25
+11
+6

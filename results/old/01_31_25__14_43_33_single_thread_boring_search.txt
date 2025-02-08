@@ -1,0 +1,27 @@
+#### Global timeout:  3000
+### TIMES   : 100
+### PROG    : cat_bug/pmpl_script
+### LOG     : logs/01_31_25__14_43_33_single_thread_boring_search.txt
+### FLAGS   : -b
+### Boring single thread search
+### ./catalyst -t3000 -s1 -b cat_bug/pmpl_script work/
+### -------------------------------------
+###
+## STICK BUG SIZE  0.25
+## SCALE (coordinates)  0.99
+## PROCESS SPAWN  : cat_bug/pmpl_script
+# of parallel jobs : 1
+# Work directory   : /home/sariel/prog/25/catalyst/work/
+# Time scale       : 1
+# Success file     : /home/sariel/prog/25/catalyst/work/success.txt
+# MODE             : Parallel search
+3001
+3001
+3001
+1105
+3001
+3001
+3001
+3001
+3002
+3001

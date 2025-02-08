@@ -10,8 +10,9 @@ function  fanalyze() {
 
 
     if  [[ ! -e $INP ]]; then
-        if  [[ -e logs/$INP ]]; then
-            INP=logs/$INP
+        FL=$(find logs_final | grep $INP)
+        if  [[ -e $FL ]]; then
+            INP=$FL
         fi
     fi
 
@@ -24,16 +25,21 @@ function  fanalyze() {
     fi
     BNAME=$(basename $INP)
     BDIR=$(dirname $INP)
-    #echo $BDIR"   :  "$BNAME
 
-    OUT=results/$BNAME
+    RELDIR=$(realpath  --relative-to=logs_final/ $INP)
+    OUT=results/$RELDIR
 
+    OUTDIR=$(dirname $OUT)
+    mkdir -p $OUTDIR >& /dev/null
+    
     if  [[ $INP -nt $OUT ]]; then
         scripts/extract_comments $INP > $OUT
         scripts/extract_runtimes $INP >> $OUT
 
         echo "Created $OUT"
+        echo ""
     fi
+    echo "$INP -> $OUT" 
 
     echo julia/stats.jl $OUT
     julia/stats.jl $OUT

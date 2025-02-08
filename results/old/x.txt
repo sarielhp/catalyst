@@ -1,0 +1,8 @@
+### ./catalyst -s4 -r wait_10_busy/wb_script work/
+###
+## PROCESS SPAWN  : wait_10_busy/wb_script
+# of parallel jobs : 12
+# Work directory   : /home/sariel/prog/25/catalyst/work/
+# Time scale       : 4
+# Success file     : /home/sariel/prog/25/catalyst/work/success.txt
+# MODE             : Counter search

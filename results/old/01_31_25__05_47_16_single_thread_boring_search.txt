@@ -1,0 +1,19 @@
+### TIMES   : 100
+### PROG    : cat_bug/pmpl_script
+### LOG     : logs/01_31_25__05_47_16_single_thread_boring_search.txt
+### FLAGS   : -b
+### Boring single thread search
+### ./catalyst -s1 -b cat_bug/pmpl_script work/
+### -------------------------------------
+###
+## STICK BUG SIZE  0.25
+## SCALE (coordinates)  0.99
+## PROCESS SPAWN  : cat_bug/pmpl_script
+# of parallel jobs : 1
+# Work directory   : /home/sariel/prog/25/catalyst/work/
+# Time scale       : 1
+# Success file     : /home/sariel/prog/25/catalyst/work/success.txt
+# MODE             : Parallel search
+10951
+1508
+7420

@@ -1,0 +1,191 @@
+#### Global timeout:  3000
+###
+## STICK BUG SIZE  0.25
+## SCALE (coordinates)  0.99
+# of parallel jobs : 12
+# Work directory   : /home/sariel/prog/25/catalyst/work/
+# Time scale       : 1
+# Suspended: 9  active: 13
+# Suspended: 9  active: 12
+# Suspended: 8  active: 12
+# Suspended: 7  active: 12
+# Suspended: 64  active: 12
+# Suspended: 63  active: 13
+# Suspended: 63  active: 12
+# Suspended: 62  active: 13
+# Suspended: 62  active: 12
+# Suspended: 61  active: 13
+# Suspended: 61  active: 12
+# Suspended: 60  active: 13
+# Suspended: 60  active: 12
+# Suspended: 6  active: 12
+# Suspended: 59  active: 13
+# Suspended: 59  active: 12
+# Suspended: 58  active: 13
+# Suspended: 58  active: 12
+# Suspended: 57  active: 13
+# Suspended: 57  active: 12
+# Suspended: 56  active: 13
+# Suspended: 56  active: 12
+# Suspended: 55  active: 12
+# Suspended: 54  active: 12
+# Suspended: 53  active: 13
+# Suspended: 53  active: 12
+# Suspended: 52  active: 12
+# Suspended: 51  active: 12
+# Suspended: 50  active: 13
+# Suspended: 50  active: 12
+# Suspended: 5  active: 13
+# Suspended: 5  active: 12
+# Suspended: 49  active: 13
+# Suspended: 49  active: 12
+# Suspended: 48  active: 13
+# Suspended: 48  active: 12
+# Suspended: 47  active: 13
+# Suspended: 46  active: 13
+# Suspended: 46  active: 12
+# Suspended: 45  active: 12
+# Suspended: 44  active: 12
+# Suspended: 43  active: 13
+# Suspended: 41  active: 12
+# Suspended: 40  active: 13
+# Suspended: 40  active: 12
+# Suspended: 38  active: 12
+# Suspended: 37  active: 12
+# Suspended: 36  active: 13
+# Suspended: 36  active: 12
+# Suspended: 35  active: 12
+# Suspended: 34  active: 12
+# Suspended: 33  active: 13
+# Suspended: 33  active: 12
+# Suspended: 31  active: 13
+# Suspended: 31  active: 12
+# Suspended: 30  active: 12
+# Suspended: 29  active: 12
+# Suspended: 28  active: 13
+# Suspended: 28  active: 12
+# Suspended: 27  active: 12
+# Suspended: 25  active: 13
+# Suspended: 25  active: 12
+# Suspended: 24  active: 13
+# Suspended: 24  active: 12
+# Suspended: 22  active: 12
+# Suspended: 21  active: 13
+# Suspended: 21  active: 12
+# Suspended: 19  active: 12
+# Suspended: 18  active: 13
+# Suspended: 18  active: 12
+# Suspended: 17  active: 13
+# Suspended: 17  active: 12
+# Suspended: 15  active: 13
+# Suspended: 15  active: 12
+# Suspended: 14  active: 12
+# Suspended: 13  active: 12
+# Suspended: 12  active: 13
+# Suspended: 11  active: 12
+# Suspended: 10  active: 12
+# Suspended: 0  active: 12
+# Suspended: 0  active: 0
+# Success file     : /home/sariel/prog/25/catalyst/work/success.txt
+# MODE             : Counter search
+# Combined mode!
+70
+65
+153
+71
+107
+293
+3
+13
+28
+4
+63
+42
+67
+94
+163
+45
+267
+335
+684
+61
+115
+160
+36
+21
+45
+194
+426
+711
+888
+115
+28
+1
+154
+50
+64
+89
+50
+46
+104
+37
+84
+79
+20
+49
+37
+24
+222
+39
+2
+58
+4
+354
+78
+13
+60
+1008
+5
+68
+109
+78
+174
+92
+134
+205
+177
+272
+29
+33
+20
+72
+91
+100
+12
+338
+210
+137
+324
+57
+202
+10
+54
+125
+124
+95
+26
+120
+98
+234
+25
+35
+142
+44
+89
+85
+9
+144
+36
+746
+203
+203

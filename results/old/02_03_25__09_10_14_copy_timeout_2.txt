@@ -1,0 +1,64 @@
+#### Global timeout:  3000
+### ./catalyst -t3000 -s1 -p -c2 cat_bug/pmpl_script work/
+###
+## STICK BUG SIZE  0.25
+## SCALE (coordinates)  0.99
+## PROCESS SPAWN  : cat_bug/pmpl_script
+# of parallel jobs : 12
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000408 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000407 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000406 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000405 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000404 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000403 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000402 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000401 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000400 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000399 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000398 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000397 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000396 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000395 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000394 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000393 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000392 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000391 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000390 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000389 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000388 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000387 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000386 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000385 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000384 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000383 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000382 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000381 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000380 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000379 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000378 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000377 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000376 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000375 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000374 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000373 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000372 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000371 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000370 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000369 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000368 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000367 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000366 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000365 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000364 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000363 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000362 /home/sariel/prog/25/catalyst/work/success.txt
+# cat_bug/pmpl_script /home/sariel/prog/25/catalyst/work/000361 /home/sariel/prog/25/catalyst/work/success.txt
+# Work directory   : /home/sariel/prog/25/catalyst/work/
+# Time scale       : 1
+# Success file     : /home/sariel/prog/25/catalyst/work/success.txt
+# MODE             : Parallel search
+6
+37
+145
+111
+66

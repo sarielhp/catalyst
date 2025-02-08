@@ -1,0 +1,61 @@
+#### Global timeout:  3000
+### ./catalyst -t3000 -s1 -p cat_bug/pmpl_script work/
+###
+## STICK BUG SIZE  0.25
+## SCALE (coordinates)  0.99
+## PROCESS SPAWN  : cat_bug/pmpl_script
+# of parallel jobs : 12
+# Work directory   : /home/sariel/prog/25/catalyst/work/
+# Time scale       : 1
+# Success file     : /home/sariel/prog/25/catalyst/work/success.txt
+# MODE             : Parallel search
+1007
+1096
+3001
+1194
+3001
+1583
+3
+25
+3
+2482
+544
+3001
+772
+1851
+807
+1987
+3001
+1402
+44
+1287
+2351
+635
+287
+1747
+515
+1726
+1210
+1882
+218
+3002
+518
+2260
+2069
+1490
+1849
+178
+3001
+1048
+1118
+27
+1463
+2693
+3001
+826
+2781
+1455
+2219
+97
+910
+646

@@ -1,0 +1,12 @@
+# Work directory     : /home/sariel/prog/25/catalyst/work/
+# Success file       : /home/sariel/prog/25/catalyst/work/success.txt
+# MODE                 : Parallel search
+# number parallel jobs : 12
+# ACTIVELY Waiting for 10 seconds...
+10
+# Work directory     : /home/sariel/prog/25/catalyst/work/
+# Success file       : /home/sariel/prog/25/catalyst/work/success.txt
+# MODE                 : Parallel search
+# number parallel jobs : 12
+# ACTIVELY Waiting for 10 seconds...
+10

@@ -1,0 +1,6 @@
+# Work directory       : /home/sariel/prog/25/catalyst/work/
+# Success file         : /home/sariel/prog/25/catalyst/work/success.txt
+# (Sub)Program         : cat_bug/pmpl_script
+# MODE                 : Parallel search
+# number parallel jobs : 12
+# Stick bug size:  5.0
