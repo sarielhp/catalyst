@@ -57,6 +57,11 @@ echo "----------------------------------------------"
 
 python3 $BDIR/prepare_pmpl_run.py
 
+echo "____________"
+pwd
+echo "____________"
+
+echo $PPLMP -f CatExperiment.xml
 $PPLMP -f CatExperiment.xml
 
 

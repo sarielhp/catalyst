@@ -53,6 +53,28 @@ function  do_a_run() {
     #rm -r -f work >& /dev/null
     #mkdir work
 
+    WDIR=/scratch.local/sariel/work/
+    mkdir -p $WDIR >& /dev/null
+    if  [[ ! -e $WDIR ]]; then
+        WDIR=/tmp/work/
+        mkdir -p $WDIR >& /dev/null
+    fi
+    if  [[ ! -e $WDIR ]]; then
+        echo "Error: Unable to create work directory!"
+        exit -1
+    fi
+
+    # Mark the beginning of a new run in the log file.
+    echo "RUN_START" >> $LOG
+    date  >> $LOG
+
+
+    echo ""
+    echo "Work directory : " $WDIR
+    echo "LOG File       : " $LOG
+#    echo "LOG FILE BASIC : " $LOGFL
+    echo ""
+
     SCFLAG=""
     if  (( $SCALE > 1 )); then
         SCFLAG="-s$SCALE"
@@ -67,22 +89,26 @@ function  do_a_run() {
 
     START=$(date +%s)
 
-    FLAGS="$GTOUT $SCFLAG $CATALYST_FLAGS $PROG work/"
+    FLAGS="$GTOUT $SCFLAG $CATALYST_FLAGS $PROG $WDIR"
     SUCCFILE=$(./catalyst --success_file $FLAGS  )
+    #echo "SUCCESS FILE: [" $SUCCFILE "]"
+
     if  [[ "$SUCCFILE" == "" ]]; then
         echo "Error: Catalyst refusing to report success file!"
         exit -1
     fi
-    
-    echo ./catalyst $GTOUT $SCFLAG $CATALYST_FLAGS $PROG work/
 
-         ./catalyst $GTOUT $SCFLAG $CATALYST_FLAGS $PROG work/ >> $LOG
+    CMD=$(echo ./catalyst $GTOUT $SCFLAG $CATALYST_FLAGS $PROG $WDIR)
+    echo $CMD
+
+         ./catalyst $GTOUT $SCFLAG $CATALYST_FLAGS $PROG $WDIR >> $LOG
 
     END=$(date +%s)
 
     DIFF=$(( $END - $START ))
 
-    #sleep 1
+    sleep 2
+
     f_kill_grep wait #
     f_kill_grep $PROG #
     f_kill_grep ppl_mp
@@ -94,15 +120,28 @@ function  do_a_run() {
     echo "" >> $LOG
     echo "" >> $LOG
     echo "" >> $LOG
+    date  >> $LOG
 
-    if  [[ -e $SUCCFILE ]]; then
+    echo "Is there a success file?"
+    if  [[ -e "$SUCCFILE" ]]; then
+        echo bogi
         DOUT=$(find_empty_dir $DSUCC)
         SDIR=$(cat $SUCCFILE | head -1)
+        echo "Copying $SDIR -> $DOUT"
+        mkdir -p $DOUT >& /dev/null
         if  [[ -d $SDIR ]]; then
-            mkdir -p DOUT
             cp -r $SDIR/* $DOUT/
+            echo $CMD > $DOUT/README
+            echo ""                   >> $DOUT/README
+            echo "RUNTIME                   : " $DIFF    >> $DOUT/README
+            echo "Work directory            : " $WDIR   >> $DOUT/README
+            echo "LOG File (global)         : " $LOG    >> $DOUT/README
+            echo "LOG File (relevant part)  : " $DOUT/$LOGFL    >> $DOUT/README
+            tac $LOG | sed "/RUN_START/Q" | tac > $DOUT/$LOGFL
+
         fi
     fi
+    echo ""
 }
 
 ############################################################
@@ -116,7 +155,8 @@ function datestr() {
 ############################################################
 
 function  random_tests() {
-    LOG=logs/$(datestr)_random_search.txt
+    LOGFL=$(datestr)_random_search.txt
+    LOG=$DLOG/$LOGFL
     #echo $LOG
     CATALYST_FLAGS="-r"
     CATALYST_FLAGS="-R" # Zeta(2) distribution
@@ -130,7 +170,9 @@ function  random_tests() {
 }
 
 function  random_zeta_2_tests() {
-    LOG=$DLOG/random_zeta_2__$(datestr).txt
+    LOGFL=random_zeta_2__$(datestr).txt
+    LOG=$DLOG/$LOGFL
+
     #echo $LOG
     CATALYST_FLAGS="-r"
     CATALYST_FLAGS="-R" # Zeta(2) distribution
@@ -144,7 +186,8 @@ function  random_zeta_2_tests() {
 }
 
 function  wide_tests() {
-    LOG=$DLOG/wide__$(datestr).txt
+    LOGFL=wide__$(datestr).txt
+    LOG=$DLOG/$LOGFL
     CATALYST_FLAGS="-a"
     rm -f $LOG
     for i in  $(seq 1 $TIMES); do
@@ -156,7 +199,8 @@ function  wide_tests() {
 
 function  parallel_tests() {
     ################################################################
-    LOG=$DLOG/parallel_$(datestr).txt
+    LOGFL=parallel_$(datestr).txt
+    LOG=$DLOG/$LOGFL
     CATALYST_FLAGS="-p"
     rm -f $LOG
     for i in $(seq 1 $TIMES); do
@@ -177,7 +221,8 @@ function  main_loop() {
 
 function  boring_tests() {
     ################################################################
-    LOG=$DLOG/single_thread__$(datestr).txt
+    LOGFL=single_thread__$(datestr).txt
+    LOG=$DLOG/$LOGFL
     SEARCH="Boring single thread search"
     CATALYST_FLAGS="-b"
 
@@ -190,7 +235,8 @@ function  boring_tests() {
 
 ################################################################
 function  counter_combined_tests() {
-    LOG=$DLOG/count_comb__$(datestr).txt
+    LOGFL=count_comb__$(datestr).txt
+    LOG=$DLOG/$LOGFL
     CATALYST_FLAGS="-m"
     rm -f $LOG
     log_start
@@ -205,7 +251,9 @@ function  counter_combined_tests() {
 
 ################################################################
 function  counter_tests() {
-    LOG=logs/$(datestr)_counter_search.txt
+    LOGFL=counter_search_$(datestr).txt
+    LOG=$DLOG/$LOGFL
+
     CATALYST_FLAGS=""
     rm -f $LOG
     for i in $(seq 1 $TIMES); do
@@ -218,7 +266,8 @@ function  counter_tests() {
 
 ################################################################
 function  copy_timeout_tests() {
-    LOG=$DLOG/copy_timeout_$TIMEOUT__$(datestr).txt
+    LOGFL=copy_timeout_$TIMEOUT__$(datestr).txt
+    LOG=$DLOG/$LOGFL
     CATALYST_FLAGS="-p -c$TIMEOUT"
     rm -f $LOG
     for i in $(seq 1 $TIMES); do
@@ -255,9 +304,6 @@ GTIMEOUT=3000
 
 ###################################################
 mkdir -p $DLOG $DSUCC >& /dev/null
-
-echo "SUCC DIR ["$X"]"
-exit -1
 
 
 

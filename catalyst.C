@@ -1350,6 +1350,7 @@ struct ArgsInfo
 
     void init() {
         /* Default values. */
+        f_print_succ_file = false;
         f_random_search = f_wide_search = false;
         f_boring = f_verbose = f_parallel_search = f_basel = false;
         f_combined_search = false;
