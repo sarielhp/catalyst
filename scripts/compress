@@ -5,34 +5,42 @@ if  [[ $# == 0 ]]; then
     exit -1
 fi
 
-if  [[ ! -e $1 ]]; then
-    echo "Error: Unable to read file: " $1
-    exit -1
-fi
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 #echo $SCRIPT_DIR
 
-FOUT="logs_final/"$(realpath  --relative-to=logs/ $1)
-FDIR=$(dirname $FOUT );
+function  handle_file() {
+    if  [[ ! -e $1 ]]; then
+        echo "Error: Unable to read file: " $1
+        exit -1
+    fi
 
-FOUTA=$FOUT".bak"
+    FOUT="logs_final/"$(realpath  --relative-to=logs/ $1)
+    FDIR=$(dirname $FOUT );
 
-mkdir -p $FDIR >& /dev/null
+    FOUTA=$FOUT".bak"
 
-grep -e "^#" -e "RUNTIME" $1 > $FOUT
+    mkdir -p $FDIR >& /dev/null
 
-#echo "Out directory : " $FDIR
+    grep -e "^#" -e "RUNTIME" $1 > $FOUT
 
-replacer "# RUNTIME" "RUNTIME" $FOUT
-grep -v "## Task created:" $FOUT > $FOUTA
-grep -v "## SEED" $FOUTA > $FOUT
-mv $FOUT $FOUTA
-grep -v pmpl_script $FOUTA > $FOUT
+    #echo "Out directory : " $FDIR
 
-rm $FOUTA >& /dev/null
+    replacer "# RUNTIME" "RUNTIME" $FOUT
+    grep -v "## Task created:" $FOUT > $FOUTA
+    grep -v "## SEED" $FOUTA > $FOUT
+    mv $FOUT $FOUTA
+    grep -v pmpl_script $FOUTA > $FOUT
 
-julia/remove_all_dup_comments.jl $FOUT
+    rm $FOUTA >& /dev/null
 
-echo "Out filename  : " $FOUT
+    julia/remove_all_dup_comments.jl $FOUT
+
+    echo "Out filename  : " $FOUT
+}
+
+for var in "$@"
+do
+    handle_file "$var"
+done
 
