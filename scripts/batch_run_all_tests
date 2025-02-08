@@ -1,0 +1,5 @@
+#! /bin/bash
+
+sbatch -psecondary-cs --time=03:59:00 --account=cs-sariel --nodes=1 --mincpus=128 scripts/run_all_tests
+
+
