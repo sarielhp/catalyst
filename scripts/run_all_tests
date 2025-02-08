@@ -1,6 +1,5 @@
 #! /bin/bash
 
-
 function  count_lines() {
     X=$(wc -l $1)
     Y=${X% *}
@@ -36,23 +35,9 @@ function  f_kill_grep() {
 }
 
 
-function  log_start() {
-    rm -f $LOG
-    echo "### $SEARCH" >> $LOG
-    echo "### -------------------------------------" >> $LOG
-    echo "### LOG     : $LOG" >> $LOG
-    echo "### PROG    : $PROG" >> $LOG
-    echo "### TIMES   : $TIMES" >> $LOG
-    echo "### FLAGS   : $CATALYST_FLAGS" >> $LOG
-    echo "### -------------------------------------" >> $LOG
-}
-
-
 function  do_a_run() {
+    echo "#######################################################" >> $LOG
     echo "=== Starting a run..."
-    #rm -r -f work >& /dev/null
-    #mkdir work
-
     WDIR=/scratch.local/sariel/work/
     mkdir -p $WDIR >& /dev/null
     if  [[ ! -e $WDIR ]]; then
@@ -66,13 +51,11 @@ function  do_a_run() {
 
     # Mark the beginning of a new run in the log file.
     echo "RUN_START" >> $LOG
-    date  >> $LOG
-
+    echo "# date " >> $LOG
 
     echo ""
     echo "Work directory : " $WDIR
-    echo "LOG File       : " $LOG
-#    echo "LOG FILE BASIC : " $LOGFL
+    echo "# LOG File       : " $LOG
     echo ""
 
     SCFLAG=""
@@ -90,8 +73,9 @@ function  do_a_run() {
     START=$(date +%s)
 
     FLAGS="$GTOUT $SCFLAG $CATALYST_FLAGS $PROG $WDIR"
+
+    #echo ./catalyst --success_file $FLAGS
     SUCCFILE=$(./catalyst --success_file $FLAGS  )
-    #echo "SUCCESS FILE: [" $SUCCFILE "]"
 
     if  [[ "$SUCCFILE" == "" ]]; then
         echo "Error: Catalyst refusing to report success file!"
@@ -99,8 +83,10 @@ function  do_a_run() {
     fi
 
     CMD=$(echo ./catalyst $GTOUT $SCFLAG $CATALYST_FLAGS $PROG $WDIR)
-    echo $CMD
-
+    echo -n "CMI: "
+    echo ./catalyst $GTOUT $SCFLAG $CATALYST_FLAGS $PROG $WDIR
+    echo "-----------------------"
+    
          ./catalyst $GTOUT $SCFLAG $CATALYST_FLAGS $PROG $WDIR >> $LOG
 
     END=$(date +%s)
@@ -114,17 +100,16 @@ function  do_a_run() {
     f_kill_grep ppl_mp
 
     echo RUNTIME: $DIFF
+    echo "# " >> $LOG
+    echo "# ---------------------------------------------------" >> $LOG
+    echo "# RUNTIME: $DIFF " >> $LOG
+    echo "#" >> $LOG
     echo "" >> $LOG
-    echo "---------------------------------------------------" >> $LOG
-    echo RUNTIME: $DIFF >> $LOG
-    echo "" >> $LOG
-    echo "" >> $LOG
-    echo "" >> $LOG
-    date  >> $LOG
+    echo "# "`date`  >> $LOG
 
-    echo "Is there a success file?"
+    # echo "Is there a success file?"
     if  [[ -e "$SUCCFILE" ]]; then
-        echo bogi
+        #echo bogi
         DOUT=$(find_empty_dir $DSUCC)
         SDIR=$(cat $SUCCFILE | head -1)
         echo "Copying $SDIR -> $DOUT"
@@ -135,14 +120,38 @@ function  do_a_run() {
             echo ""                   >> $DOUT/README
             echo "RUNTIME                   : " $DIFF    >> $DOUT/README
             echo "Work directory            : " $WDIR   >> $DOUT/README
-            echo "LOG File (global)         : " $LOG    >> $DOUT/README
-            echo "LOG File (relevant part)  : " $DOUT/$LOGFL    >> $DOUT/README
+            echo 'LOG File (global)         : ' $LOG    >> $DOUT/README
+            echo 'LOG File (relevant part)  : ' $DOUT/$LOGFL    >> $DOUT/README
             tac $LOG | sed "/RUN_START/Q" | tac > $DOUT/$LOGFL
-
         fi
     fi
     echo ""
 }
+
+
+
+function  log_start() {
+    rm -f $LOG
+    echo "### $SEARCH" >> $LOG
+    echo "### -------------------------------------" >> $LOG
+    echo "### LOG     : $LOG" >> $LOG
+    echo "### PROG    : $PROG" >> $LOG
+    echo "### TIMES   : $TIMES" >> $LOG
+    echo "### FLAGS   : $CATALYST_FLAGS" >> $LOG
+    echo "### -------------------------------------" >> $LOG
+}
+
+
+function  main_loop() {
+    LOG=$DLOG/$LOGFL
+    log_start
+    for i in $(seq 1 $TIMES); do
+        echo "LOG file: " $LOG
+        echo "$SEARCH # : " $i
+        do_a_run
+    done
+}
+
 
 ############################################################
 
@@ -156,45 +165,28 @@ function datestr() {
 
 function  random_tests() {
     LOGFL=$(datestr)_random_search.txt
-    LOG=$DLOG/$LOGFL
-    #echo $LOG
-    CATALYST_FLAGS="-r"
-    CATALYST_FLAGS="-R" # Zeta(2) distribution
-    rm -f $LOG
-    for i in  $(seq 1 $TIMES); do
-        printf "\n\n\n\n==================================================\n"
-        echo "LOG file: " $LOG
-        echo "Random search # : " $i
-        do_a_run
-    done
+    CATALYST_FLAGS="-r"    # "Regular distribution"
+    SEARCH="Random search "
+
+    main_loop
 }
 
 function  random_zeta_2_tests() {
     LOGFL=random_zeta_2__$(datestr).txt
     LOG=$DLOG/$LOGFL
-
-    #echo $LOG
-    CATALYST_FLAGS="-r"
     CATALYST_FLAGS="-R" # Zeta(2) distribution
-    rm -f $LOG
-    for i in  $(seq 1 $TIMES); do
-        printf "\n\n\n\n==================================================\n"
-        echo "LOG file: " $LOG
-        echo "Random search # : " $i
-        do_a_run
-    done
+    SEARCH="Random search zeta 2"
+
+    main_loop
 }
 
 function  wide_tests() {
     LOGFL=wide__$(datestr).txt
     LOG=$DLOG/$LOGFL
     CATALYST_FLAGS="-a"
-    rm -f $LOG
-    for i in  $(seq 1 $TIMES); do
-        echo "LOG file: " $LOG
-        echo "Wide search # : " $i
-        do_a_run
-    done
+    SEARCH="Wide search"
+
+    main_loop
 }
 
 function  parallel_tests() {
@@ -211,22 +203,15 @@ function  parallel_tests() {
 }
 
 
-function  main_loop() {
-    for i in $(seq 1 $TIMES); do
-        echo "LOG file: " $LOG
-        echo "$SEARCH # : " $i
-        do_a_run
-    done
-}
+
+
+################################################################
 
 function  boring_tests() {
-    ################################################################
     LOGFL=single_thread__$(datestr).txt
-    LOG=$DLOG/$LOGFL
     SEARCH="Boring single thread search"
     CATALYST_FLAGS="-b"
 
-    log_start
     main_loop
 }
 
@@ -236,48 +221,49 @@ function  boring_tests() {
 ################################################################
 function  counter_combined_tests() {
     LOGFL=count_comb__$(datestr).txt
-    LOG=$DLOG/$LOGFL
     CATALYST_FLAGS="-m"
-    rm -f $LOG
-    log_start
+    SEARCH="Counter comb search"
 
-    for i in $(seq 1 $TIMES); do
-        echo "LOG file: " $LOG
-        echo "Counter comb search #: " $i
-        do_a_run
-    done
+    main_loop
 }
 
 
 ################################################################
 function  counter_tests() {
     LOGFL=counter_search_$(datestr).txt
-    LOG=$DLOG/$LOGFL
-
     CATALYST_FLAGS=""
-    rm -f $LOG
-    for i in $(seq 1 $TIMES); do
-        echo "LOG file: " $LOG
-        echo "Counter search #: " $i
-        do_a_run
-    done
+    SEARCH="Counter search"
+
+    main_loop
 }
 
 
 ################################################################
 function  copy_timeout_tests() {
-    LOGFL=copy_timeout_$TIMEOUT__$(datestr).txt
-    LOG=$DLOG/$LOGFL
+    SEARCH="TTL Search"
+    LOGFL=TTL_$TIMEOUT__$(datestr).txt
     CATALYST_FLAGS="-p -c$TIMEOUT"
-    rm -f $LOG
-    for i in $(seq 1 $TIMES); do
-        echo "LOG file: " $LOG
-        echo "Timeout search #: " $i " with timeout " $TIMEOUT
-        do_a_run
-    done
+
+    main_loop
 }
 
+################################################################
+function  comp_vars() {
+    PROG=inputs/$INST/$BPROG
+    DLOG=logs/$INST/
+    DSUCC=success/$INST/
+}
+
+
+###############################################################################
+###############################################################################
+###############################################################################
+# Main parameters choices
 BPROG=pmpl_script
+TIMES=100
+SCALE=1    # Scale: Scale time by this factor
+GTIMEOUT=3000    # Global timeout
+
 
 #INST==wait_random_busy
 #INST=wait_forever_99
@@ -286,32 +272,16 @@ BPROG=pmpl_script
 #INST=maze
 INST=bug
 
+###############################################################################
 
-################################################################
-PROG=inputs/$INST/$BPROG
-DLOG=logs/$INST/
-DSUCC=success/$INST/
-TIMES=100
-#TIMEOUT=15
-
-# Scale: Scale time by this factor
-SCALE=1
-#SCALE=2000
-
-# Global timeout
-GTIMEOUT=3000
-
-
-###################################################
 mkdir -p $DLOG $DSUCC >& /dev/null
 
-
+comp_vars
 
 #boring_tests
 #random_tests
-#counter_tests
-counter_combined_tests
-#TIMEOUT=3
+counter_tests
+#counter_combined_tests
 #copy_timeout_tests
 #wide_tests
 #parallel_tests
