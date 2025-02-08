@@ -7,6 +7,19 @@ function  count_lines() {
     echo $Y
 }
 
+function  find_empty_dir() {
+    COUNTER=1
+    while [ Your != "done" ]
+    do
+        OUT=$DSUCC""$(printf "%06d" $COUNTER)
+        if  [[ ! -e $OUT ]]; then
+             echo $OUT
+             return
+        fi
+        COUNTER=$[$COUNTER +1]
+    done
+}
+
 function  f_kill_grep() {
     TDIR=/tmp/sariel/kill_grep
     mkdir -p $TDIR >& /dev/null
@@ -54,6 +67,13 @@ function  do_a_run() {
 
     START=$(date +%s)
 
+    FLAGS="$GTOUT $SCFLAG $CATALYST_FLAGS $PROG work/"
+    SUCCFILE=$(./catalyst --success_file $FLAGS  )
+    if  [[ "$SUCCFILE" == "" ]]; then
+        echo "Error: Catalyst refusing to report success file!"
+        exit -1
+    fi
+    
     echo ./catalyst $GTOUT $SCFLAG $CATALYST_FLAGS $PROG work/
 
          ./catalyst $GTOUT $SCFLAG $CATALYST_FLAGS $PROG work/ >> $LOG
@@ -74,6 +94,15 @@ function  do_a_run() {
     echo "" >> $LOG
     echo "" >> $LOG
     echo "" >> $LOG
+
+    if  [[ -e $SUCCFILE ]]; then
+        DOUT=$(find_empty_dir $DSUCC)
+        SDIR=$(cat $SUCCFILE | head -1)
+        if  [[ -d $SDIR ]]; then
+            mkdir -p DOUT
+            cp -r $SDIR/* $DOUT/
+        fi
+    fi
 }
 
 ############################################################
@@ -205,11 +234,14 @@ BPROG=pmpl_script
 #INST=wait_forever_99
 #INST=cat_exp
 #INST=cat_bug_no_scale
+#INST=maze
+INST=bug
 
-INST=cat_maze
 
-PROG=$INST/$BPROG
+################################################################
+PROG=inputs/$INST/$BPROG
 DLOG=logs/$INST/
+DSUCC=success/$INST/
 TIMES=100
 #TIMEOUT=15
 
@@ -222,7 +254,12 @@ GTIMEOUT=3000
 
 
 ###################################################
-mkdir -p $DLOG >& /dev/null
+mkdir -p $DLOG $DSUCC >& /dev/null
+
+echo "SUCC DIR ["$X"]"
+exit -1
+
+
 
 #boring_tests
 #random_tests

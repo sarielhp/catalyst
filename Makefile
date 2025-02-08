@@ -1,4 +1,4 @@
-SUBDIRS := wait10 wait_random wait_random_busy wait_10_busy
+SUBDIRS := inputs/*
 
 STR := $(shell datestrext)
 
@@ -15,7 +15,7 @@ endef
 
 .PHONY: build git_push
 build: catalyst
-	$(call FOREACH,build)
+#	$(call FOREACH,build)
 #	g++ -Wall -o catalyst catalyst.C
 
 .PHONY: clean

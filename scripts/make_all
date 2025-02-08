@@ -1,0 +1,4 @@
+#! /bin/bash
+
+find . -name Makefile -type f -exec sh -c 'make -C "${1%/*}"' sh {} \;
+

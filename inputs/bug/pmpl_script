@@ -19,6 +19,8 @@ if  (( $# != 2 )); then
     exit -1
 fi
 
+#WDIR=/scratch.local/sariel/work/
+
 #BDIR=/home/sariel/prog/25/catalyst/cat_exp
 BDIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 

@@ -770,7 +770,7 @@ void   SManager::suspend_process( int  ind )
     // them sorted by wakeup time.
     active_tasks.erase( active_tasks.begin() + ind );
 
-    
+
     suspended_tasks.push_back( p_task );
     push_heap( suspended_tasks.begin(), suspended_tasks.end(),
                TaskComparatorByWakeup() );
@@ -1140,7 +1140,7 @@ void   SManager::main_loop()
     printf( "# MODE             : %s\n", get_mode_str() );
     if  ( f_combined_search )
         printf( "# Combined mode!\n" );
-        
+
     printf( "# of parallel jobs : %d\n", max_jobs_number );
     printf( "# Time scale       : %d\n", scale );
     if  ( ( f_random_search )  &&  ( f_basel ) )
@@ -1313,6 +1313,8 @@ const char *argp_program_bug_address =
   "<sariel@illinois.edu>";
 
 
+#define  PRINT_SUCC_FILE  -1
+
 /* The options we understand. */
 static struct argp_option options[] = {
     {"wide",        'a', 0,      0,  "Wide search" },
@@ -1329,6 +1331,7 @@ static struct argp_option options[] = {
       "Timeout on running time of each COPY of alg."},
     {"scale",  's', "Seconds", OPTION_ARG_OPTIONAL,
       "Scale to use."},
+    {"success_file", PRINT_SUCC_FILE, 0,      0,  "Output success file name." },
   { 0 }
 };
 
@@ -1337,6 +1340,7 @@ static struct argp_option options[] = {
 struct ArgsInfo
 {
     bool  f_wide_search, f_verbose, f_boring, f_random_search;
+    bool  f_print_succ_file;
     bool  f_combined_search;
     bool  f_parallel_search, f_basel;
     int   time_out, scale, copy_time_out;
@@ -1372,6 +1376,10 @@ static error_t    parse_opt (int key, char *arg, struct argp_state *state)
   ArgsInfo  & info( *p_info );
 
   switch (key) {
+  case  PRINT_SUCC_FILE:
+      info.f_print_succ_file = true;
+      break;
+
   case 'a':
       info.f_wide_search = true;
       break;
@@ -1561,7 +1569,7 @@ int  main(int   argc, char*   argv[])
             error( "Combined search and wide search are not compatible." );
         p_manager->set_combined_search( true );
     }
-        
+
     if  ( opt.f_wide_search ) {
         p_manager->set_wide_search( true );
         p_manager->set_seq_generator( new  SequencePlusOne() );
@@ -1587,6 +1595,12 @@ int  main(int   argc, char*   argv[])
     p_manager->prepare_to_run();
 
     string cmd = command_line( argc, argv );
+
+    if  ( opt.f_print_succ_file ) {
+        printf( "%s\n", p_manager->get_success_file_name() );
+        return  0;
+    }
+
     printf( "### %s\n###\n", cmd.c_str() );
 
     printf( "# Work directory   : %s\n", p_manager->get_work_dir().c_str() );
