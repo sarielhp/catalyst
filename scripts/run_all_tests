@@ -146,6 +146,7 @@ function  log_start() {
 
 
 function  main_loop() {
+    mkdir -p $DLOG >& /dev/null
     LOG=$DLOG/$LOGFL
     log_start
     echo "LOG file: " $LOG
