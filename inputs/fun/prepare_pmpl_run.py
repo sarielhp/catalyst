@@ -12,7 +12,7 @@ def replace_placeholders(content):
     sseed = str(generate_random_int(0, 9999999))
     content = content.replace("@@seed@@", sseed)
     print( "## SEED ", sseed )
-    
+
     start_ranges = [[-33.0, 33.0], [30.0, 33.0], [-1.0, 1.0]]
     goal_ranges = [[-33.0, 33.0], [-33.0, -30.0], [-1.0, 1.0]]
 
@@ -31,12 +31,12 @@ def generate_numbers_from_ranges(ranges):
         else:
             raise ValueError("Invalid range: min value is greater than max value")
     return ' '.join(result)
+
+
 def main():
-
-
     with open("CatExperimentTemplate.xml", "r") as template_file:
         template_content = template_file.read()
-            
+
         content = replace_placeholders(template_content)
         filename = f"CatExperiment.xml"
 
