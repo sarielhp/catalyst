@@ -1,32 +1,56 @@
+#! /bin/bash
 
-julia/latex_stats.jl \
-        results/cat_bug_boring.txt \
-        results/cat_bug_parallel.txt \
-        results/cat_bug_random_zeta_2.txt \
-        results/cat_bug_random.txt \
-        results/cat_bug_wide_search.txt \
-        results/cat_bug_scale_0_99.txt \
-        results/cat_bug_counter_comb_search.txt
+HOME=$(eval echo ~$USER)
 
+function  fix_up() {
+    replacer "count\_comb"           "Counter+Cache" $FL
+    replacer "counter\_comb\_search" "Counter+Cache" $FL
+    replacer "scale\_0\_99" "Counter" $FL
+    replacer "wide\_search" "Wide" $FL
+    replacer "random\_zeta\_2" "Random $\zeta(2)$" $FL
+    replacer "random"          "Random"            $FL
+    replacer "boring"          "Boring"            $FL
+    replacer "parallel"        "Parallel"          $FL
+    replacer "rrrrrrrrr"       "l|rrr|rrrrr"       $FL
+    replacer "counter"         "Counter"           $FL
+}
+
+function  copy_it() {
+    pushd . >& /dev/null
+    cd $HOME/papers/25/catastrophe/
+    snapshot figs/*.tex >& /dev/null
+
+    L=$(grep -n Random $FL |  cut -f1 -d: | head -1)
+
+    sed -i "$L i \\\\\\hline" $FL
+
+    DFL=$HOME/papers/25/catastrophe/figs/$1
+    cp $FL $DFL
+    popd  >& /dev/null
+}
+
+julia/stats_latex_table.jl \
+        results/bug/boring.txt \
+        results/bug/parallel.txt \
+        results/bug/random_zeta_2.txt \
+        results/bug/random.txt \
+        results/bug/wide_search.txt \
+        results/bug/scale_0_99.txt \
+        results/bug/counter_comb_search.txt
 FL=$(realpath out/results.tex)
+fix_up
+copy_it cat_bug_diff_tech.tex
 
-replacer "counter\_comb\_search" "Counter+Cache" $FL
-replacer "scale\_0\_99" "Counter" $FL
-replacer "wide\_search" "Wide" $FL
-replacer "random\_zeta\_2" "Random $\zeta(2)$" $FL
-replacer "random"          "Random"            $FL
-replacer "boring"          "Boring"            $FL
-replacer "parallel"        "Parallel"          $FL
-replacer "rrrrrrrrr"       "l|rrr|rrrrr"       $FL
+##############################################################
 
-cd /home/sariel/papers/25/catastrophe/
-snapshot figs/*.tex >& /dev/null
 
-L=$(grep -n Random $FL |  cut -f1 -d: | head -1)
 
-sed -i "$L i \\\\\\hline" $FL
+julia/stats_latex_table.jl \
+    results/bug/count_comb_cluster_128.txt \
+    results/bug/counter_cluster_128.txt \
+    results/bug/parallel_cluster_128.txt
 
-DFL=/home/sariel/papers/25/catastrophe/figs/cat_bug_diff_tech.tex
-cp $FL $DFL
 
+fix_up
+copy_it cat_bug_cluster_128.tex
 

@@ -1,9 +1,11 @@
 #! /bin/bash
 
+HOME=$(eval echo ~$USER)
+
 if  [[ "$USER" -eq "sariel" ]]; then
-    PPLMP=/home/sariel/prog/25/pmpl/build/ppl_mp
+    PPLMP=$HOME/prog/25/pmpl/build/ppl_mp
 else
-    PPLMP=/home/stav/mptools/src/pmpl
+    PPLMP=$HOME/mptools/src/pmpl
 fi
 
 # $1: Work directory
@@ -14,9 +16,8 @@ if  (( $# != 2 )); then
     exit -1
 fi
 
-#BDIR=/home/sariel/prog/25/catalyst/cat_exp
-BDIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
+BDIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 mkdir $1 >& /dev/null
 
@@ -42,9 +43,9 @@ echo cmd:$*
 
 cd $1
 
-echo "----------------------------------------------"
-pwd
-echo "----------------------------------------------"
+#echo "----------------------------------------------"
+#pwd
+#echo "----------------------------------------------"
 
 #trap "echo received sigterm" SIGTERM
 
@@ -63,3 +64,4 @@ if  (( $L > 0 )); then
 else
     echo "Nope"
 fi
+
