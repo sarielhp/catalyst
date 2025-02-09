@@ -54,11 +54,11 @@ L=$(find . | grep -i  .stat | wc -l)
 if  (( $L > 0 )); then
     # Create & write into the success file...
     echo "=================================================================="
-    stat_file=$(find "$1" -type f -name "*.rdmp.path" -print -quit)
-    if [[ -n "$stat_file" ]]; then
-        cp "$stat_file" ../../ppl_paths/
-    else
-        echo "No .path file found in $1"
-    fi
+#    stat_file=$(find "$1" -type f -name "*.rdmp.path" -print -quit)
+#    if [[ -n "$stat_file" ]]; then
+#        cp "$stat_file" ../../ppl_paths/
+#    else
+#        echo "No .path file found in $1"
+#    fi
     echo  $1 > $2
 fi
