@@ -1,0 +1,19 @@
+
+# Motion Planning Experiment: BugTrap
+
+## Environment
+- **Description**: 3D hollow oblong shape with a single thin funnel shaped entrance with the thin part of the funnel inside the trap.
+- **Bounding box dimensions**: 100 x 100 x 100
+- **Note**: The environment is based on the BugTrap benchmark from the Parasol Lab at the University of Illinois.
+- **Link**: [BugTrap Benchmark](https://parasollab.web.illinois.edu/resources/mpbenchmarks/BugTrap/)
+
+## Robot
+- **Type**: 6DOF mobile robot
+- **Shape**: Elongated cylinder
+
+## Task
+- **Start**: A configuration outside of the trap
+- **Goal**: A configuration outside of the trap
+
+## Notes
+- **Scaling** In this version the nearest-neighbor distance is scaled to give more weight to positional DOFs than to rotational DOFs.

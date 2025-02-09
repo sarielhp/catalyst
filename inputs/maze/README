@@ -1,0 +1,17 @@
+
+# Motion Planning Experiment: 2D Maze
+
+## Environment
+- **Description**: A 2D maze with corriders of width 1. There are 2 entrances to the maze.
+- **Bounding box dimensions**: 77 x 70
+- **Note**: The environment is based on the BugTrap benchmark from the Parasol Lab at the University of Illinois.
+- **Link**: [BugTrap Benchmark](https://gitlab-beta.engr.illinois.edu/parasol-group/parasol/open-ppl-env/-/tree/benchmarks/Maze?ref_type=heads)
+
+
+## Robot
+- **Type**: 3DOF mobile robot
+- **Shape**: Rectangle with dimensions 0.2x0.2
+
+## Task
+- **Start**: A configuration at one of the maze entrances.
+- **Goal**:  A configuration at the other maze entrance.
