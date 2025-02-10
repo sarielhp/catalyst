@@ -1019,7 +1019,8 @@ void  SManager::spawn_single_task()
     Task  * tsk = new  Task();
 
     counter_tasks_created++;
-    printf( "## Task created: %d\n", counter_tasks_created );
+    if  ( ( counter_tasks_created & 0x1f ) == 0 )
+        printf( "## Task created: %d\n", counter_tasks_created );
 
     // We run a process for one second if we are in the wide search mode...
     if  ( f_wide_search ) {
@@ -1137,12 +1138,14 @@ void  SManager::prepare_to_run()
 
 void   SManager::main_loop()
 {
-    printf( "# MODE             : %s\n", get_mode_str() );
+    printf( "# MODE                 : %s\n", get_mode_str() );
     if  ( f_combined_search )
         printf( "# Combined mode!\n" );
 
-    printf( "# of parallel jobs : %d\n", max_jobs_number );
-    printf( "# Time scale       : %d\n", scale );
+    printf( "# of parallel jobs     : %d\n", max_jobs_number );
+    if  ( max_suspends > 0 ) 
+        printf( "# max # suspended jobs : %d\n", max_suspends );
+    printf( "# Time scale           : %d\n", scale );
     if  ( ( f_random_search )  &&  ( f_basel ) )
         printf( "## Basel distribution  (Prob[X=i] ≈ 1/i^2)\n" );
     printf( "-----------------------------------------------------------\n\n" );
@@ -1539,7 +1542,8 @@ int  main(int   argc, char*   argv[])
     //p_manager->set_threads_num( opt.num_threads );
     //p_manager->set_threads_num( (2 * opt.num_threads) / 3  );
     p_manager->set_threads_num( (3 * opt.num_threads) / 4  );
-    p_manager->set_max_suspends_num( 4*opt.num_threads );
+    if  ( opt.f_combined_search  )
+        p_manager->set_max_suspends_num( opt.num_threads );
 
     //p_manager->set_threads_num( 12 );
     p_manager->set_program( opt.program );
