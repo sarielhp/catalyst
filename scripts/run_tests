@@ -1,0 +1,336 @@
+#! /bin/bash
+
+if  (( $# != 2 )); then
+    echo "run_tests [input] [test]"
+    echo ""
+    echo "input: bug/shelves/fun/etc"
+    echo ""
+    echo "test: counter/random/para/wide/counter_comb"
+    echo""
+    exit -1
+fi
+    
+function  count_lines() {
+    X=$(wc -l $1)
+    Y=${X% *}
+    echo $Y
+}
+
+function  find_empty_dir() {
+    COUNTER=1
+    while [ Your != "done" ]
+    do
+        OUT=$DSUCC""$(printf "%06d" $COUNTER)
+        if  [[ ! -e $OUT ]]; then
+             echo $OUT
+             return
+        fi
+        COUNTER=$[$COUNTER +1]
+    done
+}
+
+function  f_kill_grep() {
+    TDIR=/tmp/sariel/kill_grep
+    mkdir -p $TDIR >& /dev/null
+    TFL=$TDIR/kill_grep.txt
+
+    ps auxw | grep $1 | grep -v kill_grep | grep -v grep > $TFL
+    L=$(count_lines $TFL)
+    if  (( $L > 0 )); then
+        cat $TFL |  gi -v kill_grep
+        echo "ESCAPED PROCESSES: " $L
+        kill -9 `cat $TFL | awk '{print $2}'` >& /dev/null
+    fi
+    #echo "NO ESCAPED PROCESSES"
+}
+
+
+function  do_a_run() {
+    #echo "#######################################################" >> $LOG
+    echo "=== Starting a run..."
+    WDIR=/scratch.local/sariel/work/
+    mkdir -p $WDIR >& /dev/null
+    if  [[ ! -e $WDIR ]]; then
+        WDIR=/tmp/work/
+        mkdir -p $WDIR >& /dev/null
+    fi
+    if  [[ ! -e $WDIR ]]; then
+        echo "Error: Unable to create work directory!"
+        exit -1
+    fi
+
+    # Mark the beginning of a new run in the log file.
+    echo "RUN_START" >> $LOG
+    echo "# START TIME: "`date` >> $LOG
+    echo "# Host : "`hostname` >> $LOG
+
+    echo ""
+    echo "Work directory : " $WDIR
+    echo "# LOG File       : " $LOG
+    echo ""
+
+    SCFLAG=""
+    if  (( $SCALE > 1 )); then
+        SCFLAG="-s$SCALE"
+    fi
+
+    if  [[ "$GTIMEOUT" == "" ]]; then
+        GTOUT=""
+    else
+        GTOUT="-t$GTIMEOUT"
+        echo "#### Global timeout: " $GTIMEOUT >> $LOG
+    fi
+
+    START=$(date +%s)
+
+    FLAGS="$GTOUT $SCFLAG $CATALYST_FLAGS $PROG $WDIR"
+
+    #echo ./catalyst --success_file $FLAGS
+    SUCCFILE=$(./catalyst --success_file $FLAGS  )
+
+    if  [[ "$SUCCFILE" == "" ]]; then
+        echo "Error: Catalyst refusing to report success file!"
+        exit -1
+    fi
+
+    CMD=$(echo ./catalyst $GTOUT $SCFLAG $CATALYST_FLAGS $PROG $WDIR)
+    echo -n "CMI: "
+    echo ./catalyst $GTOUT $SCFLAG $CATALYST_FLAGS $PROG $WDIR
+    echo "-----------------------"
+    
+         ./catalyst $GTOUT $SCFLAG $CATALYST_FLAGS $PROG $WDIR >> $LOG
+
+    END=$(date +%s)
+
+    DIFF=$(( $END - $START ))
+
+    sleep 2
+
+    f_kill_grep wait #
+    f_kill_grep $PROG #
+    f_kill_grep ppl_mp
+
+    echo RUNTIME: $DIFF
+    #echo "# " >> $LOG
+    #echo "# ---------------------------------------------------" >> $LOG
+    echo "# RUNTIME: $DIFF " >> $LOG
+    echo "#" >> $LOG
+    echo "" >> $LOG
+    echo "# END   TIME: "`date`  >> $LOG
+
+    # echo "Is there a success file?"
+    if  [[ -e "$SUCCFILE" ]]; then
+        #echo bogi
+        DOUT=$(find_empty_dir $DSUCC)
+        SDIR=$(cat $SUCCFILE | head -1)
+        echo "Copying $SDIR -> $DOUT"
+        mkdir -p $DOUT >& /dev/null
+        if  [[ -d $SDIR ]]; then
+            cp -r $SDIR/* $DOUT/
+            echo $CMD > $DOUT/README
+            echo ""                   >> $DOUT/README
+            echo "RUNTIME                   : " $DIFF    >> $DOUT/README
+            echo "Work directory            : " $WDIR   >> $DOUT/README
+            echo 'LOG File (global)         : ' $LOG    >> $DOUT/README
+            echo 'LOG File (relevant part)  : ' $DOUT/$LOGFL    >> $DOUT/README
+            tac $LOG | sed "/RUN_START/Q" | tac > $DOUT/$LOGFL
+        fi
+    fi
+    echo ""
+}
+
+
+
+function  log_start() {
+    rm -f $LOG
+    echo "### $SEARCH" >> $LOG
+    echo "### -------------------------------------" >> $LOG
+    echo "### LOG     : $LOG" >> $LOG
+    echo "### PROG    : $PROG" >> $LOG
+    echo "### TIMES   : $TIMES" >> $LOG
+    echo "### FLAGS   : $CATALYST_FLAGS" >> $LOG
+    echo "### -------------------------------------" >> $LOG
+    lscpu | sed '1,/Vulner/!d' | grep -iv flags: |  sed 's/^/### /g' >> $LOG
+    echo "###-----------------------------------------------------" >> $LOG
+}
+
+
+function  main_loop() {
+    mkdir -p $DLOG >& /dev/null
+    LOG=$DLOG/$LOGFL
+    log_start
+    echo "LOG file: " $LOG
+    for i in $(seq 1 $TIMES); do
+        echo -n "####################" >> $LOG
+        echo "################################################## " $i >> $LOG
+        echo "$SEARCH # : " $i >> $LOG
+        do_a_run $1
+    done
+}
+
+
+############################################################
+
+
+function datestr() {
+    echo  `date +%m_%d_%y__%H_%M_%S`
+}
+
+
+############################################################
+
+function  random_tests() {
+    LOGFL=$(datestr)_random_search.txt
+    CATALYST_FLAGS="-r"    # "Regular distribution"
+    SEARCH="Random search "
+
+    main_loop
+}
+
+function  random_zeta_2_tests() {
+    LOGFL=random_zeta_2__$(datestr).txt
+    LOG=$DLOG/$LOGFL
+    CATALYST_FLAGS="-R" # Zeta(2) distribution
+    SEARCH="Random search zeta 2"
+
+    main_loop
+}
+
+function  wide_tests() {
+    LOGFL=wide__$(datestr).txt
+    LOG=$DLOG/$LOGFL
+    CATALYST_FLAGS="-a"
+    SEARCH="Wide search"
+
+    main_loop
+}
+
+function  parallel_tests() {
+    ################################################################
+    LOGFL=parallel_$(datestr).txt
+    CATALYST_FLAGS="-p"
+    SEARCH="Parallel search"
+    
+    main_loop
+}
+
+
+################################################################
+
+function  boring_tests() {
+    LOGFL=single_thread__$(datestr).txt
+    SEARCH="Boring single thread search"
+    CATALYST_FLAGS="-b"
+
+    main_loop
+}
+
+# parallel_tests()
+
+
+################################################################
+function  counter_combined_tests() {
+    LOGFL=count_comb__$(datestr).txt
+    CATALYST_FLAGS="-m"
+    SEARCH="Counter comb search"
+
+    main_loop
+}
+
+
+################################################################
+function  counter_tests() {
+    LOGFL=counter_search_$(datestr).txt
+    CATALYST_FLAGS=""
+    SEARCH="Counter search"
+
+    main_loop
+}
+
+
+################################################################
+function  copy_timeout_tests() {
+    SEARCH="TTL Search"
+    LOGFL=TTL_$TIMEOUT__$(datestr).txt
+    CATALYST_FLAGS="-p -c$TIMEOUT"
+
+    main_loop
+}
+
+################################################################
+function  comp_vars() {
+    PROG=inputs/$INST/$BPROG
+    DLOG=logs/$INST/
+    DSUCC=success/$INST/
+}
+
+
+###############################################################################
+###############################################################################
+###############################################################################
+# Main parameters choices
+BPROG=pmpl_script
+TIMES=100
+SCALE=1    # Scale: Scale time by this factor
+GTIMEOUT=3000    # Global timeout
+
+
+#INST==wait_random_busy
+#INST=wait_forever_99
+#INST=cat_exp
+#INST=cat_bug_no_scale
+INST=maze
+#INST=bug
+
+###############################################################################
+
+mkdir -p $DLOG $DSUCC >& /dev/null
+
+comp_vars
+
+INPUT=$1
+TEST=$2
+
+case "$INPUT" in
+    "shelves" )
+        INST="shelves";;
+    "bug" )
+        INST="bug";;
+    "maze" )
+        INST="maze";;
+esac
+
+echo $INST
+
+case  "$TEST"  in
+    "counter" )
+        counter_tests;;
+
+    "para" )
+        parallel_tests;;
+
+    "wide" )
+        wide_tests;;
+
+    "random" )
+        random_tests;;
+
+    "zeta" )
+        random_zeta_2_tests;;
+    
+    "counter_comb" )
+        counter_combined_tests;;
+
+esac
+
+
+exit -1
+
+#boring_tests
+#counter_combined_tests
+#copy_timeout_tests
+#parallel_tests
+
+#wide_tests
+
+exit -1
