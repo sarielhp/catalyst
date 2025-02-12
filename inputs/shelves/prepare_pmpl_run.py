@@ -13,8 +13,8 @@ def replace_placeholders(content):
     content = content.replace("@@seed@@", sseed)
     print( "## SEED ", sseed )
 
-    content = content.replace("@@start@@", "0.0 -0.5 0.0 -0.5 0.0 0.0")
-    content = content.replace("@@goal@@", "-0.064 -0.75 -0.3 -0.45 -1.0 0.0")
+    content = content.replace("@@start@@", "0.5 -0.5 0.0 -0.5 0.0 0.0")
+    content = content.replace("@@goal@@", "-0.06 -0.75 -0.3 -0.45 -1.0 0.0")
     # content = content.replace("@@goal@@", "0.55 -0.73 -0.25 -0.5 1.0 0.0")
     
 
