@@ -45,7 +45,7 @@ copy_it cat_bug_diff_tech.tex
 
 
 
-julia/stats_latex_table.jl \
+julia julia/stats_latex_table.jl \
     results/bug/count_comb_cluster_128.txt \
     results/bug/counter_cluster_128.txt \
     results/bug/parallel_cluster_128.txt
