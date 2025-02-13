@@ -45,6 +45,8 @@
     <NeighborhoodFinders>
       <BruteForceNF label="Nearest" dmLabel="euclidean" unconnected="false"
         k="1"/>
+      <BruteForceNF label="PRMNearest" dmLabel="euclidean" unconnected="false"
+        k="5"/>
     </NeighborhoodFinders>
 
     <Samplers>
@@ -71,7 +73,7 @@
 
     <Connectors>
       <NeighborhoodConnector label="Closest" debug="false"
-        nfLabel="Nearest" lpLabel="sl" checkIfSameCC="false"/>
+        nfLabel="PRMNearest" lpLabel="sl" checkIfSameCC="false"/>
     </Connectors>
 
     <Metrics>
