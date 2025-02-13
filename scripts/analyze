@@ -1,51 +1,9 @@
 #! /bin/bash
 
-if  (( $# < 1 )); then
-    echo "Wrong number of parameters!"
-    exit
-fi
+FLO=$(scripts/compress $1  | awk '{print $4}')
 
-function  fanalyze() {
-    INP=$1
+echo ""
+echo "FLO : " $FLO
+echo ""
 
-
-    if  [[ ! -e $INP ]]; then
-        FL=$(find logs_final | grep $INP)
-        if  [[ -e $FL ]]; then
-            INP=$FL
-        fi
-    fi
-
-    if  [[ ! -e $INP ]]; then
-        echo ""
-        echo "Error:  File does not exist!"
-        echo "$INP"
-        echo ""
-        exit
-    fi
-    BNAME=$(basename $INP)
-    BDIR=$(dirname $INP)
-
-    RELDIR=$(realpath  --relative-to=logs_final/ $INP)
-    OUT=results/$RELDIR
-
-    OUTDIR=$(dirname $OUT)
-    mkdir -p $OUTDIR >& /dev/null
-    
-    if  [[ $INP -nt $OUT ]]; then
-        scripts/extract_comments $INP > $OUT
-        scripts/extract_runtimes $INP >> $OUT
-
-        echo "Created $OUT"
-        echo ""
-    fi
-    echo "$INP -> $OUT" 
-
-    echo julia/stats.jl $OUT
-    julia/stats.jl $OUT
-}
-
-for var in "$@"
-do
-    fanalyze "$var"
-done
+scripts/analyze_inner $FLO

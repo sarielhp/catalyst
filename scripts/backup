@@ -1,0 +1,13 @@
+#! /bin/bash
+
+rm *.zip >& /dev/null
+
+FL=catalyst_`datestr`.zip
+zip -r $FL . \
+         -x "logs/*" -x "logs_final/*" "results/old/*" \
+         -x "work/*" -x "versions/*" \
+         -x catalyst \
+         -x "success/*" -x ".git/*"
+
+DST=`cdtoday_dir`
+mv $FL $DST
