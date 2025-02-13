@@ -27,10 +27,14 @@ function  handle_file() {
     #echo "Out directory : " $FDIR
 
     replacer "# RUNTIME" "RUNTIME" $FOUT
-    grep -v "## Task created:" $FOUT > $FOUTA
-    grep -v "## SEED" $FOUTA > $FOUT
-    mv $FOUT $FOUTA
-    grep -v pmpl_script $FOUTA > $FOUT
+    grep -v "## Task created:" $FOUT  > $FOUTA
+    grep -v "## SEED"          $FOUTA > $FOUT
+    grep -v -i "# START TIME:" $FOUT  > $FOUTA
+    grep -v -i "# END   TIME:" $FOUTA > $FOUT
+    grep -v -i "######################################################" \
+                               $FOUT  > $FOUTA
+#    mv $FOUT $FOUTA
+    grep -v pmpl_script        $FOUTA > $FOUT
 
     rm $FOUTA >& /dev/null
 

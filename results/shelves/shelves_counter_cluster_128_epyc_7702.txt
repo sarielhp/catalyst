@@ -1,0 +1,459 @@
+##cmd:/scratch.local/sariel/work/002948 /scratch.local/sariel/work/success.txt
+##cmd:/scratch.local/sariel/work/002062 /scratch.local/sariel/work/success.txt
+##cmd:/scratch.local/sariel/work/002056 /scratch.local/sariel/work/success.txt
+###-----------------------------------------------------
+#### Global timeout:  3000
+### Vulnerability Gather data sampling:   Not affected
+### Vendor ID:                            AuthenticAMD
+### Thread(s) per core:                   1
+### TIMES   : 100
+### Stepping:                             0
+### Socket(s):                            2
+### On-line CPU(s) list:                  0-127
+### NUMA node1 CPU(s):                    64-127
+### NUMA node0 CPU(s):                    0-63
+### NUMA node(s):                         2
+### Model:                                49
+### Model name:                           AMD EPYC 7702 64-Core Processor
+### LOG     : logs/shelves//counter_search_02_11_25__23_43_28.txt
+### L3 cache:                             512 MiB (32 instances)
+### L2 cache:                             64 MiB (128 instances)
+### L1i cache:                            4 MiB (128 instances)
+### L1d cache:                            4 MiB (128 instances)
+### FLAGS   :
+### Counter search
+### Core(s) per socket:                   64
+### CPU(s):                               128
+### CPU op-mode(s):                       32-bit, 64-bit
+### CPU family:                           23
+### Byte Order:                           Little Endian
+### BogoMIPS:                             3992.11
+### Architecture:                         x86_64
+### Address sizes:                        48 bits physical, 48 bits virtual
+### -------------------------------------
+###
+## cmd:/scratch.local/sariel/work/004018 /scratch.local/sariel/work/success.txt
+## cmd:/scratch.local/sariel/work/003385 /scratch.local/sariel/work/success.txt
+## cmd:/scratch.local/sariel/work/002741 /scratch.local/sariel/work/success.txt
+## cmd:/scratch.local/sariel/work/002496 /scratch.local/sariel/work/success.txt
+## cmd:/scratch.local/sariel/work/002184 /scratch.local/sariel/work/success.txt
+## Pcmd:/scratch.local/sariel/work/003101 /scratch.local/sariel/work/success.txt
+## Pcmd:/scratch.local/sariel/work/002962 /scratch.local/sariel/work/success.txt
+## PRcmd:/scratch.local/sariel/work/003400 /scratch.local/sariel/work/success.txt
+## PRcmd:/scratch.local/sariel/work/002517 /scratch.local/sariel/work/success.txt
+## PRcmd:/scratch.local/sariel/work/001723 /scratch.local/sariel/work/success.txt
+## PRcmd:/scratch.local/sariel/work/001005 /scratch.local/sariel/work/success.txt
+## PROcmd:/scratch.local/sariel/work/002877 /scratch.local/sariel/work/success.txt
+## PROcmd:/scratch.local/sariel/work/002133 /scratch.local/sariel/work/success.txt
+## PROcmd:/scratch.local/sariel/work/000478 /scratch.local/sariel/work/success.txt
+## PROcmd:/scratch.local/sariel/work/000474 /scratch.local/sariel/work/success.txt
+## PROcmd:/scratch.local/sariel/work/000473 /scratch.local/sariel/work/success.txt
+## PROcmd:/scratch.local/sariel/work/000472 /scratch.local/sariel/work/success.txt
+## PROcmd:/scratch.local/sariel/work/000467 /scratch.local/sariel/work/success.txt
+## PROcmd:/scratch.local/sariel/work/000466 /scratch.local/sariel/work/success.txt
+## PROcmd:/scratch.local/sariel/work/000462 /scratch.local/sariel/work/success.txt
+## PROcmd:/scratch.local/sariel/work/000461 /scratch.local/sariel/work/success.txt
+## PROcmd:/scratch.local/sariel/work/000460 /scratch.local/sariel/work/success.txt
+## PROCcmd:/scratch.local/sariel/work/002651 /scratch.local/sariel/work/success.txt
+## PROCcmd:/scratch.local/sariel/work/000999 /scratch.local/sariel/work/success.txt
+## PROCcmd:/scratch.local/sariel/work/000997 /scratch.local/sariel/work/success.txt
+## PROCcmd:/scratch.local/sariel/work/000720 /scratch.local/sariel/work/success.txt
+## PROCcmd:/scratch.local/sariel/work/000479 /scratch.local/sariel/work/success.txt
+## PROCcmd:/scratch.local/sariel/work/000478 /scratch.local/sariel/work/success.txt
+## PROCcmd:/scratch.local/sariel/work/000440 /scratch.local/sariel/work/success.txt
+## PROCEcmd:/scratch.local/sariel/work/002327 /scratch.local/sariel/work/success.txt
+## PROCEcmd:/scratch.local/sariel/work/000852 /scratch.local/sariel/work/success.txt
+## PROCEScmd:/scratch.local/sariel/work/000851 /scratch.local/sariel/work/success.txt
+## PROCEScmd:/scratch.local/sariel/work/000846 /scratch.local/sariel/work/success.txt
+## PROCESScmd:/scratch.local/sariel/work/001810 /scratch.local/sariel/work/success.txt
+## PROCESS cmd:/scratch.local/sariel/work/003538 /scratch.local/sariel/work/success.txt
+## PROCESS cmd:/scratch.local/sariel/work/001904 /scratch.local/sariel/work/success.txt
+## PROCESS cmd:/scratch.local/sariel/work/001154 /scratch.local/sariel/work/success.txt
+## PROCESS cmd:/scratch.local/sariel/work/001153 /scratch.local/sariel/work/success.txt
+## PROCESS cmd:/scratch.local/sariel/work/001148 /scratch.local/sariel/work/success.txt
+## PROCESS Scmd:/scratch.local/sariel/work/000547 /scratch.local/sariel/work/success.txt
+## PROCESS Scmd:/scratch.local/sariel/work/000543 /scratch.local/sariel/work/success.txt
+## PROCESS SPcmd:/scratch.local/sariel/work/001906 /scratch.local/sariel/work/success.txt
+## PROCESS SPcmd:/scratch.local/sariel/work/001503 /scratch.local/sariel/work/success.txt
+## PROCESS SPcmd:/scratch.local/sariel/work/001489 /scratch.local/sariel/work/success.txt
+## PROCESS SPAcmd:/scratch.local/sariel/work/001259 /scratch.local/sariel/work/success.txt
+## PROCESS SPAcmd:/scratch.local/sariel/work/001253 /scratch.local/sariel/work/success.txt
+## PROCESS SPAcmd:/scratch.local/sariel/work/001250 /scratch.local/sariel/work/success.txt
+## PROCESS SPAcmd:/scratch.local/sariel/work/000422 /scratch.local/sariel/work/success.txt
+## PROCESS SPAcmd:/scratch.local/sariel/work/000419 /scratch.local/sariel/work/success.txt
+## PROCESS SPAcmd:/scratch.local/sariel/work/000417 /scratch.local/sariel/work/success.txt
+## PROCESS SPAcmd:/scratch.local/sariel/work/000416 /scratch.local/sariel/work/success.txt
+## PROCESS SPAcmd:/scratch.local/sariel/work/000415 /scratch.local/sariel/work/success.txt
+## PROCESS SPAcmd:/scratch.local/sariel/work/000414 /scratch.local/sariel/work/success.txt
+## PROCESS SPAcmd:/scratch.local/sariel/work/000413 /scratch.local/sariel/work/success.txt
+## PROCESS SPAcmd:/scratch.local/sariel/work/000412 /scratch.local/sariel/work/success.txt
+## PROCESS SPAcmd:/scratch.local/sariel/work/000411 /scratch.local/sariel/work/success.txt
+## PROCESS SPAcmd:/scratch.local/sariel/work/000410 /scratch.local/sariel/work/success.txt
+## PROCESS SPAcmd:/scratch.local/sariel/work/000409 /scratch.local/sariel/work/success.txt
+## PROCESS SPAcmd:/scratch.local/sariel/work/000402 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/003021 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000430 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000428 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000427 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000426 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000425 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000424 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000423 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000422 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000421 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000420 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000419 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000418 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000417 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000416 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000415 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000414 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000412 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000408 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000402 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000262 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000261 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000260 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000259 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000258 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000257 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000254 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000104 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000103 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000102 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000101 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000100 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000099 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000098 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWcmd:/scratch.local/sariel/work/000097 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWNcmd:/scratch.local/sariel/work/001690 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWNcmd:/scratch.local/sariel/work/001127 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWNcmd:/scratch.local/sariel/work/001126 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWNcmd:/scratch.local/sariel/work/001121 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWNcmd:/scratch.local/sariel/work/001120 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWNcmd:/scratch.local/sariel/work/001118 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWNcmd:/scratch.local/sariel/work/001116 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWNcmd:/scratch.local/sariel/work/001115 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWNcmd:/scratch.local/sariel/work/000750 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWNcmd:/scratch.local/sariel/work/000266 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWNcmd:/scratch.local/sariel/work/000263 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWNcmd:/scratch.local/sariel/work/000262 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWNcmd:/scratch.local/sariel/work/000261 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWNcmd:/scratch.local/sariel/work/000260 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWNcmd:/scratch.local/sariel/work/000259 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWNcmd:/scratch.local/sariel/work/000258 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWNcmd:/scratch.local/sariel/work/000257 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWNcmd:/scratch.local/sariel/work/000256 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWNcmd:/scratch.local/sariel/work/000253 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWNcmd:/scratch.local/sariel/work/000252 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWNcmd:/scratch.local/sariel/work/000251 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN cmd:/scratch.local/sariel/work/001965 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN cmd:/scratch.local/sariel/work/001960 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN cmd:/scratch.local/sariel/work/001959 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN cmd:/scratch.local/sariel/work/001954 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN cmd:/scratch.local/sariel/work/001950 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN cmd:/scratch.local/sariel/work/001134 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN cmd:/scratch.local/sariel/work/001131 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN cmd:/scratch.local/sariel/work/001128 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN cmd:/scratch.local/sariel/work/000764 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN cmd:/scratch.local/sariel/work/000763 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  cmd:/scratch.local/sariel/work/003441 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  cmd:/scratch.local/sariel/work/001688 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  :cmd:/scratch.local/sariel/work/001464 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  :cmd:/scratch.local/sariel/work/001462 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  :cmd:/scratch.local/sariel/work/001208 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputscmd:/scratch.local/sariel/work/002215 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputscmd:/scratch.local/sariel/work/002214 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputscmd:/scratch.local/sariel/work/001379 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelvescmd:/scratch.local/sariel/work/005342 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelvescmd:/scratch.local/sariel/work/003650 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelvescmd:/scratch.local/sariel/work/003266 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelvescmd:/scratch.local/sariel/work/003245 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelvescmd:/scratch.local/sariel/work/002601 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelvescmd:/scratch.local/sariel/work/002558 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelvescmd:/scratch.local/sariel/work/001529 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelvescmd:/scratch.local/sariel/work/001525 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelvescmd:/scratch.local/sariel/work/001522 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelvescmd:/scratch.local/sariel/work/001354 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmplcmd:/scratch.local/sariel/work/001680 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmplcmd:/scratch.local/sariel/work/001674 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmplcmd:/scratch.local/sariel/work/000760 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmplcmd:/scratch.local/sariel/work/000758 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scripcmd:/scratch.local/sariel/work/001841 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scripcmd:/scratch.local/sariel/work/000848 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scripcmd:/scratch.local/sariel/work/000841 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scripcmd:/scratch.local/sariel/work/000839 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scripcmd:/scratch.local/sariel/work/000838 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scripcmd:/scratch.local/sariel/work/000834 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scripcmd:/scratch.local/sariel/work/000833 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scripcmd:/scratch.local/sariel/work/000828 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scripcmd:/scratch.local/sariel/work/000826 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scripcmd:/scratch.local/sariel/work/000823 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scripcmd:/scratch.local/sariel/work/000822 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scricmd:/scratch.local/sariel/work/001820 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scricmd:/scratch.local/sariel/work/001817 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scricmd:/scratch.local/sariel/work/001814 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scrcmd:/scratch.local/sariel/work/001837 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scrcmd:/scratch.local/sariel/work/001462 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scrcmd:/scratch.local/sariel/work/001454 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scrcmd:/scratch.local/sariel/work/001453 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scrcmd:/scratch.local/sariel/work/001442 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scrcmd:/scratch.local/sariel/work/001439 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scrcmd:/scratch.local/sariel/work/001232 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scrcmd:/scratch.local/sariel/work/001231 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scrcmd:/scratch.local/sariel/work/001227 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scrcmd:/scratch.local/sariel/work/001226 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scrcmd:/scratch.local/sariel/work/001225 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scrcmd:/scratch.local/sariel/work/001224 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scrcmd:/scratch.local/sariel/work/001221 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scrcmd:/scratch.local/sariel/work/001218 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scrcmd:/scratch.local/sariel/work/001210 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scrcmd:/scratch.local/sariel/work/000873 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scrcmd:/scratch.local/sariel/work/000860 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_scrcmd:/scratch.local/sariel/work/000858 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_sccmd:/scratch.local/sariel/work/001456 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_sccmd:/scratch.local/sariel/work/001448 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_cmd:/scratch.local/sariel/work/001678 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_cmd:/scratch.local/sariel/work/001675 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_cmd:/scratch.local/sariel/work/001673 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_cmd:/scratch.local/sariel/work/001672 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_cmd:/scratch.local/sariel/work/001661 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpl_cmd:/scratch.local/sariel/work/001657 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpcmd:/scratch.local/sariel/work/004167 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpcmd:/scratch.local/sariel/work/001929 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpcmd:/scratch.local/sariel/work/001922 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmpcmd:/scratch.local/sariel/work/001916 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmcmd:/scratch.local/sariel/work/000896 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pmcmd:/scratch.local/sariel/work/000895 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pcmd:/scratch.local/sariel/work/000290 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pcmd:/scratch.local/sariel/work/000289 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pcmd:/scratch.local/sariel/work/000286 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pcmd:/scratch.local/sariel/work/000285 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pcmd:/scratch.local/sariel/work/000281 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pcmd:/scratch.local/sariel/work/000280 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/pcmd:/scratch.local/sariel/work/000279 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/cmd:/scratch.local/sariel/work/002061 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/cmd:/scratch.local/sariel/work/001106 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/cmd:/scratch.local/sariel/work/001103 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/cmd:/scratch.local/sariel/work/000289 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/cmd:/scratch.local/sariel/work/000286 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/cmd:/scratch.local/sariel/work/000285 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/cmd:/scratch.local/sariel/work/000284 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/cmd:/scratch.local/sariel/work/000281 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelves/cmd:/scratch.local/sariel/work/000279 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelvecmd:/scratch.local/sariel/work/004502 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelvecmd:/scratch.local/sariel/work/003040 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelvecmd:/scratch.local/sariel/work/001262 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelvecmd:/scratch.local/sariel/work/001258 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelvecmd:/scratch.local/sariel/work/001257 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelvecmd:/scratch.local/sariel/work/001253 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelvcmd:/scratch.local/sariel/work/003523 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelvcmd:/scratch.local/sariel/work/001518 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelvcmd:/scratch.local/sariel/work/001262 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelvcmd:/scratch.local/sariel/work/001254 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelvcmd:/scratch.local/sariel/work/001248 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelcmd:/scratch.local/sariel/work/002825 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelcmd:/scratch.local/sariel/work/002051 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelcmd:/scratch.local/sariel/work/000570 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelcmd:/scratch.local/sariel/work/000569 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelcmd:/scratch.local/sariel/work/000568 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelcmd:/scratch.local/sariel/work/000567 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelcmd:/scratch.local/sariel/work/000566 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelcmd:/scratch.local/sariel/work/000565 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelcmd:/scratch.local/sariel/work/000564 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelcmd:/scratch.local/sariel/work/000563 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelcmd:/scratch.local/sariel/work/000562 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelcmd:/scratch.local/sariel/work/000561 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelcmd:/scratch.local/sariel/work/000560 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelcmd:/scratch.local/sariel/work/000553 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shelcmd:/scratch.local/sariel/work/000551 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shecmd:/scratch.local/sariel/work/004923 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shecmd:/scratch.local/sariel/work/002602 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shecmd:/scratch.local/sariel/work/002366 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shecmd:/scratch.local/sariel/work/000572 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shecmd:/scratch.local/sariel/work/000568 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shecmd:/scratch.local/sariel/work/000567 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shecmd:/scratch.local/sariel/work/000565 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shecmd:/scratch.local/sariel/work/000563 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shecmd:/scratch.local/sariel/work/000562 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shecmd:/scratch.local/sariel/work/000561 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shecmd:/scratch.local/sariel/work/000560 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shecmd:/scratch.local/sariel/work/000559 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shecmd:/scratch.local/sariel/work/000558 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shecmd:/scratch.local/sariel/work/000557 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shecmd:/scratch.local/sariel/work/000556 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shecmd:/scratch.local/sariel/work/000555 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shecmd:/scratch.local/sariel/work/000554 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shecmd:/scratch.local/sariel/work/000548 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shcmd:/scratch.local/sariel/work/004314 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shcmd:/scratch.local/sariel/work/003292 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/shcmd:/scratch.local/sariel/work/002593 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/scmd:/scratch.local/sariel/work/002886 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/scmd:/scratch.local/sariel/work/002632 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/scmd:/scratch.local/sariel/work/001374 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/scmd:/scratch.local/sariel/work/000983 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/scmd:/scratch.local/sariel/work/000711 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/scmd:/scratch.local/sariel/work/000704 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/scmd:/scratch.local/sariel/work/000703 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/scmd:/scratch.local/sariel/work/000702 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/scmd:/scratch.local/sariel/work/000700 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/scmd:/scratch.local/sariel/work/000696 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/scmd:/scratch.local/sariel/work/000695 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/scmd:/scratch.local/sariel/work/000694 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/scmd:/scratch.local/sariel/work/000691 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/scmd:/scratch.local/sariel/work/000680 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/scmd:/scratch.local/sariel/work/000452 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/cmd:/scratch.local/sariel/work/001034 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/cmd:/scratch.local/sariel/work/001026 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/cmd:/scratch.local/sariel/work/000992 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/cmd:/scratch.local/sariel/work/000990 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/cmd:/scratch.local/sariel/work/000986 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/cmd:/scratch.local/sariel/work/000984 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/cmd:/scratch.local/sariel/work/000710 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/cmd:/scratch.local/sariel/work/000701 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/cmd:/scratch.local/sariel/work/000700 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/cmd:/scratch.local/sariel/work/000698 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/cmd:/scratch.local/sariel/work/000697 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/cmd:/scratch.local/sariel/work/000696 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/cmd:/scratch.local/sariel/work/000695 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/cmd:/scratch.local/sariel/work/000693 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/cmd:/scratch.local/sariel/work/000692 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/cmd:/scratch.local/sariel/work/000691 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/cmd:/scratch.local/sariel/work/000689 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/cmd:/scratch.local/sariel/work/000688 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputs/cmd:/scratch.local/sariel/work/000686 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputcmd:/scratch.local/sariel/work/003081 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputcmd:/scratch.local/sariel/work/001283 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputcmd:/scratch.local/sariel/work/001280 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputcmd:/scratch.local/sariel/work/001277 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputcmd:/scratch.local/sariel/work/000996 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputcmd:/scratch.local/sariel/work/000994 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputcmd:/scratch.local/sariel/work/000990 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputcmd:/scratch.local/sariel/work/000744 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputcmd:/scratch.local/sariel/work/000743 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inputcmd:/scratch.local/sariel/work/000730 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inpucmd:/scratch.local/sariel/work/003312 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inpucmd:/scratch.local/sariel/work/002419 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inpucmd:/scratch.local/sariel/work/002147 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inpcmd:/scratch.local/sariel/work/001756 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inpcmd:/scratch.local/sariel/work/001752 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inpcmd:/scratch.local/sariel/work/001749 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inpcmd:/scratch.local/sariel/work/001741 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inpcmd:/scratch.local/sariel/work/001736 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : inpcmd:/scratch.local/sariel/work/000624 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : incmd:/scratch.local/sariel/work/003156 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : incmd:/scratch.local/sariel/work/002433 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : incmd:/scratch.local/sariel/work/001757 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : incmd:/scratch.local/sariel/work/000623 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : incmd:/scratch.local/sariel/work/000617 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : incmd:/scratch.local/sariel/work/000614 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : icmd:/scratch.local/sariel/work/001216 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : cmd:/scratch.local/sariel/work/001370 /scratch.local/sariel/work/success.txt
+## PROCESS SPAWN  : cmd:/scratch.local/sariel/work/001230 /scratch.local/sariel/work/success.txt
+# of parallel jobs     : 96
+# max # suspended jobs : 96
+# Work directory   : /scratch.local/sariel/work/
+# Time scale           : 1
+# Success file     : /scratch.local/sariel/work/success.txt
+# MODE                 : Counter search
+# Host : ccc0272.campuscluster.illinois.edu
+36
+70
+147
+33
+12
+5
+238
+129
+86
+43
+43
+9
+80
+38
+88
+15
+107
+30
+35
+18
+46
+57
+235
+85
+16
+158
+64
+92
+119
+82
+41
+89
+89
+34
+90
+36
+122
+6
+46
+69
+33
+54
+52
+47
+45
+27
+37
+8
+7
+186
+14
+10
+159
+46
+134
+11
+26
+5
+31
+62
+43
+6
+9
+12
+14
+91
+31
+8
+73
+47
+38
+38
+18
+244
+58
+91
+165
+43
+79
+49
+40
+14
+446
+273
+45
+44
+91
+38
+17
+8
+46
+14
+21
+130
+28
+40
+5
+166
+110
+81

@@ -1,0 +1,138 @@
+###-----------------------------------------------------
+#### Global timeout:  3000
+### Vulnerability Gather data sampling:   Not affected
+### Vendor ID:                            AuthenticAMD
+### Thread(s) per core:                   1
+### TIMES   : 100
+### Stepping:                             0
+### Socket(s):                            2
+### Parallel search
+### On-line CPU(s) list:                  0-127
+### NUMA node1 CPU(s):                    64-127
+### NUMA node0 CPU(s):                    0-63
+### NUMA node(s):                         2
+### Model:                                49
+### Model name:                           AMD EPYC 7702 64-Core Processor
+### LOG     : logs/shelves//parallel_02_12_25__12_53_54.txt
+### L3 cache:                             512 MiB (32 instances)
+### L2 cache:                             64 MiB (128 instances)
+### L1i cache:                            4 MiB (128 instances)
+### L1d cache:                            4 MiB (128 instances)
+### FLAGS   : -p
+### Core(s) per socket:                   64
+### CPU(s):                               128
+### CPU op-mode(s):                       32-bit, 64-bit
+### CPU family:                           23
+### Byte Order:                           Little Endian
+### BogoMIPS:                             3992.11
+### Architecture:                         x86_64
+### Address sizes:                        48 bits physical, 48 bits virtual
+### -------------------------------------
+###
+# of parallel jobs     : 96
+# max # suspended jobs : 96
+# Work directory   : /scratch.local/sariel/work/
+# Time scale           : 1
+# Success file     : /scratch.local/sariel/work/success.txt
+# MODE                 : Parallel search
+# Host : ccc0272.campuscluster.illinois.edu
+76
+7
+47
+19
+212
+57
+88
+91
+79
+20
+541
+1425
+24
+101
+807
+156
+11
+56
+9
+620
+81
+9
+59
+281
+208
+71
+288
+44
+7
+68
+527
+6
+5
+5
+20
+376
+16
+254
+4
+30
+20
+61
+5
+875
+16
+1330
+6
+126
+137
+186
+282
+43
+35
+56
+221
+96
+59
+84
+5
+27
+14
+151
+45
+5
+7
+269
+19
+82
+533
+26
+306
+1413
+154
+93
+83
+109
+51
+32
+1910
+126
+126
+10
+294
+124
+17
+41
+265
+434
+7
+8
+6
+186
+1067
+148
+11
+1169
+24
+44
+460
+6

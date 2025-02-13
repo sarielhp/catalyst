@@ -1143,7 +1143,7 @@ void   SManager::main_loop()
         printf( "# Combined mode!\n" );
 
     printf( "# of parallel jobs     : %d\n", max_jobs_number );
-    if  ( max_suspends > 0 ) 
+    if  ( max_suspends > 0 )
         printf( "# max # suspended jobs : %d\n", max_suspends );
     printf( "# Time scale           : %d\n", scale );
     if  ( ( f_random_search )  &&  ( f_basel ) )
@@ -1278,6 +1278,9 @@ void  Task::launch()
     // Spawn a new process
     //printf( "New process started!\n" );
     printf( "## PROCESS SPAWN  : %s\n", command.c_str() );
+
+    fflush(  stdout  );
+
     if (posix_spawn(&pid, command.c_str(), NULL, &attr, argv, NULL) != 0) {
         perror("spawn failed");
         exit(EXIT_FAILURE);
