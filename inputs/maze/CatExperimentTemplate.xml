@@ -70,6 +70,8 @@
     </EdgeValidityCheckers>
 
     <Connectors>
+      <NeighborhoodConnector label="Closest" debug="false"
+        nfLabel="Nearest" lpLabel="sl" checkIfSameCC="false"/>
     </Connectors>
 
     <Metrics>
@@ -102,6 +104,11 @@
         <Evaluator label="Query"/>
       </BasicRRTStrategy>
 
+      <BasicPRM label="PRM" debug="false" querySampler="UniformRandomFree">
+        <Sampler label="UniformRandomFree" number="10" attempts="1"/>
+        <Connector label="Closest"/>
+        <Evaluator label="Query"/>
+      </BasicPRM>
     </MPStrategies>
 
     <MPTools>
@@ -109,7 +116,7 @@
 
     <!-- MPProblem allows multiple solvers to be specified and executed. -->
 
-    <Solver mpStrategyLabel="RRT" seed="@@seed@@"
+    <Solver mpStrategyLabel="PRM" seed="@@seed@@"
       baseFilename="CatExperiment" vizmoDebug="true"/>
 
   </Library>
