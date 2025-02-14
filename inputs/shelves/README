@@ -2,13 +2,13 @@
 # Motion Planning Experiment: Shelves
 
 ## Environment
-- **Description**: A table a fixed manipulator at its center. 3 shelf structures are on 3 different sides of the manipulator, each shelf structure has 4 compartments, 2 on the bottom shelf and 2 on the top shelf.
+- **Description**: A table with a fixed manipulator at its center, and a double shelf is in front of the manipulator. The top shelf contains 3 objects, a cylindrical object, and two rectangular prisms.
 - **Bounding box dimensions**: 6 x 6 x 4
 
 ## Robot
 - **Type**: UR5e
 
 ## Task
-- **Start**: A randomly generated configuration with the robot end-effector inside a shelf compartment.
-- **Goal**: A randomly generated configuration with the robot end-effector inside a different shelf compartment.
+- **Start**: A neutral position of the manipulator. The robot links are aligned and the robot is completely vertical.
+- **Goal**: A configuration with the robot end-effector inside the top shelf and it's arm btween two objects.
 
