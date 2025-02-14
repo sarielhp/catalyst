@@ -15,15 +15,32 @@ function  fix_up() {
     replacer "counter"         "Counter"           $FL
 }
 
+# insert_hline out/result.tex Random 
+function  insert_hline() {
+#    echo "==========================="
+#    echo grep -n $1 $FL
+#    echo "==========================="
+#    grep -n $1 $FL
+    L=$(grep -n $1 $FL |  cut -f1 -d: | head -1)
+
+#    echo "LLLL ["$L"] LLLL" 
+    if  (( $L > 0 )); then
+        sed -i "$L i \\\\\\hline" $FL
+    fi
+}    
+
 function  copy_it() {
     pushd . >& /dev/null
     cd $HOME/papers/25/catastrophe/
     snapshot figs/*.tex >& /dev/null
 
-    L=$(grep -n Random $FL |  cut -f1 -d: | head -1)
-
-    sed -i "$L i \\\\\\hline" $FL
-
+    #=
+#    L=$(grep -n Random $FL |  cut -f1 -d: | head -1)
+#
+#    if  (( $L > 0 )); then
+#        sed -i "$L i \\\\\\hline" $FL
+#    fi
+    
     DFL=$HOME/papers/25/catastrophe/figs/$1
     cp $FL $DFL
     popd  >& /dev/null
@@ -54,3 +71,38 @@ julia julia/stats_latex_table.jl \
 fix_up
 copy_it cat_bug_cluster_128.tex
 
+############################################################################
+####### 7713 shelves
+
+function  fix_up_7713() {
+    replacer "counter\_comb"   "Counter+Cache" $FL
+    replacer "counter"         "Counter" $FL
+    replacer "wide\_search"    "Wide" $FL
+    replacer "random\_zeta"    "Random $\zeta(2)$" $FL
+    replacer "random"          "Random"            $FL
+    replacer "ttl\_5"          '\TTL $5$'          $FL
+    replacer "ttl\_10"         '\TTL $10$'         $FL
+    replacer "parallel"        "Parallel"          $FL
+    replacer "rrrrrrr"         "l|r||r|r||rrrr"    $FL
+    replacer "counter"         "Counter"           $FL
+}
+
+DIR=results/shelves/7713
+
+julia/stats_latex_table.jl             \
+    $DIR/shelves_random_7713.txt       \
+    $DIR/shelves_counter_7713.txt      \
+    $DIR/shelves_counter_comb_7713.txt \
+    $DIR/shelves_random_zeta_7713.txt  \
+    $DIR/shelves_parallel_7713.txt     \
+    $DIR/shelves_ttl_5_7713.txt        \
+    $DIR/shelves_ttl_10_7713.txt
+
+#exit
+
+FL=$(realpath out/results.tex)
+fix_up_7713
+
+insert_hline TTL
+
+copy_it shelves_7713.tex

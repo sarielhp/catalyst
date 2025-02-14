@@ -141,6 +141,8 @@ function  log_start() {
     echo "### FLAGS   : $CATALYST_FLAGS" >> $LOG
     echo "### -------------------------------------" >> $LOG
     lscpu | sed '1,/Vulner/!d' | grep -iv flags: |  sed 's/^/### /g' >> $LOG
+    echo "### -------------------------------------" >> $LOG
+    free -h  |  sed 's/^/### /g'  >>  $LOG
     echo "###-----------------------------------------------------" >> $LOG
 }
 

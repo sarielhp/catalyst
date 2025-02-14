@@ -121,12 +121,20 @@ function  is_boring_column( df, column )
     runs_num = length( unique( sort( df[ :, column ] ) ) );
     return  ( runs_num == 1 );
 end
+
 function  rm_boring_column( df, column )
 #    println( "RM ", column );
 #    println( df );
     if  ( is_boring_column( df, column ) )
         select!(df, Not([column]))
+        return  true;
     end
+
+    return  false;
+end
+
+function  rm_column( df, column )
+    select!(df, Not([column]))
 end
 
 function  (@main)(ARGS)
@@ -139,7 +147,7 @@ function  (@main)(ARGS)
     df = DataFrame();
 
     CL_SIMULATION = "Simulation";
-    CL_RUNS = "Runs";
+    CL_RUNS = "# Runs";
     CL_SUCC_RUNS = "# Succ";
     CL_FAIL_RUNS = "# Fails";
     CL_MEAN = "Mean";
@@ -161,6 +169,7 @@ function  (@main)(ARGS)
         df_add_row( df );
 
         i = nrow( df );
+        println( "s: ", s );
         df[ i, CL_SIMULATION ] = s;
         df[ i, CL_RUNS       ] = string( length( arr ) + failures );
         df[ i, CL_SUCC_RUNS  ] = string( length( arr ) );
@@ -177,15 +186,23 @@ function  (@main)(ARGS)
     suff = longest_common_suffix( df[ :, CL_SIMULATION ] );
     k = length( pref );
     k_suff = length( suff );
+
+    println( "Prefix: [", pref, "]" );
     for  i  ∈ 1:nrow( df )
         df[ i, CL_SIMULATION ] = chop(  df[ i, CL_SIMULATION ], head=k, tail=k_suff );
     end
 
 
     rm_boring_column( df, CL_RUNS );
-    rm_boring_column( df, CL_SUCC_RUNS );
-    rm_boring_column( df, CL_FAIL_RUNS );
+    f_fail_rm = rm_boring_column( df, CL_FAIL_RUNS );    
+    if  ( f_fail_rm )
+        println( "RMMMMMMMMMMMMMMMMMMMMMMMMM" );
+        rm_column( df, CL_SUCC_RUNS );
+    else
+        rm_boring_column( df, CL_SUCC_RUNS );
+    end
 
+    
     write_latex_table( "out/results.tex" , df );
     println( "Created file: ", "out/results.tex" );
 end

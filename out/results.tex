@@ -1,14 +1,12 @@
-\hline
-\begin{tabular}{rrrrrr}
-\hline
+\begin{tabular}{l|r||r|r||rrrr}
   \hline
+  \textbf{Simulation} & \textbf{\# Runs} & \textbf{Mean} & \textbf{Median} & \textbf{Std Dev} & \textbf{Min} & \textbf{Max} \\\hline
+  \cellcolor{lightgray}{\texttt{Random}} & \cellcolor{lightgray}{\texttt{100}} & \cellcolor{lightgray}{\texttt{47.54}} & \cellcolor{lightgray}{\texttt{27.00}} & \cellcolor{lightgray}{\texttt{59.79}} & \cellcolor{lightgray}{\texttt{4.00}} & \cellcolor{lightgray}{\texttt{442.00}} \\
+  \texttt{Counter} & \texttt{100} & \texttt{58.42} & \texttt{39.00} & \texttt{53.90} & \texttt{5.00} & \texttt{234.00} \\
+  \cellcolor{lightgray}{\texttt{Counter+Cache}} & \cellcolor{lightgray}{\texttt{100}} & \cellcolor{lightgray}{\texttt{64.33}} & \cellcolor{lightgray}{\texttt{53.00}} & \cellcolor{lightgray}{\texttt{61.56}} & \cellcolor{lightgray}{\texttt{4.00}} & \cellcolor{lightgray}{\texttt{364.00}} \\
+  \texttt{Random $\zeta(2)$} & \texttt{100} & \texttt{64.69} & \texttt{41.50} & \texttt{68.92} & \texttt{5.00} & \texttt{315.00} \\
+  \cellcolor{lightgray}{\texttt{Parallel}} & \cellcolor{lightgray}{\texttt{102}} & \cellcolor{lightgray}{\texttt{152.13}} & \cellcolor{lightgray}{\texttt{38.50}} & \cellcolor{lightgray}{\texttt{269.39}} & \cellcolor{lightgray}{\texttt{5.00}} & \cellcolor{lightgray}{\texttt{1400.00}} \\
 \hline
-  \textbf{Simulation} & \textbf{Mean} & \textbf{Median} & \textbf{Std Dev} & \textbf{Min} & \textbf{Max} \\\hline
-\hline
-  \cellcolor{lightgray}{\texttt{Counter+Cache}} & \cellcolor{lightgray}{\texttt{29.95}} & \cellcolor{lightgray}{\texttt{18.50}} & \cellcolor{lightgray}{\texttt{32.99}} & \cellcolor{lightgray}{\texttt{4.00}} & \cellcolor{lightgray}{\texttt{171.00}} \\
-\hline
-  \texttt{Counter} & \texttt{18.89} & \texttt{12.00} & \texttt{17.11} & \texttt{4.00} & \texttt{69.00} \\
-\hline
-  \cellcolor{lightgray}{\texttt{Parallel}} & \cellcolor{lightgray}{\texttt{91.41}} & \cellcolor{lightgray}{\texttt{9.00}} & \cellcolor{lightgray}{\texttt{191.94}} & \cellcolor{lightgray}{\texttt{4.00}} & \cellcolor{lightgray}{\texttt{1057.00}} \\\hline
-\hline
+  \texttt{\TTL $5$} & \texttt{100} & \texttt{50.51} & \texttt{34.00} & \texttt{56.48} & \texttt{4.00} & \texttt{303.00} \\
+  \cellcolor{lightgray}{\texttt{\TTL $10$}} & \cellcolor{lightgray}{\texttt{100}} & \cellcolor{lightgray}{\texttt{53.13}} & \cellcolor{lightgray}{\texttt{38.50}} & \cellcolor{lightgray}{\texttt{46.54}} & \cellcolor{lightgray}{\texttt{5.00}} & \cellcolor{lightgray}{\texttt{272.00}} \\\hline
 \end{tabular}
