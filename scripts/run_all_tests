@@ -256,6 +256,25 @@ function  comp_vars() {
     DSUCC=success/$INST/
 }
 
+function  check_system() {
+    HS=$(hostname -s)
+    if  [[ "$HS" == "red" ]]; then
+        return
+    fi
+    if  [[ "$HS" == "valis" ]]; then
+        return
+    fi
+
+    CPU=$(lscpu | grep -i EPYC | grep 7713)
+    if  [[ "$CPU" == "" ]]; then
+        echo "Error: Script runs now only on the AMD EPYC 7713 cluster compuers!"
+        echo "Bye bye"
+        exit -1
+    fi
+    echo "CPU CHECK"
+    echo "#### Seems to be AMD EPYC 7713" 
+}
+
 
 ###############################################################################
 ###############################################################################
@@ -265,18 +284,21 @@ BPROG=pmpl_script
 TIMES=100
 SCALE=1    # Scale: Scale time by this factor
 GTIMEOUT=3000    # Global timeout
-
+TIMEOUT=3
 
 #INST==wait_random_busy
 #INST=wait_forever_99
 #INST=cat_exp
 #INST=cat_bug_no_scale
 #INST=maze
-#INST=bug
+INST=bug
 #INST=shelves
-INST=fun
+#INST=fun
 
 ###############################################################################
+
+check_system
+
 
 mkdir -p $DLOG $DSUCC >& /dev/null
 
