@@ -163,13 +163,15 @@ function  (@main)(ARGS)
         CL_MIN, CL_MAX );
 
     for  s ∈ ARGS
+        if   ( length( s ) == 0 )  continue  end
+
+        println( "Reading: ", s );
         arr = read_file_w_comments_floats( s )
         failures = remove_above( arr, 3000 );
 
         df_add_row( df );
 
         i = nrow( df );
-        println( "s: ", s );
         df[ i, CL_SIMULATION ] = s;
         df[ i, CL_RUNS       ] = string( length( arr ) + failures );
         df[ i, CL_SUCC_RUNS  ] = string( length( arr ) );
@@ -187,22 +189,23 @@ function  (@main)(ARGS)
     k = length( pref );
     k_suff = length( suff );
 
-    println( "Prefix: [", pref, "]" );
+    #println( "Prefix: [", pref, "]" );
     for  i  ∈ 1:nrow( df )
         df[ i, CL_SIMULATION ] = chop(  df[ i, CL_SIMULATION ], head=k, tail=k_suff );
     end
 
 
     rm_boring_column( df, CL_RUNS );
-    f_fail_rm = rm_boring_column( df, CL_FAIL_RUNS );    
+    f_fail_rm = rm_boring_column( df, CL_FAIL_RUNS );
     if  ( f_fail_rm )
-        println( "RMMMMMMMMMMMMMMMMMMMMMMMMM" );
+        #println( "RMMMMMMMMMMMMMMMMMMMMMMMMM" );
         rm_column( df, CL_SUCC_RUNS );
     else
         rm_boring_column( df, CL_SUCC_RUNS );
     end
 
-    
+
     write_latex_table( "out/results.tex" , df );
     println( "Created file: ", "out/results.tex" );
+    println( "\n\n" );
 end

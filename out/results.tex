@@ -1,12 +1,9 @@
-\begin{tabular}{l|r||r|r||rrrr}
+\begin{tabular}{l|r||r|r||rrrrrr}
   \hline
-  \textbf{Simulation} & \textbf{\# Runs} & \textbf{Mean} & \textbf{Median} & \textbf{Std Dev} & \textbf{Min} & \textbf{Max} \\\hline
-  \cellcolor{lightgray}{\texttt{Random}} & \cellcolor{lightgray}{\texttt{100}} & \cellcolor{lightgray}{\texttt{47.54}} & \cellcolor{lightgray}{\texttt{27.00}} & \cellcolor{lightgray}{\texttt{59.79}} & \cellcolor{lightgray}{\texttt{4.00}} & \cellcolor{lightgray}{\texttt{442.00}} \\
-  \texttt{Counter} & \texttt{100} & \texttt{58.42} & \texttt{39.00} & \texttt{53.90} & \texttt{5.00} & \texttt{234.00} \\
-  \cellcolor{lightgray}{\texttt{Counter+Cache}} & \cellcolor{lightgray}{\texttt{100}} & \cellcolor{lightgray}{\texttt{64.33}} & \cellcolor{lightgray}{\texttt{53.00}} & \cellcolor{lightgray}{\texttt{61.56}} & \cellcolor{lightgray}{\texttt{4.00}} & \cellcolor{lightgray}{\texttt{364.00}} \\
-  \texttt{Random $\zeta(2)$} & \texttt{100} & \texttt{64.69} & \texttt{41.50} & \texttt{68.92} & \texttt{5.00} & \texttt{315.00} \\
-  \cellcolor{lightgray}{\texttt{Parallel}} & \cellcolor{lightgray}{\texttt{102}} & \cellcolor{lightgray}{\texttt{152.13}} & \cellcolor{lightgray}{\texttt{38.50}} & \cellcolor{lightgray}{\texttt{269.39}} & \cellcolor{lightgray}{\texttt{5.00}} & \cellcolor{lightgray}{\texttt{1400.00}} \\
-\hline
-  \texttt{\TTL $5$} & \texttt{100} & \texttt{50.51} & \texttt{34.00} & \texttt{56.48} & \texttt{4.00} & \texttt{303.00} \\
-  \cellcolor{lightgray}{\texttt{\TTL $10$}} & \cellcolor{lightgray}{\texttt{100}} & \cellcolor{lightgray}{\texttt{53.13}} & \cellcolor{lightgray}{\texttt{38.50}} & \cellcolor{lightgray}{\texttt{46.54}} & \cellcolor{lightgray}{\texttt{5.00}} & \cellcolor{lightgray}{\texttt{272.00}} \\\hline
+  \textbf{Simulation} & \textbf{\# Runs} & \textbf{\# Succ} & \textbf{\# Fails} & \textbf{Mean} & \textbf{Median} & \textbf{Std Dev} & \textbf{Min} & \textbf{Max} \\\hline
+  \cellcolor{lightgray}{\texttt{Counter}} & \cellcolor{lightgray}{\texttt{42}} & \cellcolor{lightgray}{\texttt{42}} & \cellcolor{lightgray}{\texttt{0}} & \cellcolor{lightgray}{\texttt{335.93}} & \cellcolor{lightgray}{\texttt{215.00}} & \cellcolor{lightgray}{\texttt{371.37}} & \cellcolor{lightgray}{\texttt{5.00}} & \cellcolor{lightgray}{\texttt{1755.00}} \\
+  \texttt{Parallel} & \texttt{20} & \texttt{6} & \FailX{14} & \texttt{757.67} & \texttt{406.00} & \texttt{785.47} & \texttt{6.00} & \texttt{2112.00} \\
+  \cellcolor{lightgray}{\texttt{Random $\zeta(2)$}} & \cellcolor{lightgray}{\texttt{41}} & \cellcolor{lightgray}{\texttt{41}} & \cellcolor{lightgray}{\texttt{0}} & \cellcolor{lightgray}{\texttt{338.93}} & \cellcolor{lightgray}{\texttt{193.00}} & \cellcolor{lightgray}{\texttt{371.96}} & \cellcolor{lightgray}{\texttt{11.00}} & \cellcolor{lightgray}{\texttt{1392.00}} \\
+  \texttt{Counter+Cache} & \texttt{11} & \texttt{11} & \texttt{0} & \texttt{417.27} & \texttt{381.00} & \texttt{340.94} & \texttt{48.00} & \texttt{1156.00} \\
+  \cellcolor{lightgray}{\texttt{Random}} & \cellcolor{lightgray}{\texttt{28}} & \cellcolor{lightgray}{\texttt{28}} & \cellcolor{lightgray}{\texttt{0}} & \cellcolor{lightgray}{\texttt{490.29}} & \cellcolor{lightgray}{\texttt{358.00}} & \cellcolor{lightgray}{\texttt{515.31}} & \cellcolor{lightgray}{\texttt{6.00}} & \cellcolor{lightgray}{\texttt{2151.00}} \\\hline
 \end{tabular}
