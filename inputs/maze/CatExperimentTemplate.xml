@@ -107,7 +107,7 @@
       </BasicRRTStrategy>
 
       <BasicPRM label="PRM" debug="false" querySampler="UniformRandomFree">
-        <Sampler label="UniformRandomFree" number="10" attempts="1"/>
+        <Sampler label="UniformRandomFree" number="200" attempts="1"/>
         <Connector label="Closest"/>
         <Evaluator label="Query"/>
       </BasicPRM>
