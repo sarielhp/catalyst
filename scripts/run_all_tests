@@ -223,7 +223,7 @@ function  boring_tests() {
 ################################################################
 function  counter_combined_tests() {
     LOGFL=count_comb__$(datestr).txt
-    CATALYST_FLAGS="-m"
+    CATALYST_FLAGS="-m -n"
     SEARCH="Counter comb search"
 
     main_loop

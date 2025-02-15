@@ -7,7 +7,6 @@
 #include  <stdlib.h>
 #include  <stdio.h>
 #include  <assert.h>
-//#include  <pthread.h>
 #include  <string.h>
 #include  <unistd.h>
 #include  <spawn.h>
@@ -38,6 +37,62 @@
 #ifdef PROCPS_COMPILR
 #include <libproc2/pids.h>
 #endif
+
+
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+/* Used by main to communicate with parse_opt. */
+
+#define  MODE_NOT_DEF        0
+#define  MODE_WIDE           1
+#define  MODE_BORING         2
+#define  MODE_RANDOM         3
+#define  MODE_COUNTER        4
+#define  MODE_PARALLEL       5
+#define  MODE_ZETA_2         6
+
+
+class WMode
+{
+private:
+    int   mode;
+public:
+    WMode() { mode = 0; }
+
+    int  get() const { return  mode; }
+    void set( int  _val = 0 ) { mode = _val; }
+    bool  is_boring() { return  mode == MODE_BORING; }
+    bool  is( int  val ) { return  mode == val; }
+
+};
+
+struct ArgsInfo
+{
+    WMode  mode;
+    bool  f_verbose;
+    bool  f_print_succ_file;
+    bool  f_jobs_cache;
+    int   time_out, scale, copy_time_out;
+    const char *program;
+    const char *work_dir;
+    unsigned int  num_threads;
+
+    void init() {
+        /* Default values. */
+        f_print_succ_file = false;
+        f_verbose = false;
+        f_jobs_cache = false;
+        time_out = -1;
+        copy_time_out = -1;
+        program = "";
+        work_dir = "";
+        scale = 1;
+        num_threads = std::thread::hardware_concurrency();
+        mode.set( MODE_NOT_DEF );
+    }
+};
+
+
 
 
 /////////////////////////////////////////////////////////////
@@ -434,10 +489,6 @@ private:
 
     int  time_counter;
 
-    /// Wide search implementation
-    bool  f_wide_search, f_parallel_search, f_random_search, f_basel;
-    bool  f_combined_search;
-
     int   max_jobs_number;
     bool  f_scheduler_stop;
         //deque_tasks  tasks;
@@ -450,9 +501,12 @@ private:
     char * success_fn;
     int  g_timer, scale;
 
+    WMode  wmode, orig_wmode;
+
 public:
+    const WMode   & mode();
+    bool  is( int _val ) { return  wmode.is( _val ); }
     void  set_verbose( bool  _flag ) { f_verbose = _flag; }
-    void  set_combined_search( bool  _flag ) { f_combined_search = _flag; }
     void  set_timeout( int  t ) { time_out = t; }
     void  set_copy_timeout( int  t ) { copy_time_out = t; }
     void  set_success_file( string s ) { success_file = s; }
@@ -464,9 +518,11 @@ public:
     }
 
 
+    /*
     void  set_wide_search( bool  flag ) { f_wide_search = flag; }
     void  set_random_search( bool  flag ) { f_random_search = flag; }
     void  set_parallel_search( bool  flag ) { f_parallel_search = flag; }
+    `*/
 
     void  kill_min_suspended_task();
     void  update_min_suspended_runtime();
@@ -486,11 +542,11 @@ public:
     SManager()
     {
         time_counter = 0;
-        f_random_search = f_parallel_search = f_wide_search = false;
+        //f_random_search = f_parallel_search = f_wide_search = false;
         success_fn = NULL;
         f_done = false;
         counter_tasks_created = 0;
-        f_combined_search = f_verbose = f_success_found = f_basel = false;
+        f_verbose = f_success_found = false;
         max_jobs_number = 1;
         max_suspends = 0;
         min_sus_runtime = 0;
@@ -503,13 +559,15 @@ public:
         copy_time_out = -1;
     }
 
+    void  set_orig_mode( WMode  &_mode ) { orig_wmode = _mode; }
+    void  set_mode( WMode  &_mode ) { wmode = _mode; }
+
     const char   * get_mode_str();
     bool  slots_available();
     void wakeup_thread() {
     }
 
     void set_success( bool  f_val ) { f_success_found = f_val; }
-    void set_basel  ( bool  f_val ) { f_basel = f_val; }
 
     void   set_scale( int  _scale ) { scale = _scale; }
     void   set_program( const char  * _prog ) { prog = _prog; }
@@ -525,7 +583,7 @@ public:
     bool  is_parallel() {
         return  max_jobs_number > 1;
     }
-    void  set_threads_num( int  n ) { max_suspends = max_jobs_number = n; }
+    void  set_threads_num( int  n ) {  max_jobs_number = n; }
     void  set_max_suspends_num( int  n ) { max_suspends = n; }
     void  spawn_single_task();
     void  spawn_tasks();
@@ -538,9 +596,63 @@ public:
     void  resume_first_process();
 
     void  verify_suspended_tasks_heap();
+    void  setup( ArgsInfo  & opt );
 };
 
 /*--- Start of code ---*/
+void  SManager::setup( ArgsInfo  & opt )
+{
+    set_scale( opt.scale );
+    set_work_dir( opt.work_dir );
+
+    set_orig_mode( opt.mode );
+    set_mode( opt.mode );
+
+    printf( "MODE = %d\n",  opt.mode.get() );
+    if  ( is( MODE_NOT_DEF ) ) {
+        printf( "You must select a search mode...\n" );
+    }
+
+    set_verbose( opt.f_verbose );
+    set_timeout( opt.time_out );
+    set_copy_timeout( opt.copy_time_out );
+
+    if   ( wmode.is_boring() ) {
+        wmode.set( MODE_PARALLEL );
+        set_threads_num( 1 );
+    }
+    if  ( ( opt.copy_time_out > 0 )  &&  ( ! wmode.is( MODE_PARALLEL ) ) ) {
+        printf( "Error: copy timeout larger than zero can be used only with "
+                "parallel search.\n\n" );
+        exit( -1 );
+    }
+    if  ( is( MODE_WIDE ) ) {
+        //set_wide_search( true );
+        set_seq_generator( new  SequencePlusOne() );
+        return;
+    }
+    if  ( is( MODE_PARALLEL ) ) {
+        if  ( opt.copy_time_out > 0 )
+            set_seq_generator( new SequenceRepeatVal( opt.copy_time_out ) );
+        else
+            set_seq_generator( new  SequenceMaxInt() );
+        return;
+    }
+    if  ( is( MODE_RANDOM ) ) {
+        set_seq_generator( new  SequenceRandom() );
+            return;
+    }
+    if  ( is( MODE_ZETA_2 ) ) {
+        set_seq_generator( new    SequenceRBasel() );
+        return;
+    }
+    if  ( is( MODE_COUNTER ) ) {
+        set_seq_generator( new    SequenceRBasel() );
+        return;
+    }
+    printf( "ERROR: Must specify a mode!\n" );
+    exit ( -1 );
+}
 
 
 void  SManager::check_for_success()
@@ -782,7 +894,7 @@ void   SManager::suspend_process( int  ind )
 
 void   SManager::resume_first_process()
 {
-    assert( f_wide_search );
+    assert( is( MODE_WIDE ) );
     assert( suspended_tasks.size() > 0 );
 
     Task * p_task = suspended_tasks.front() ;
@@ -809,7 +921,7 @@ void   SManager::resume_first_process()
 
 void   SManager::resume_sus_process( int  pos, int  new_time_limit )
 {
-    assert( f_combined_search );
+    assert( max_suspends > 0 );
     assert( (int)suspended_tasks.size() > pos );
 
     Task * p_task = suspended_tasks[ pos ];
@@ -868,7 +980,8 @@ void   SManager::kill_all_tasks()
 
 void   SManager::kill_min_suspended_task()
 {
-    assert( f_combined_search );  // should only be called in combined mode...
+
+    assert( max_suspends > 0 );
 
     if  ( suspended_tasks.size() == 0 )
         return;
@@ -937,22 +1050,22 @@ void   SManager::handle_expired_tasks()
 
         pid_t cpid = p_task->get_child_pid();
         if   ( f_success_found
-               ||  ( ( ! f_wide_search )  &&  ( ! f_combined_search ) ) ) {
+               ||  ( ( ! is( MODE_WIDE ) )  &&  ( max_suspends == 0 ) ) ) {
             count++;
             kill_process( cpid );
             p_task->set_done( true );
             continue;
         }
-        if   ( f_parallel_search )
+        if   ( is( MODE_PARALLEL ) )
             continue;
 
         // f_success_found == false  &&  f_wide_search = true
         assert( ! f_success_found );
         assert( p_task->is_expired() );
-        assert( f_wide_search  ||  f_combined_search );
+        assert( is( MODE_WIDE )  ||  ( max_suspends > 0 ) );
 
         p_task->update_total_runtime();
-        if  ( f_wide_search ) {
+        if  ( is( MODE_WIDE ) ) {
             suspend_process( ind );
             continue;
         }
@@ -1008,7 +1121,7 @@ void  SManager::spawn_single_task()
 
     int  time_limit = scale * (int)seq_gen->next();
 
-    if   ( f_combined_search ) {
+    if   ( max_suspends > 0 ) {
         int  pos = get_suspended_task_to_wake( time_limit );
         if  ( pos >= 0 ) {
             resume_sus_process( pos, time_limit );
@@ -1023,7 +1136,7 @@ void  SManager::spawn_single_task()
         printf( "## Task created: %d\n", counter_tasks_created );
 
     // We run a process for one second if we are in the wide search mode...
-    if  ( f_wide_search ) {
+    if  ( is( MODE_WIDE ) ) {
         tsk->set_id( counter_tasks_created );
         tsk->set_time_limit( scale );
         tsk->set_time_delta( time_limit );
@@ -1068,14 +1181,14 @@ void  SManager::spawn_tasks()
 
     if  ( f_success_found )
         return;
-    if  ( ! f_wide_search ) {
+    if  ( ! is( MODE_WIDE ) ) {
         while  ( slots_available() ) {
             spawn_single_task();
         }
         return;
     }
 
-    assert( f_wide_search ); // Just for clarity
+    assert( is( MODE_WIDE ) ); // Just for clarity
 
     // If no slot is available, then we have to wait for some active
     // tasks to be suspended...
@@ -1105,14 +1218,21 @@ void  SManager::spawn_tasks()
 
 const char   * SManager::get_mode_str()
 {
-    if  ( f_wide_search )
-        return "Wide search";
-    if  ( f_parallel_search )
+    if  ( orig_wmode.is( MODE_BORING ) )
+        return  "Boring search";
+    if  ( is( MODE_WIDE ) )
+        return  "Wide search";
+    if  ( is( MODE_PARALLEL ) )
         return "Parallel search";
-    if  ( f_random_search )
+    if  ( is( MODE_RANDOM ) )
         return "Random search";
+    if  ( is( MODE_ZETA_2 ) )
+        return "Random Zeta_2 search";
+    if  ( is( MODE_COUNTER ) )
+        return "Counter search";
 
-    return   "Counter search";
+    assert( false );
+    return   "";
 }
 
 
@@ -1138,39 +1258,29 @@ void  SManager::prepare_to_run()
 
 void   SManager::main_loop()
 {
-    printf( "# MODE                 : %s\n", get_mode_str() );
-    if  ( f_combined_search )
-        printf( "# Combined mode!\n" );
+    string smode = get_mode_str();
+    if  ( max_suspends > 0 ) {
+        smode = smode + " + Cache";
+    }
+    printf( "# MODE                 : %s\n", smode.c_str() );
 
     printf( "# of parallel jobs     : %d\n", max_jobs_number );
     if  ( max_suspends > 0 )
         printf( "# max # suspended jobs : %d\n", max_suspends );
     printf( "# Time scale           : %d\n", scale );
-    if  ( ( f_random_search )  &&  ( f_basel ) )
+    if  ( is( MODE_ZETA_2 ) )
         printf( "## Basel distribution  (Prob[X=i] ≈ 1/i^2)\n" );
     printf( "-----------------------------------------------------------\n\n" );
     fflush( stdout );
 
     time_t  start_time = time( NULL );
 
-    //int  time_diff = 0;
     do {
         int  curr_time = (int)( time( NULL ) - start_time );
         printf( "Current time: %d\n", curr_time );
         if  ( ( curr_time & 0xf ) == 0 ) {
             fflush( stdout );
         }
-        /*
-        printf( "# Suspended: %d  active: %d\n",
-                (int)suspended_tasks.size(),
-                (int)active_tasks.size() );
-        */
-        /*
-        printf( "#X" );
-        for  ( int i = 0; i < (int)suspended_tasks.size(); i++ )
-            printf( "%d ", suspended_tasks[ i ]->runtime() );
-        printf( "\n" );
-        */
 
         if  ( ( time_out > 0 )  &&  ( curr_time > time_out ) ) {
             printf( "\n\n\n" "Timeout exceeded! Exiting... \n\n\n" );
@@ -1323,17 +1433,18 @@ const char *argp_program_bug_address =
 
 /* The options we understand. */
 static struct argp_option options[] = {
+    {"counter",     'n', 0,      0,  "Counter search" },
     {"wide",        'a', 0,      0,  "Wide search" },
     {"parallel",    'p', 0,      0,  "Parallel search" },
     {"verbose",     'v', 0,      0,  "Verbose" },
-    {"boring",      'b', 0,      0,  "Boring: Runs a single thread "
+    {"boring",      'b', 0,      0,  "Boring: Runs a single thread"
                                   "no fancy nonsense." },
     {"random",      'r', 0,      0,  "Random search" },
-    {"combined",    'm', 0,      0,  "Combined search" },
+    {"cache",       'm', 0,      0,  "Use cache of suspended threads" },
     {"rbasel",      'R', 0,      0,  "Random search using Basel distribution" },
-    {"gtimeout",    't', "Seconds", OPTION_ARG_OPTIONAL,
+    {"gtimeout",    't', "Secs", OPTION_ARG_OPTIONAL,
       "Timeout on OVERALL running time of simulation."},
-    {"copytimeout", 'c', "Seconds", OPTION_ARG_OPTIONAL,
+    {"copytimeout", 'c', "Secs", OPTION_ARG_OPTIONAL,
       "Timeout on running time of each COPY of alg."},
     {"scale",  's', "Seconds", OPTION_ARG_OPTIONAL,
       "Scale to use."},
@@ -1342,32 +1453,7 @@ static struct argp_option options[] = {
 };
 
 
-/* Used by main to communicate with parse_opt. */
-struct ArgsInfo
-{
-    bool  f_wide_search, f_verbose, f_boring, f_random_search;
-    bool  f_print_succ_file;
-    bool  f_combined_search;
-    bool  f_parallel_search, f_basel;
-    int   time_out, scale, copy_time_out;
-    const char *program;
-    const char *work_dir;
-    unsigned int  num_threads;
 
-    void init() {
-        /* Default values. */
-        f_print_succ_file = false;
-        f_random_search = f_wide_search = false;
-        f_boring = f_verbose = f_parallel_search = f_basel = false;
-        f_combined_search = false;
-        time_out = -1;
-        copy_time_out = -1;
-        program = "";
-        work_dir = "";
-        scale = 1;
-        num_threads = std::thread::hardware_concurrency();
-    }
-};
 
 
 
@@ -1388,20 +1474,23 @@ static error_t    parse_opt (int key, char *arg, struct argp_state *state)
       break;
 
   case 'a':
-      info.f_wide_search = true;
+      info.mode.set( MODE_WIDE );
+      break;
+
+  case 'n':
+      info.mode.set( MODE_COUNTER );
       break;
 
   case 'r':
-      info.f_random_search = true;
+      info.mode.set( MODE_RANDOM );
       break;
 
   case 'm':
-      info.f_combined_search = true;
+      info.f_jobs_cache = true;
       break;
 
   case 'R':
-      info.f_random_search = true;
-      info.f_basel = true;
+      info.mode.set( MODE_ZETA_2 );
       break;
 
   case 'v':
@@ -1409,11 +1498,11 @@ static error_t    parse_opt (int key, char *arg, struct argp_state *state)
       break;
 
   case 'b':
-      info.f_boring = true;
+      info.mode.set( MODE_BORING );
       break;
 
   case 'p':
-      info.f_parallel_search = true;
+      info.mode.set( MODE_PARALLEL );
       break;
 
   case  't' :
@@ -1463,11 +1552,6 @@ static error_t    parse_opt (int key, char *arg, struct argp_state *state)
 
   default:
       return ARGP_ERR_UNKNOWN;
-  }
-
-  if  ( info.f_wide_search  &&   info.f_parallel_search ) {
-      printf( "\n\n" "Not allowed to do both parallel search and wide search!!!\n" );
-      argp_usage (state);
   }
 
   return 0;
@@ -1542,13 +1626,10 @@ int  main(int   argc, char*   argv[])
     procps_init();
 #endif
 
-    //p_manager->set_threads_num( opt.num_threads );
-    //p_manager->set_threads_num( (2 * opt.num_threads) / 3  );
     p_manager->set_threads_num( (3 * opt.num_threads) / 4  );
-    if  ( opt.f_combined_search  )
+    if  ( opt.f_jobs_cache  )
         p_manager->set_max_suspends_num( opt.num_threads );
 
-    //p_manager->set_threads_num( 12 );
     p_manager->set_program( opt.program );
 
     if  ( ! is_file_exists( opt.program ) ) {
@@ -1556,50 +1637,7 @@ int  main(int   argc, char*   argv[])
         exit( -1 );
     }
 
-    p_manager->set_scale( opt.scale );
-    p_manager->set_work_dir( opt.work_dir );
-
-    if   ( opt.f_boring ) {
-        opt.f_parallel_search = true;
-        p_manager->set_wide_search( false );
-        p_manager->set_parallel_search( true );
-        p_manager->set_threads_num( 1 );
-    }
-
-    if  ( ( opt.copy_time_out > 0 )  &&  ( !opt.f_parallel_search ) ) {
-        printf( "Error: copy timeout larger than zero can be used only with "
-                "parallel search.\n\n" );
-        exit( -1 );
-    }
-
-    if  ( opt.f_combined_search ) {
-        if  ( opt.f_wide_search )
-            error( "Combined search and wide search are not compatible." );
-        p_manager->set_combined_search( true );
-    }
-
-    if  ( opt.f_wide_search ) {
-        p_manager->set_wide_search( true );
-        p_manager->set_seq_generator( new  SequencePlusOne() );
-    } else if  ( opt.f_parallel_search ) {
-        p_manager->set_parallel_search( true );
-        if  ( opt.copy_time_out > 0 )
-            p_manager->set_seq_generator( new
-                       SequenceRepeatVal( opt.copy_time_out ) );
-        else
-            p_manager->set_seq_generator( new  SequenceMaxInt() );
-    } else if  ( opt.f_random_search ) {
-        p_manager->set_random_search( true );
-        if  ( opt.f_basel ) {
-            p_manager->set_seq_generator( new  SequenceRBasel() );
-            p_manager->set_basel( true );
-        } else
-            p_manager->set_seq_generator( new  SequenceRandom() );
-    } else {
-        p_manager->set_seq_generator( new  SequenceCounter() );
-    }
-    p_manager->set_verbose( opt.f_verbose );
-
+    p_manager->setup( opt );
     p_manager->prepare_to_run();
 
     string cmd = command_line( argc, argv );
@@ -1614,12 +1652,7 @@ int  main(int   argc, char*   argv[])
     printf( "# Work directory   : %s\n", p_manager->get_work_dir().c_str() );
     printf( "# Success file     : %s\n", p_manager->get_success_file_name() );
 
-    p_manager->set_timeout( opt.time_out );
-    p_manager->set_copy_timeout( opt.copy_time_out );
-
     p_manager->main_loop();
-
-    ///printf( "Everything is done???\n" );
 
     return  0;
 }
