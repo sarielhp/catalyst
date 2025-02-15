@@ -233,7 +233,7 @@ function  counter_combined_tests() {
 ################################################################
 function  counter_tests() {
     LOGFL=counter_search_$(datestr).txt
-    CATALYST_FLAGS=""
+    CATALYST_FLAGS="-n"
     SEARCH="Counter search"
 
     main_loop
