@@ -20,6 +20,8 @@ BDIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 
 mkdir $1 >& /dev/null
+LLOG=$(realpath $1/log.txt)
+#echo "LLOG: "$LLOG
 
 # Copy all the files to the new work directory...
 
@@ -36,7 +38,7 @@ TRG=$(realpath $1/env/)
 FL=$1/CatExperimentTemplate.xml
 
 sed s,@@path_to_env@@,$TRG, -i $FL
-echo cmd:$*
+echo cmd:$* > $LLOG
 
 #########################################3
 # Go into work directory
@@ -44,14 +46,14 @@ echo cmd:$*
 cd $1
 
 #echo "----------------------------------------------"
-echo "PWD: " `pwd`
+echo "PWD: " `pwd`>> $LLOG
 #echo "----------------------------------------------"
 
 #trap "echo received sigterm" SIGTERM
 
 python3 $BDIR/prepare_pmpl_run.py
 
-$PPLMP -f CatExperiment.xml
+$PPLMP -f CatExperiment.xml >> $LLOG  2>&1
 
 # Check if run was successful
 # In this case - a file with .stat exists in the directory...

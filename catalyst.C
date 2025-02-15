@@ -1,6 +1,10 @@
 /*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
  * catalyst.C -
  *     A catastrophe avoiding scheduler.
+ ---------------------------------------------------------------
+ * Version 0.7, Sat Feb 15 02:32:06 PM CST 2025
+ *     Total rewrite to have more accurate time tracking. Now
+ *     sleeping the correct time in milliseconds.
 \*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*/
 
 #include  <sys/stat.h>
@@ -344,6 +348,7 @@ inline bool   is_file_exists(const std::string& name) {
 
 
 /*--- Constants ---*/
+typedef  pair<int, int>  PairInt;
 
 class SManager;
 typedef class SManager   * SManagerPtr;
@@ -360,7 +365,7 @@ private:
     int  time_limit, id;
     pid_t pid;
 
-    int  total_runtime;
+    int  total_runtime, total_rounds;
 
     // The wide search implementation
     int  next_wakeup;  // next_wakeup = current_wakeup + time_delta
@@ -376,10 +381,14 @@ public:
         f_done = f_success = false;
         next_wakeup = 0;
         time_delta = 0;
-        total_runtime = 0;
+        total_runtime = total_rounds = 0;
     }
 
+    int   rounds() { return  total_rounds; }
     int   runtime() { return  total_runtime; }
+
+    PairInt  profile() { return  PairInt( total_runtime, total_rounds ); }
+
     void   set_time_delta( int  _dlt ) { time_delta = _dlt; }
     void   set_id( int  _id ) { id = _id; }
     int    process_status();
@@ -395,9 +404,15 @@ public:
 
     void  set_time_limit( int  _limit ) { time_limit = _limit; }
 
-    void  compute_next_wakeup( int  delta ) {
-        assert( delta > 0 );
-        next_wakeup += delta;
+    void  compute_next_wakeup( ) {
+        assert( time_delta > 0 );
+        //int x = next_wakeup;
+        next_wakeup += time_delta;
+        //printf( "MMM %d -> %d\n", x, next_wakeup );
+    }
+
+    void  inc_total_rounds() {
+        total_rounds++;
     }
 
     void  update_total_runtime()
@@ -517,6 +532,7 @@ public:
         seq_gen = _seq_gen;
     }
 
+    void  print_profile();
 
     /*
     void  set_wide_search( bool  flag ) { f_wide_search = flag; }
@@ -647,7 +663,7 @@ void  SManager::setup( ArgsInfo  & opt )
         return;
     }
     if  ( is( MODE_COUNTER ) ) {
-        set_seq_generator( new    SequenceRBasel() );
+        set_seq_generator( new    SequenceCounter() );
         return;
     }
     printf( "ERROR: Must specify a mode!\n" );
@@ -848,10 +864,11 @@ void   kill_process( pid_t  cpid )
 
 void    SManager::verify_suspended_tasks_heap()
 {
+    //printf( "Before...\n" );
     for ( unsigned  k = 0; k < ( suspended_tasks.size() - 1 ); k++ ) {
         unsigned u = 2*k+1;
         if  ( u >= suspended_tasks.size() )
-            continue;
+            break;
         if  ( suspended_tasks[ k ]->next_wakeup_time()
               > suspended_tasks[ u ]->next_wakeup_time() ) {
             printf( "\n\n\nSORTING ORDER WROGN\n" );
@@ -866,6 +883,7 @@ void    SManager::verify_suspended_tasks_heap()
             exit( -1 );
         }
     }
+    //printf( "After...\n" ); fflush( stdout );
 }
 
 
@@ -882,6 +900,8 @@ void   SManager::suspend_process( int  ind )
     // them sorted by wakeup time.
     active_tasks.erase( active_tasks.begin() + ind );
 
+    if  ( is( MODE_WIDE ) )
+        p_task->compute_next_wakeup();
 
     suspended_tasks.push_back( p_task );
     push_heap( suspended_tasks.begin(), suspended_tasks.end(),
@@ -889,7 +909,14 @@ void   SManager::suspend_process( int  ind )
 
     // Verify suspended tasks are sorted correct in the *heap*
     verify_suspended_tasks_heap();
+    if  ( f_verbose ) {
+        printf( "Suspended tasks size: %4d  A:%4d  TIMER: %6d\n",
+                (int)suspended_tasks.size(),
+                (int)active_tasks.size(), time_counter );
+        fflush( stdout );
+    }
 }
+
 
 
 void   SManager::resume_first_process()
@@ -901,18 +928,25 @@ void   SManager::resume_first_process()
 
     // Update the start time of the process
     p_task->record_start_time();
-
+    p_task->inc_total_rounds();
+    
+    //printf( "About to send signal...\n" ); fflush(stdout );
     //----------------------------------------------------
     // Suspending the process: Low level stuff
     send_signal( p_task->get_child_pid(), SIGCONT, "SIGCONT" );
+    //printf( "After  sending signal...\n" ); fflush(stdout );
 
     /// Moving it from suspend to resumed tasks...
     active_tasks.push_back( p_task );
+    //printf( "XAfter  sending signal...\n" ); fflush(stdout );
 
     pop_heap( suspended_tasks.begin(), suspended_tasks.end(),
               TaskComparatorByWakeup() );
+    //printf( "YXAfter  sending signal...\n" ); fflush(stdout );
     suspended_tasks.pop_back();
+    //printf( "ZZYXAfter  sending signal...\n" ); fflush(stdout );
     verify_suspended_tasks_heap();
+    //printf( "___ZXAfter  sending signal...\n" ); fflush(stdout );
 }
 
 
@@ -929,6 +963,7 @@ void   SManager::resume_sus_process( int  pos, int  new_time_limit )
     // Update the start time of the process
     p_task->record_start_time();
     p_task->set_time_limit( new_time_limit - p_task->runtime() );
+    p_task->inc_total_rounds();
 
     //----------------------------------------------------
     // Suspending the process: Low level stuff
@@ -1041,7 +1076,7 @@ void   SManager::handle_expired_tasks()
             return;
         if   ( ! p_task->is_expired() )
             continue;
-        ///printf( "Expired task????\n" );
+        //printf( "Expired task????\n" ); fflush( stdout );
 
         check_for_success();
 
@@ -1071,7 +1106,8 @@ void   SManager::handle_expired_tasks()
         }
 
         /// Unimportant - should be killed...
-        if   ( p_task->runtime() <= min_sus_runtime ) {
+        if  ( ( ! is( MODE_WIDE )  )
+              &&   ( p_task->runtime() <= min_sus_runtime ) ) {
             kill_process( cpid );
             p_task->set_done( true );
             continue;
@@ -1088,9 +1124,33 @@ void   SManager::handle_expired_tasks()
         suspend_process( ind );
         update_min_suspended_runtime();
     }
-    if  ( count > 0 )
+    if  ( ( count > 0 )   &&   ( f_verbose ) ) {
         printf( "Killed %d processes\n", count );
+        fflush( stdout );
+    }
 }
+
+
+void  SManager::print_profile()
+{
+    vector<PairInt>  totals;
+
+    for  ( int  ind  = active_tasks.size() - 1; ind >= 0; ind-- ) {
+        totals.push_back( active_tasks[ ind ]->profile() );
+   }
+    for  ( int  ind  = suspended_tasks.size() - 1; ind >= 0; ind-- ) {
+        totals.push_back( suspended_tasks[ ind ]->profile() );
+    }
+    sort(totals.begin(), totals.end(), greater<>());
+
+    for ( int  i = 0; i < (int)totals.size(); i++ ) {
+        printf( " %3d: %3d [Rounds: %d]\n", i, totals[ i ].first,
+                totals[ i ].second );
+    }
+    fflush( stdout );
+
+}
+
 
 
 int   SManager::get_suspended_task_to_wake( int  time_limit )
@@ -1106,6 +1166,7 @@ int   SManager::get_suspended_task_to_wake( int  time_limit )
             pos = k;
         }
     }
+    //printf( "RRRR POS: %3d:  %3d -> %3d\n", pos, rt, time_limit );
     return  pos;
 }
 
@@ -1120,11 +1181,13 @@ void  SManager::spawn_single_task()
 
 
     int  time_limit = scale * (int)seq_gen->next();
+    //printf( "TTTTTT: %d\n", time_limit );
 
-    if   ( max_suspends > 0 ) {
+    if   ( ( max_suspends > 0 )  &&  ( ! is( MODE_WIDE ) ) ) {
         int  pos = get_suspended_task_to_wake( time_limit );
         if  ( pos >= 0 ) {
             resume_sus_process( pos, time_limit );
+            return;
         }
     }
 
@@ -1140,10 +1203,11 @@ void  SManager::spawn_single_task()
         tsk->set_id( counter_tasks_created );
         tsk->set_time_limit( scale );
         tsk->set_time_delta( time_limit );
-        tsk->compute_next_wakeup( time_limit );
+        //printf( "DELTA: %d\n", time_limit );
+        tsk->compute_next_wakeup();
         //printf( "ZZZZ\n" ); fflush( stdout );
     } else {
-        printf( "LIMIT: %d\n", time_limit );
+        //printf( "LIMIT: %d\n", time_limit );
         tsk->set_time_limit( time_limit );
     }
     tsk->set_manager( this );
@@ -1178,7 +1242,6 @@ bool  SManager::slots_available()
 void  SManager::spawn_tasks()
 {
     check_for_success();
-
     if  ( f_success_found )
         return;
     if  ( ! is( MODE_WIDE ) ) {
@@ -1203,9 +1266,21 @@ void  SManager::spawn_tasks()
 
         assert( suspended_tasks.size() > 0 );
 
+        //int tasks_alive;
+
+        //tasks_alive = (int)suspended_tasks.size() + (int)active_tasks.size();
+
         int  future = time_counter + 1;
+        //printf( "tasks : %d  < %d\n", tasks_alive, future );
+        //for  ( int  k = 0; k <(int)suspended_tasks.size(); k++ ) {
+        //  printf( " %d ", suspended_tasks[ k ]->next_wakeup_time() );
+        //  }
+        //printf( "\n" );fflush( stdout );
+
         if  ( suspended_tasks[ 0 ]->next_wakeup_time() < future ) {
+            //printf( "resuming?\n" ); fflush( stdout );
             resume_first_process();
+            //printf( "...resuming?\n" ); fflush( stdout );
             continue;
         }
 
@@ -1213,6 +1288,7 @@ void  SManager::spawn_tasks()
         time_counter++;   // TIME forward by one unit
         spawn_single_task();
     }
+    //printf( "escape\n" );fflush( stdout );
 }
 
 
@@ -1254,6 +1330,10 @@ void  SManager::prepare_to_run()
     set_success_file( out_success_fn );
 }
 
+typedef std::chrono::milliseconds  Milliseconds;
+        Milliseconds  duration_ms( auto  x ) {
+            return  std::chrono::duration_cast<Milliseconds>( x );
+        }
 
 
 void   SManager::main_loop()
@@ -1275,40 +1355,78 @@ void   SManager::main_loop()
 
     time_t  start_time = time( NULL );
 
+    auto t_start_global = std::chrono::steady_clock::now();
     do {
+        auto t_start = std::chrono::steady_clock::now();
         int  curr_time = (int)( time( NULL ) - start_time );
-        printf( "Current time: %d\n", curr_time );
+
+        if  ( time_counter == 0 )
+            printf( "Suspended tasks: %4d   Active: %5d "
+                    "  Real time: %6d\n",
+                    (int)suspended_tasks.size(),
+                    (int)active_tasks.size(), curr_time );
+        else
+            printf( "Stats Tasks. Suspended: %4d Active: %5d     V"
+                    "tm : %6d   Real time: %6d\n",
+                    (int)suspended_tasks.size(),
+                    (int)active_tasks.size(), time_counter, curr_time );
+        fflush( stdout );
+        //print_profile();
+
+        //printf( "AX\n" ); fflush(stdout);
         if  ( ( curr_time & 0xf ) == 0 ) {
             fflush( stdout );
         }
 
+        //printf( "AB\n" ); fflush(stdout);
         if  ( ( time_out > 0 )  &&  ( curr_time > time_out ) ) {
             printf( "\n\n\n" "Timeout exceeded! Exiting... \n\n\n" );
             break;
         }
 
+        //printf( "AC\n" ); fflush(stdout);
         if  ( f_verbose )
             printf( "Active: %4d   suspended: %4d   SIM TIME: %6d\n",
                     (int)active_tasks.size(),
                     (int)suspended_tasks.size(),
                     time_counter );
 
+        //        printf( "A\n" ); fflush(stdout);
         check_for_done_tasks();
         if  ( is_found_success() )
             break;
 
+        //printf( "B\n" ); fflush(stdout);
         handle_expired_tasks();
         if  ( is_found_success() )
             break;
+        //printf( "C\n" ); fflush(stdout);
 
         //printf( "ML C Looping...\n" );
         spawn_tasks();
+        //printf( "C\n" ); fflush(stdout);
         //printf( "D Looping...\n" );
         if  ( is_found_success() )
             break;
+        
+        auto now = std::chrono::steady_clock::now();
 
-        //printf( "E Looping...\n" );
-        sleep( 1 );
+        
+        //namespace duration_cast =  std::chrono::duration_cast<Milliseconds>();
+        auto elapsed = duration_ms( now - t_start );
+        auto elapsed_global = duration_ms( now - t_start_global );
+
+        
+        int dur = elapsed.count();
+        //int dur_global = elapsed_global.count();
+        //printf( "Round time 1/1000 seconds: %d  [%d]\n",
+        //        (int)dur, (int)dur_global );
+        int sleep_micro = 1000*(1000-dur);
+        if  ( sleep_micro  > 0 )
+            usleep( sleep_micro  );
+
+        //printf( "...Waking\n" );
+        //fflush( stdout );
 
     }  while ( ! is_found_success() );
     kill_all_tasks();
@@ -1366,6 +1484,7 @@ int    Task::process_status()
 void  Task::launch()
 {
     record_start_time();
+    inc_total_rounds();
 
     if  ( p_manager->is_found_success() ) {
         f_done = true;
@@ -1387,7 +1506,10 @@ void  Task::launch()
 
     // Spawn a new process
     //printf( "New process started!\n" );
-    printf( "## PROCESS SPAWN  : %s\n", command.c_str() );
+    static int  count_out = 0;
+    count_out++;
+    if  ( count_out <= 10 )
+        printf( "## PROCESS SPAWN  : %s\n", command.c_str() );
 
     fflush(  stdout  );
 
@@ -1423,8 +1545,11 @@ static char doc[] =
 /* A description of the arguments we accept. */
 static char args_doc[] = "PROG   WORK-DIR";
 
-const char *argp_program_version =
-  "catalyst 0.5";
+
+#define  VERSION  "0.7"
+#define  PROGRAM  "Catalyst"
+
+const char *argp_program_version = NULL;
 const char *argp_program_bug_address =
   "<sariel@illinois.edu>";
 
@@ -1595,6 +1720,12 @@ void  error( const char  * err )
 
 int  main(int   argc, char*   argv[])
 {
+    string prog_ver = string(  PROGRAM ) + " " + VERSION;
+
+    argp_program_version = prog_ver.c_str();
+    
+
+
     ArgsInfo  opt;
 
     /*
@@ -1649,6 +1780,7 @@ int  main(int   argc, char*   argv[])
 
     printf( "### %s\n###\n", cmd.c_str() );
 
+    printf( "##### Catalyst %s\n", prog_ver.c_str() );
     printf( "# Work directory   : %s\n", p_manager->get_work_dir().c_str() );
     printf( "# Success file     : %s\n", p_manager->get_success_file_name() );
 
