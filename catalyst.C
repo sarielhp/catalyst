@@ -1196,7 +1196,7 @@ void  SManager::spawn_single_task()
 
     counter_tasks_created++;
 
-    static int  max_tasks_c = 16;
+    static int  max_tasks_c = 32;
     if  ( counter_tasks_created >= max_tasks_c ) {
         printf( "## Task created: %d\n", counter_tasks_created );
         max_tasks_c += counter_tasks_created;
