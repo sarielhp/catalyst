@@ -1364,10 +1364,11 @@ void   SManager::main_loop()
         auto t_start = std::chrono::steady_clock::now();
         int  curr_time = (int)( time( NULL ) - start_time );
 
+        int  sus_count = (int)suspended_tasks.size();
+        if  ( sus_count > 0 )
+            printf( "Suspended tasks: %4d   ", sus_count );
         if  ( time_counter == 0 )
-            printf( "Suspended tasks: %4d   Active: %5d "
-                    "  Real time: %6d\n",
-                    (int)suspended_tasks.size(),
+            printf( "Active: %5d  Real time: %6d\n",
                     (int)active_tasks.size(), curr_time );
         else
             printf( "Stats Tasks. Suspended: %4d Active: %5d     V"
@@ -1426,6 +1427,9 @@ void   SManager::main_loop()
         //printf( "Round time 1/1000 seconds: %d  [%d]\n",
         //        (int)dur, (int)dur_global );
         int sleep_micro = 1000*(1000-dur);
+
+        /// Or lets just be stupid and sleep for a second...
+        sleep_micro = 1000; 
         if  ( sleep_micro  > 0 )
             usleep( sleep_micro  );
 
