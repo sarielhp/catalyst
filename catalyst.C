@@ -1334,9 +1334,10 @@ void  SManager::prepare_to_run()
 }
 
 typedef std::chrono::milliseconds  Milliseconds;
-        Milliseconds  duration_ms( auto  x ) {
-            return  std::chrono::duration_cast<Milliseconds>( x );
-        }
+//Milliseconds  duration_ms( auto  x ) {
+//    return  std::chrono::duration_cast<Milliseconds>( x );
+//}
+#define duration_ms std::chrono::duration_cast<Milliseconds>
 
 
 void   SManager::main_loop()
