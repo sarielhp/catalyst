@@ -1195,9 +1195,12 @@ void  SManager::spawn_single_task()
     Task  * tsk = new  Task();
 
     counter_tasks_created++;
-    if  ( ( counter_tasks_created & 0x1f ) == 0 )
-        printf( "## Task created: %d\n", counter_tasks_created );
 
+    static int  max_tasks_c = 16;
+    if  ( counter_tasks_created >= max_tasks_c ) {
+        printf( "## Task created: %d\n", counter_tasks_created );
+        max_tasks_c += counter_tasks_created;
+    }
     // We run a process for one second if we are in the wide search mode...
     if  ( is( MODE_WIDE ) ) {
         tsk->set_id( counter_tasks_created );
