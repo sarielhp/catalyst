@@ -156,7 +156,6 @@ function  main_loop() {
         echo -n "####################" >> $LOG
         echo "################################################## " $i >> $LOG
         echo "$SEARCH # : " $i >> $LOG
-        echo "# $SEARCH iteration : " $i
         do_a_run $1
     done
 }
@@ -292,9 +291,9 @@ TIMEOUT=3
 #INST=wait_forever_99
 #INST=cat_exp
 #INST=cat_bug_no_scale
-INST=maze
+#INST=maze
 #INST=bug
-#INST=shelves
+INST=shelves
 #INST=fun
 
 ###############################################################################
@@ -307,11 +306,12 @@ mkdir -p $DLOG $DSUCC >& /dev/null
 comp_vars
 
 #boring_tests
-#random_tests
-#counter_tests
-#counter_combined_tests
+random_tests
+random_zeta_2_tests
+counter_tests
+counter_combined_tests
 #copy_timeout_tests
 wide_tests
-#parallel_tests
+parallel_tests
 
 exit -1
