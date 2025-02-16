@@ -1,0 +1,137 @@
+#! /bin/bash
+
+HOME=$(eval echo ~$USER)
+
+function  fix_up() {
+    replacer "count\_comb"           "Counter+Cache" $FL
+    replacer "counter\_comb\_search" "Counter+Cache" $FL
+    replacer "scale\_0\_99" "Counter" $FL
+    replacer "wide\_search" "Wide" $FL
+    replacer "random\_zeta\_2" "Random $\zeta(2)$" $FL
+    replacer "random"          "Random"            $FL
+    replacer "boring"          "Boring"            $FL
+    replacer "parallel"        "Parallel"          $FL
+    replacer "rrrrrrrrr"       "l|rrr|rrrrr"       $FL
+    replacer "counter"         "Counter"           $FL
+}
+
+# insert_hline out/result.tex Random
+function  insert_hline() {
+#    echo "==========================="
+#    echo grep -n $1 $FL
+#    echo "==========================="
+#    grep -n $1 $FL
+    L=$(grep -n $1 $FL |  cut -f1 -d: | head -1)
+
+#    echo "LLLL ["$L"] LLLL"
+    if  (( $L > 0 )); then
+        sed -i "$L i \\\\\\hline" $FL
+    fi
+}
+
+function  copy_it() {
+    pushd . >& /dev/null
+    cd $HOME/papers/25/catastrophe/
+    snapshot figs/*.tex >& /dev/null
+
+    #=
+#    L=$(grep -n Random $FL |  cut -f1 -d: | head -1)
+#
+#    if  (( $L > 0 )); then
+#        sed -i "$L i \\\\\\hline" $FL
+#    fi
+
+    DFL=$HOME/papers/25/catastrophe/figs/$1
+    cp $FL $DFL
+    popd  >& /dev/null
+}
+
+julia/stats_latex_table.jl \
+        results/bug/boring.txt \
+        results/bug/parallel.txt \
+        results/bug/random_zeta_2.txt \
+        results/bug/random.txt \
+        results/bug/wide_search.txt \
+        results/bug/scale_0_99.txt \
+        results/bug/counter_comb_search.txt
+FL=$(realpath out/results.tex)
+fix_up
+copy_it cat_bug_diff_tech.tex
+
+##############################################################
+
+
+
+julia julia/stats_latex_table.jl \
+    results/bug/count_comb_cluster_128.txt \
+    results/bug/counter_cluster_128.txt \
+    results/bug/parallel_cluster_128.txt
+
+
+fix_up
+copy_it cat_bug_cluster_128.tex
+
+############################################################################
+####### 7713 shelves
+
+function  fix_up_7713() {
+    replacer "counter\_comb"   "Counter+Cache" $FL
+    replacer "counter"         "Counter" $FL
+    replacer "wide\_search"    "Wide" $FL
+    replacer "random\_zeta"    "Random $\zeta(2)$" $FL
+    replacer "random"          "Random"            $FL
+    replacer "ttl\_2"          '\TTL $2$'          $FL
+    replacer "ttl\_3"          '\TTL $3$'          $FL
+    replacer "ttl\_5"          '\TTL $5$'          $FL
+    replacer "ttl\_10"         '\TTL $10$'         $FL
+    replacer "parallel"        "Parallel"          $FL
+    replacer "counter"         "Counter"           $FL
+}
+
+DIR=results/shelves/7713
+
+julia/stats_latex_table.jl             \
+    $DIR/shelves_random_7713.txt       \
+    $DIR/shelves_counter_7713.txt      \
+    $DIR/shelves_counter_comb_7713.txt \
+    $DIR/shelves_random_zeta_7713.txt  \
+    $DIR/shelves_parallel_7713.txt     \
+    $DIR/shelves_ttl_2_7713.txt        \
+    $DIR/shelves_ttl_3_7713.txt        \
+    $DIR/shelves_ttl_5_7713.txt        \
+    $DIR/shelves_ttl_10_7713.txt
+
+#exit
+
+FL=$(realpath out/results.tex)
+fix_up_7713
+
+replacer "rrrrrrr"         "l|r||r|r||rrrr"    $FL
+
+insert_hline TTL
+
+copy_it shelves_7713.tex
+
+############################################################################
+####### 7713 bug length 2
+DIR=results/bug/7713
+
+julia/stats_latex_table.jl             \
+    $DIR/parallel_bug_L2_7713.txt \
+    $DIR/counter_bug_L2_7713.txt \
+    $DIR/random_zeta_bug_L2_7713.txt \
+    $DIR/counter_comb_bug_L2_7713.txt \
+    $DIR/random_bug_L2_7713.txt
+
+FL=$(realpath out/results.tex)
+fix_up_7713
+
+replacer "rrrrrrr"         "l||r|r|r||rr|rr"    $FL
+replacer "\# Runs"         "\#"    $FL
+replacer "\# Succ"        "Succs"    $FL
+replacer "\# Fails"        "Fails"    $FL
+
+insert_hline Parallel
+
+copy_it bug_len_2_7713.tex
+

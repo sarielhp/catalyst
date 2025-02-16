@@ -310,7 +310,7 @@ comp_vars
 #counter_tests
 #counter_combined_tests
 #copy_timeout_tests
-#wide_tests
-parallel_tests
+wide_tests
+#parallel_tests
 
 exit -1
