@@ -156,6 +156,7 @@ function  main_loop() {
         echo -n "####################" >> $LOG
         echo "################################################## " $i >> $LOG
         echo "$SEARCH # : " $i >> $LOG
+        echo "# $SEARCH iteration : " $i
         do_a_run $1
     done
 }

@@ -24,6 +24,9 @@ function  insert_hline() {
     L=$(grep -n $1 $FL |  cut -f1 -d: | head -1)
 
 #    echo "LLLL ["$L"] LLLL"
+    if [[ "$L"  == "" ]]; then
+        return
+    fi
     if  (( $L > 0 )); then
         sed -i "$L i \\\\\\hline" $FL
     fi
@@ -58,14 +61,18 @@ FL=$(realpath out/results.tex)
 fix_up
 copy_it cat_bug_diff_tech.tex
 
-##############################################################
 
+##############################################################
+##############################################################
+# Bug trap 0.25 on cluster
 
 
 julia julia/stats_latex_table.jl \
+    results/bug/parallel_cluster_128.txt \
     results/bug/count_comb_cluster_128.txt \
-    results/bug/counter_cluster_128.txt \
-    results/bug/parallel_cluster_128.txt
+    results/bug/counter_cluster_128.txt 
+
+replacer "rrrrrr"         "l||r|r||r||rr"    $FL
 
 
 fix_up
@@ -135,3 +142,56 @@ insert_hline Parallel
 
 copy_it bug_len_2_7713.tex
 
+
+############################################################################
+####### Maze valis
+
+DIR=results/maze/
+
+julia/stats_latex_table.jl             \
+    $DIR/parallel_maze_valis.txt \
+    $DIR/counter_cache_valis.txt \
+    $DIR/random_zeta_maze_valis.txt \
+    $DIR/counter_search_maze_valis.txt \
+    $DIR/random_maze_valis.txt
+
+FL=$(realpath out/results.tex)
+fix_up_7713
+
+replacer "rrrrrrr"         "l||r|r|r||rr|rr"    $FL
+replacer "\# Runs"         "\#"    $FL
+replacer "\# Succ"        "Succs"    $FL
+replacer "\# Fails"        "Fails"    $FL
+
+replacer "Counter\_cach"   "Counter+Cache"    $FL
+replacer "\_maz"   ""    $FL
+
+insert_hline Parallel
+
+copy_it maze_valis.tex
+
+
+############################################################################
+####### Maze 7713
+
+DIR=results/maze/
+
+julia/stats_latex_table.jl             \
+    $DIR/parallel_maze_7713.txt    \
+    $DIR/random_zeta_maze_7713.txt \
+    $DIR/counter_cache_maze_7713.txt \
+    $DIR/counter_maze_7713.txt
+
+FL=$(realpath out/results.tex)
+fix_up_7713
+
+replacer "rrrrrrr"         "l||r|r|r||rr|rr"    $FL
+replacer "\# Runs"         "\#"    $FL
+replacer "\# Succ"        "Succs"    $FL
+replacer "\# Fails"        "Fails"    $FL
+
+replacer "Counter\_cache"   "Counter+Cache"    $FL
+
+insert_hline Parallel
+
+copy_it maze_7713.tex

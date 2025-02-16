@@ -1429,7 +1429,7 @@ void   SManager::main_loop()
         int sleep_micro = 1000*(1000-dur);
 
         /// Or lets just be stupid and sleep for a second...
-        sleep_micro = 1000000; 
+        /// sleep_micro = 1000000; 
         if  ( sleep_micro  > 0 )
             usleep( sleep_micro  );
         
