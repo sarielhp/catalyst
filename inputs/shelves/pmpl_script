@@ -20,6 +20,7 @@ fi
 BDIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 mkdir $1 >& /dev/null
+LLOG=$(realpath $1/log.txt)
 
 # Copy all the files to the new work directory...
 
@@ -36,7 +37,7 @@ TRG=$(realpath $1/env/)
 FL=$1/CatExperimentTemplate.xml
 
 sed s,@@path_to_env@@,$TRG, -i $FL
-echo cmd:$*
+echo cmd:$*  >> $LLOG
 
 #########################################3
 # Go into work directory
@@ -45,7 +46,7 @@ cd $1
 
 python3 $BDIR/prepare_pmpl_run.py
 
-$PPLMP -f CatExperiment.xml
+$PPLMP -f CatExperiment.xml  >> $LLOG  2>&1
 
 
 # Check if run was successful
@@ -53,7 +54,7 @@ $PPLMP -f CatExperiment.xml
 L=$(find . | grep -i  .stat | wc -l)
 if  (( $L > 0 )); then
     # Create & write into the success file...
-    echo "=================================================================="
+    echo "=========================================================" >> $LLOG
 #    stat_file=$(find "$1" -type f -name "*.rdmp.path" -print -quit)
 #    if [[ -n "$stat_file" ]]; then
 #        cp "$stat_file" ../../ppl_paths/
