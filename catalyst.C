@@ -1774,7 +1774,7 @@ int  main(int   argc, char*   argv[])
     procps_init();
 #endif
 
-    p_manager->set_threads_num( (3 * opt.num_threads) / 4  );
+    p_manager->set_threads_num( (3 * opt.num_threads) / 4 );
     if  ( opt.f_jobs_cache  )
         p_manager->set_max_suspends_num( opt.num_threads );
 
