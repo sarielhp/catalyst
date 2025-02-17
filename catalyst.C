@@ -45,6 +45,12 @@
 
 /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
+
+static bool   f_sched_fill_second = true;
+
+
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
 /* Used by main to communicate with parse_opt. */
 
 #define  MODE_NOT_DEF        0
@@ -929,7 +935,7 @@ void   SManager::resume_first_process()
     // Update the start time of the process
     p_task->record_start_time();
     p_task->inc_total_rounds();
-    
+
     //printf( "About to send signal...\n" ); fflush(stdout );
     //----------------------------------------------------
     // Suspending the process: Low level stuff
@@ -1346,7 +1352,8 @@ void   SManager::main_loop()
     if  ( max_suspends > 0 ) {
         smode = smode + " + Cache";
     }
-    printf( "# MODE                 : %s\n", smode.c_str() );
+    printf( "# MODE                     : %s\n", smode.c_str() );
+    printf( "# Scheduler fill to second : %d\n", (int)f_sched_fill_second );
 
     printf( "# of parallel jobs     : %d\n", max_jobs_number );
     if  ( max_suspends > 0 )
@@ -1413,15 +1420,15 @@ void   SManager::main_loop()
         //printf( "D Looping...\n" );
         if  ( is_found_success() )
             break;
-        
+
         auto now = std::chrono::steady_clock::now();
 
-        
+
         //namespace duration_cast =  std::chrono::duration_cast<Milliseconds>();
         auto elapsed = duration_ms( now - t_start );
         auto elapsed_global = duration_ms( now - t_start_global );
 
-        
+
         int dur = elapsed.count();
         //int dur_global = elapsed_global.count();
         //printf( "Round time 1/1000 seconds: %d  [%d]\n",
@@ -1429,10 +1436,12 @@ void   SManager::main_loop()
         int sleep_micro = 1000*(1000-dur);
 
         /// Or lets just be stupid and sleep for a second...
-        /// sleep_micro = 1000000; 
+        if  ( ! f_sched_fill_second )
+            sleep_micro = 1000000;
+
         if  ( sleep_micro  > 0 )
             usleep( sleep_micro  );
-        
+
         //printf( "...Waking\n" );
         //fflush( stdout );
 
@@ -1731,7 +1740,7 @@ int  main(int   argc, char*   argv[])
     string prog_ver = string(  PROGRAM ) + " " + VERSION;
 
     argp_program_version = prog_ver.c_str();
-    
+
 
 
     ArgsInfo  opt;
