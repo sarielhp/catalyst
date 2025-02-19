@@ -1,11 +1,27 @@
 #! /bin/bash
 
 function  handle_file() {
-    FLO=$(scripts/compress $1  | awk '{print $4}')
+    if [[ -d $1 ]]; then
+        continue
+    fi
 
-    echo ""
-    echo "FLO : " $FLO
-    echo ""
+    MIDFILE="logs_final/"$(realpath  --relative-to=logs/ $1)
+    DIR=$(dirname $MIDFILE);
+    
+    echo $MIDFILE
+    echo $DIR
+    mkdir -p $DIR >& /dev/null
+    
+    FLO=$MIDFILE
+    if  [[ $1  -nt $MIDFILE ]]; then
+        FLO=$(scripts/compress $1  | awk '{print $4}')
+    fi
+
+
+    if  [[ "$FLO" != "$MIDFILE" ]]; then
+        echo "Error: Different files? $FLO != $MIDFILE"
+        exit
+    fi
 
     scripts/analyze_inner $FLO
 }
@@ -15,4 +31,3 @@ do
     echo "$var"
     handle_file "$var"
 done
-

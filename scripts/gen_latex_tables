@@ -3,15 +3,22 @@
 HOME=$(eval echo ~$USER)
 
 function  fix_up() {
+    replacer "\# Runs"         "\#"    $FL
+    replacer "\# Succ"        "Succs"    $FL
+    replacer "\# Fails"        "Fails"    $FL
+
     replacer "count\_comb"           "Counter+Cache" $FL
     replacer "counter\_comb\_search" "Counter+Cache" $FL
+    replacer "Counter\_cache"   "Counter+Cache"    $FL
+    replacer "count\_cache"     "Counter+Cache"    $FL
     replacer "scale\_0\_99" "Counter" $FL
     replacer "wide\_search" "Wide" $FL
+    replacer "wide"         "Wide" $FL
     replacer "random\_zeta\_2" "Random $\zeta(2)$" $FL
+    replacer '\\texttt{zeta}'  '\\texttt{Random $\zeta(2)$}' $FL
     replacer "random"          "Random"            $FL
     replacer "boring"          "Boring"            $FL
     replacer "parallel"        "Parallel"          $FL
-    replacer "rrrrrrrrr"       "l|rrr|rrrrr"       $FL
     replacer "counter"         "Counter"           $FL
 }
 
@@ -45,41 +52,12 @@ function  copy_it() {
 #    fi
 
     DFL=$HOME/papers/25/catastrophe/figs/$1
+    rm $DFL >& /dev/null
     cp $FL $DFL
     popd  >& /dev/null
 }
 
-julia/stats_latex_table.jl \
-        results/bug/boring.txt \
-        results/bug/parallel.txt \
-        results/bug/random_zeta_2.txt \
-        results/bug/random.txt \
-        results/bug/wide_search.txt \
-        results/bug/scale_0_99.txt \
-        results/bug/counter_comb_search.txt
-FL=$(realpath out/results.tex)
-fix_up
-copy_it cat_bug_diff_tech.tex
-
-
-##############################################################
-##############################################################
-# Bug trap 0.25 on cluster
-
-
-julia julia/stats_latex_table.jl \
-    results/bug/parallel_cluster_128.txt \
-    results/bug/count_comb_cluster_128.txt \
-    results/bug/counter_cluster_128.txt 
-
-replacer "rrrrrr"         "l||r|r||r||rr"    $FL
-
-
-fix_up
-copy_it cat_bug_cluster_128.tex
-
 ############################################################################
-####### 7713 shelves
 
 function  fix_up_7713() {
     replacer "counter\_comb"   "Counter+Cache" $FL
@@ -95,42 +73,157 @@ function  fix_up_7713() {
     replacer "counter"         "Counter"           $FL
 }
 
+function  check_out_file() {
+    if  [[ ! -e $FL ]]; then
+        echo ""
+        echo "ERROR: failed to create $FL"
+        echo ""
+        exit -1
+    fi
+}
+
+function  header() {
+    echo ""
+    echo ""
+    echo ""
+    echo "---------------------------------------------------------------"
+    echo $1
+    echo""
+}
+
+FL=$(realpath out/results.tex)
+
+
+#############################################################################
+#############################################################################
+#############################################################################
+# Bug 0.25 valis
+
+header  "bug 0.25 valis"
+rm -f $FL >& /dev/null
+
+julia_fast julia/stats_latex_table.jl \
+        results/bug/boring.txt \
+        results/bug/parallel.txt \
+        results/bug/wide_search.txt \
+        results/bug/random_zeta_2.txt \
+        results/bug/random.txt \
+        results/bug/scale_0_99.txt \
+        results/bug/counter_comb_search.txt
+
+check_out_file
+
+fix_up
+replacer "rrrrrrrrr"       "l|rrr|rrrrr"       $FL
+
+insert_hline Wide
+
+copy_it cat_bug_diff_tech.tex
+
+
+##############################################################
+##############################################################
+# Bug trap 0.25 on cluster
+
+header "Bug trap 0.25 on cluster"
+rm -f $FL >& /dev/null
+
+julia_fast julia/stats_latex_table.jl \
+    results/bug/parallel_cluster_128.txt \
+    results/bug/count_comb_cluster_128.txt \
+    results/bug/counter_cluster_128.txt
+
+check_out_file
+
+replacer "rrrrrr"         "l||r|r||r||rr"    $FL
+
+
+fix_up
+copy_it cat_bug_cluster_128.tex
+
+
+############################################################################
+############################################################################
+############################################################################
+####### Shelves valis
+
+header "Shelves valis"
+rm -f $FL >& /dev/null
+
+DIR=results/shelves/valis/
+rm out/results.tex >& /dev/null
+
+julia_fast julia/stats_latex_table.jl    \
+    $DIR/shelves_valis_parallel.txt      \
+    $DIR/shelves_valis_random.txt        \
+    $DIR/shelves_valis_zeta.txt          \
+    $DIR/shelves_valis_counter.txt       \
+    $DIR/shelves_valis_count_cache.txt
+check_out_file
+
+fix_up
+
+replacer "rrrrrrr"         "l||r|r|r||rr|rr"    $FL
+
+replacer "Counter\_cache"   "Counter+Cache"    $FL
+
+insert_hline Random
+
+copy_it shelves_valis.tex
+
+
+############################################################################
+############################################################################
+############################################################################
+### Shelves 7713
+
+header "Shelves cluster"
+rm $FL >& /dev/null
+
 DIR=results/shelves/7713
 
-julia/stats_latex_table.jl             \
+julia_fast julia/stats_latex_table.jl             \
+    $DIR/shelves_parallel_7713.txt     \
     $DIR/shelves_random_7713.txt       \
     $DIR/shelves_counter_7713.txt      \
     $DIR/shelves_counter_comb_7713.txt \
     $DIR/shelves_random_zeta_7713.txt  \
-    $DIR/shelves_parallel_7713.txt     \
     $DIR/shelves_ttl_2_7713.txt        \
     $DIR/shelves_ttl_3_7713.txt        \
     $DIR/shelves_ttl_5_7713.txt        \
     $DIR/shelves_ttl_10_7713.txt
+check_out_file
 
-#exit
-
-FL=$(realpath out/results.tex)
 fix_up_7713
 
 replacer "rrrrrrr"         "l|r||r|r||rrrr"    $FL
 
 insert_hline TTL
+insert_hline Parallel
 
 copy_it shelves_7713.tex
 
+
+############################################################################
+############################################################################
 ############################################################################
 ####### 7713 bug length 2
+
+header "Bug length 2 cluster"
+rm $FL >& /dev/null
+
 DIR=results/bug/7713
 
-julia/stats_latex_table.jl             \
+julia_fast julia/stats_latex_table.jl             \
+    $DIR/wide_bug_L2_7713.txt \
     $DIR/parallel_bug_L2_7713.txt \
     $DIR/counter_bug_L2_7713.txt \
     $DIR/random_zeta_bug_L2_7713.txt \
     $DIR/counter_comb_bug_L2_7713.txt \
     $DIR/random_bug_L2_7713.txt
 
-FL=$(realpath out/results.tex)
+check_out_file
+
 fix_up_7713
 
 replacer "rrrrrrr"         "l||r|r|r||rr|rr"    $FL
@@ -144,46 +237,61 @@ copy_it bug_len_2_7713.tex
 
 
 ############################################################################
+############################################################################
+############################################################################
 ####### Maze valis
 
-DIR=results/maze/
+header "Maze valis"
+rm $FL >& /dev/null
 
-julia/stats_latex_table.jl             \
+DIR=results/maze/valis/
+
+julia_fast julia/stats_latex_table.jl             \
     $DIR/parallel_maze_valis.txt \
+    $DIR/wide_maze_valis.txt \
     $DIR/counter_cache_valis.txt \
     $DIR/random_zeta_maze_valis.txt \
     $DIR/counter_search_maze_valis.txt \
     $DIR/random_maze_valis.txt
 
-FL=$(realpath out/results.tex)
-fix_up_7713
+check_out_file
+
+fix_up
 
 replacer "rrrrrrr"         "l||r|r|r||rr|rr"    $FL
-replacer "\# Runs"         "\#"    $FL
-replacer "\# Succ"        "Succs"    $FL
-replacer "\# Fails"        "Fails"    $FL
+#replacer "\# Runs"         "\#"    $FL
+#replacer "\# Succ"        "Succs"    $FL
+#replacer "\# Fails"        "Fails"    $FL
 
-replacer "Counter\_cach"   "Counter+Cache"    $FL
+#replacer "Counter\_cach"   "Counter+Cache"    $FL
 replacer "\_maz"   ""    $FL
 
-insert_hline Parallel
+insert_hline Wide
 
 copy_it maze_valis.tex
 
 
 ############################################################################
+############################################################################
+############################################################################
 ####### Maze 7713
 
-DIR=results/maze/
+header "Maze cluster"
+rm $FL >& /dev/null
 
-julia/stats_latex_table.jl             \
+DIR=results/maze/7713
+
+julia_fast julia/stats_latex_table.jl             \
     $DIR/parallel_maze_7713.txt    \
     $DIR/random_zeta_maze_7713.txt \
     $DIR/counter_cache_maze_7713.txt \
-    $DIR/counter_maze_7713.txt
+    $DIR/counter_maze_7713.txt \
+    $DIR/wide_maze_7713.txt
 
-FL=$(realpath out/results.tex)
+check_out_file
+
 fix_up_7713
+fix_up
 
 replacer "rrrrrrr"         "l||r|r|r||rr|rr"    $FL
 replacer "\# Runs"         "\#"    $FL
@@ -195,3 +303,32 @@ replacer "Counter\_cache"   "Counter+Cache"    $FL
 insert_hline Parallel
 
 copy_it maze_7713.tex
+
+
+
+############################################################################
+############################################################################
+############################################################################
+####### Bug 0.25 timeouts
+header "Bug 0.25 timeouts"
+rm $FL >& /dev/null
+
+DIR=results/bug/
+
+julia_fast julia/stats_latex_table.jl         \
+           $DIR/timeout*.txt
+
+check_out_file
+fix_up
+
+replacer "rrrrrrr"         "|l||r||r|r||r|r|r|r"    $FL
+
+replacer "Simulation"   "TTL"    $FL
+
+#insert_hline Parallel
+
+copy_it cat_bug_timeouts.tex
+
+############################################################################
+cd ~/papers/25/catastrophe/
+l

@@ -167,6 +167,10 @@ function  (@main)(ARGS)
 
         println( "Reading: ", s );
         arr = read_file_w_comments_floats( s )
+        if  ( length( arr ) > 100 )
+            arr = arr[ 1:100 ]; 
+        end
+
         failures = remove_above( arr, 3000 );
 
         df_add_row( df );
@@ -195,7 +199,7 @@ function  (@main)(ARGS)
     end
 
 
-    rm_boring_column( df, CL_RUNS );
+    #rm_boring_column( df, CL_RUNS );
     f_fail_rm = rm_boring_column( df, CL_FAIL_RUNS );
     if  ( f_fail_rm )
         #println( "RMMMMMMMMMMMMMMMMMMMMMMMMM" );

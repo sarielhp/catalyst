@@ -222,8 +222,8 @@ function  boring_tests() {
 
 ################################################################
 
-function  counter_combined_tests() {
-    LOGFL=count_comb__$(datestr).txt
+function  counter_cache_tests() {
+    LOGFL=count_cache__$(datestr).txt
     CATALYST_FLAGS="-m -n"
     SEARCH="Counter comb search"
 
@@ -292,8 +292,8 @@ TIMEOUT=3
 #INST=cat_exp
 #INST=cat_bug_no_scale
 #INST=maze
-#INST=bug
-INST=shelves
+INST=bug
+#INST=shelves
 #INST=fun
 
 ###############################################################################
@@ -306,12 +306,12 @@ mkdir -p $DLOG $DSUCC >& /dev/null
 comp_vars
 
 #boring_tests
-random_tests
-random_zeta_2_tests
+#random_tests
 counter_tests
-counter_combined_tests
+#counter_cache_tests
+random_zeta_2_tests
 #copy_timeout_tests
-wide_tests
-parallel_tests
+#wide_tests
+#parallel_tests
 
 exit -1
