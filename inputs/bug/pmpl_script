@@ -26,6 +26,7 @@ BDIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 
 mkdir $1 >& /dev/null
+LLOG=$(realpath $1/log.txt)
 
 # Copy all the files to the new work directory...
 
@@ -57,12 +58,13 @@ echo "----------------------------------------------"
 
 python3 $BDIR/prepare_pmpl_run.py
 
-echo "____________"
+#echo "____________"
 pwd
-echo "____________"
+#echo "____________"
 
 echo $PPLMP -f CatExperiment.xml
-$PPLMP -f CatExperiment.xml
+$PPLMP -f CatExperiment.xml >> $LLOG  2>&1
+
 
 
 # Check if run was successful
