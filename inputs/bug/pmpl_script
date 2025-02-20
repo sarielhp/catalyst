@@ -43,16 +43,16 @@ TRG=$(realpath $1/env/)
 FL=$1/CatExperimentTemplate.xml
 
 sed s,@@path_to_env@@,$TRG, -i $FL
-echo cmd:$*
+#echo cmd:$*
 
 #########################################3
 # Go into work directory
 
 cd $1
 
-echo "----------------------------------------------"
-pwd
-echo "----------------------------------------------"
+#echo "----------------------------------------------"
+echo "PWD: " `pwd`
+#echo "----------------------------------------------"
 
 #trap "echo received sigterm" SIGTERM
 
