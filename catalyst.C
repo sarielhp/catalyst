@@ -630,7 +630,8 @@ void  SManager::setup( ArgsInfo  & opt )
     set_orig_mode( opt.mode );
     set_mode( opt.mode );
 
-    printf( "MODE = %d\n",  opt.mode.get() );
+    
+    //printf( "MODE = %d\n",  opt.mode.get() );
     if  ( is( MODE_NOT_DEF ) ) {
         printf( "You must select a search mode...\n" );
     }

@@ -37,7 +37,7 @@ function  f_kill_grep() {
 
 function  do_a_run() {
     #echo "#######################################################" >> $LOG
-    echo "=== Starting a run..."
+    echo "=== Starting a run: " $2
     WDIR=/scratch.local/sariel/work/
     mkdir -p $WDIR >& /dev/null
     if  [[ ! -e $WDIR ]]; then
@@ -76,6 +76,7 @@ function  do_a_run() {
     FLAGS="$GTOUT $SCFLAG $CATALYST_FLAGS $PROG $WDIR"
 
     #echo ./catalyst --success_file $FLAGS
+    #./catalyst --success_file $FLAGS
     SUCCFILE=$(./catalyst --success_file $FLAGS  )
 
     if  [[ "$SUCCFILE" == "" ]]; then
@@ -87,7 +88,7 @@ function  do_a_run() {
     echo -n "CMI: "
     echo ./catalyst $GTOUT $SCFLAG $CATALYST_FLAGS $PROG $WDIR
     echo "-----------------------"
-    
+
          ./catalyst $GTOUT $SCFLAG $CATALYST_FLAGS $PROG $WDIR >> $LOG
 
     END=$(date +%s)
@@ -108,11 +109,18 @@ function  do_a_run() {
     echo "" >> $LOG
     echo "# END   TIME: "`date`  >> $LOG
 
+    #echo "RUN COMPLETED!"
+
+    #ls -la "$SUCCFILE"
+
+    #echo "RUN COMPLETED 2!"
+    
     # echo "Is there a success file?"
     if  [[ -e "$SUCCFILE" ]]; then
         #echo bogi
         DOUT=$(find_empty_dir $DSUCC)
         SDIR=$(cat $SUCCFILE | head -1)
+        #echo "Trying to copy success file!"
         echo "Copying $SDIR -> $DOUT"
         mkdir -p $DOUT >& /dev/null
         if  [[ -d $SDIR ]]; then
@@ -156,7 +164,7 @@ function  main_loop() {
         echo -n "####################" >> $LOG
         echo "################################################## " $i >> $LOG
         echo "$SEARCH # : " $i >> $LOG
-        do_a_run $1
+        do_a_run $1 $i
     done
 }
 
@@ -202,7 +210,7 @@ function  parallel_tests() {
     LOGFL=parallel_$(datestr).txt
     CATALYST_FLAGS="-p"
     SEARCH="Parallel search"
-    
+
     main_loop
 }
 
@@ -273,7 +281,7 @@ function  check_system() {
         exit -1
     fi
     echo "CPU CHECK"
-    echo "#### Seems to be AMD EPYC 7713" 
+    echo "#### Seems to be AMD EPYC 7713"
 }
 
 
@@ -292,7 +300,8 @@ TIMEOUT=3
 #INST=cat_exp
 #INST=cat_bug_no_scale
 #INST=maze
-INST=bug
+#INST=bug
+INST=path_length
 #INST=shelves
 #INST=fun
 
@@ -309,7 +318,7 @@ comp_vars
 #random_tests
 counter_tests
 #counter_cache_tests
-random_zeta_2_tests
+#random_zeta_2_tests
 #copy_timeout_tests
 #wide_tests
 #parallel_tests

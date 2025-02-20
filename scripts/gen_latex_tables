@@ -1,4 +1,4 @@
-#! /bin/bash
+t#! /bin/bash
 
 HOME=$(eval echo ~$USER)
 
@@ -234,6 +234,32 @@ replacer "\# Fails"        "Fails"    $FL
 insert_hline Parallel
 
 copy_it bug_len_2_7713.tex
+
+
+
+############################################################################
+############################################################################
+############################################################################
+####### valis bug length 2
+
+header "Bug length 2 valis"
+rm $FL >& /dev/null
+
+DIR=results/bug/valis_L2/
+
+julia_fast julia/stats_latex_table.jl             \
+           $DIR/counter_valis_L2.txt
+
+check_out_file
+
+fix_up_7713
+
+replacer "rrrrrrr"         "l||r|r|r||rr|rr"    $FL
+replacer "\# Runs"         "\#"    $FL
+replacer "\# Succ"        "Succs"    $FL
+replacer "\# Fails"        "Fails"    $FL
+
+copy_it bug_len_2_valis.tex
 
 
 ############################################################################

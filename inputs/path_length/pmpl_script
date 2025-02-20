@@ -62,8 +62,8 @@ if  (( $L > 0 )); then
     python3 $BDIR/path_length.py $P
     # Create & write into the success file...
     echo "=================================================================="
-    echo  $* > $2
+    echo  $1 > $2
+    echo  $2 >> $2
 else
     echo "Nope"
 fi
-
