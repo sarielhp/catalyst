@@ -300,8 +300,8 @@ TIMEOUT=3
 #INST=cat_exp
 #INST=cat_bug_no_scale
 #INST=maze
-#INST=bug
-INST=path_length
+INST=bug
+#INST=path_length
 #INST=shelves
 #INST=fun
 
@@ -316,11 +316,11 @@ comp_vars
 
 #boring_tests
 #random_tests
-counter_tests
+#counter_tests
 #counter_cache_tests
 #random_zeta_2_tests
 #copy_timeout_tests
 #wide_tests
-#parallel_tests
+parallel_tests
 
 exit -1

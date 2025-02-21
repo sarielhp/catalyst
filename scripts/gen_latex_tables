@@ -248,7 +248,8 @@ rm $FL >& /dev/null
 DIR=results/bug/valis_L2/
 
 julia_fast julia/stats_latex_table.jl             \
-           $DIR/counter_valis_L2.txt
+           $DIR/counter_valis_L2.txt \
+           $DIR/counter_cache_valis_L2.txt
 
 check_out_file
 
