@@ -51,7 +51,7 @@ sed s,@@path_to_env@@,$TRG, -i $FL
 cd $1
 
 #echo "----------------------------------------------"
-echo "PWD: " `pwd`
+#echo "PWD: " `pwd`
 #echo "----------------------------------------------"
 
 #trap "echo received sigterm" SIGTERM

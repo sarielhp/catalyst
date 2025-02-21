@@ -82,7 +82,7 @@ struct ArgsInfo
     bool  f_verbose;
     bool  f_print_succ_file;
     bool  f_jobs_cache;
-    int   time_out, scale, copy_time_out;
+    int   time_out, scale, copy_time_out, number_jobs_cache;
     const char *program;
     const char *work_dir;
     unsigned int  num_threads;
@@ -94,6 +94,7 @@ struct ArgsInfo
         f_jobs_cache = false;
         time_out = -1;
         copy_time_out = -1;
+        number_jobs_cache = 0;
         program = "";
         work_dir = "";
         scale = 1;
@@ -301,7 +302,7 @@ public:
 
 #define  PI_SQ_OVER_6  0.6079271018540267
 
-// Basel distribution:
+// Gamma 2 distribution:
 // Returns the value i with probability proportional to 1/i^2....
 class   SequenceRBasel : public AbstractSequence
 {
@@ -1583,8 +1584,9 @@ static struct argp_option options[] = {
     {"boring",      'b', 0,      0,  "Boring: Runs a single thread"
                                   "no fancy nonsense." },
     {"random",      'r', 0,      0,  "Random search" },
-    {"cache",       'm', 0,      0,  "Use cache of suspended threads" },
-    {"rbasel",      'R', 0,      0,  "Random search using Basel distribution" },
+    {"cache",       'm', "Procs",OPTION_ARG_OPTIONAL,
+                                 "Use cache of suspended threads, procs." },
+    {"zeta",        'R', 0,      0,  "Random search using ζ(2) distribution" },
     {"gtimeout",    't', "Secs", OPTION_ARG_OPTIONAL,
       "Timeout on OVERALL running time of simulation."},
     {"copytimeout", 'c', "Secs", OPTION_ARG_OPTIONAL,
@@ -1630,6 +1632,7 @@ static error_t    parse_opt (int key, char *arg, struct argp_state *state)
 
   case 'm':
       info.f_jobs_cache = true;
+      info.number_jobs_cache = arg? atoi(arg) : 0;
       break;
 
   case 'R':
@@ -1776,9 +1779,13 @@ int  main(int   argc, char*   argv[])
 #endif
 
     p_manager->set_threads_num( (3 * opt.num_threads) / 4 );
-    if  ( opt.f_jobs_cache  )
-        p_manager->set_max_suspends_num( opt.num_threads );
-
+    if  ( opt.f_jobs_cache  ) {
+        if  ( opt.number_jobs_cache > 0 )
+            p_manager->set_max_suspends_num( opt.number_jobs_cache );
+        else
+            p_manager->set_max_suspends_num( opt.num_threads );
+    }
+    
     p_manager->set_program( opt.program );
 
     if  ( ! is_file_exists( opt.program ) ) {
