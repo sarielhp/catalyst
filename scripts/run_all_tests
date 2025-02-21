@@ -232,8 +232,8 @@ function  boring_tests() {
 
 function  counter_cache_tests() {
     LOGFL=count_cache__$(datestr).txt
-    CATALYST_FLAGS="-m -n"
-    SEARCH="Counter comb search"
+    CATALYST_FLAGS="-m$CACHE_SIZE -n"
+    SEARCH="Counter cache search"
 
     main_loop
 }
@@ -294,6 +294,7 @@ TIMES=100
 SCALE=1    # Scale: Scale time by this factor
 GTIMEOUT=3000    # Global timeout
 TIMEOUT=3
+CACHE_SIZE=20
 
 #INST==wait_random_busy
 #INST=wait_forever_99
@@ -317,10 +318,10 @@ comp_vars
 #boring_tests
 #random_tests
 #counter_tests
-#counter_cache_tests
+counter_cache_tests
 #random_zeta_2_tests
 #copy_timeout_tests
 #wide_tests
-parallel_tests
+#parallel_tests
 
 exit -1

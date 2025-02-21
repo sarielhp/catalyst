@@ -38,7 +38,7 @@ function  handle_file() {
 
     rm $FOUTA >& /dev/null
 
-    julia julia/remove_all_dup_comments.jl $FOUT
+    julia_fast julia/remove_all_dup_comments.jl $FOUT
 
     echo "Out filename  : " $FOUT
 }
