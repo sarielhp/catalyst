@@ -1,4 +1,6 @@
-t#! /bin/bash
+#! /bin/bash
+
+# COMMENT
 
 HOME=$(eval echo ~$USER)
 
