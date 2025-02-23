@@ -1,0 +1,40 @@
+#! /bin/bash
+
+. ~/bin/misc/bash_utils
+
+
+    
+HDIR=~/prog/25/catalyst/
+TDIR=/tmp/sariel/catalyst/
+mkdir -p $TDIR >& /dev/null
+
+TFL=$(mktemp -p $TDIR)
+#echo $TFL
+
+
+SDIR=$(get_script_dir "${BASH_SOURCE[0]}")
+LDIR=$(realpath $SDIR/../logs)
+RDIR=$(realpath $SDIR/../results)
+
+#BDIR=~/prog/25/catalyst
+find $LDIR -type f -iname "*.txt" > $TFL
+
+while read SRC; do
+    TRG=$RDIR/$(realpath --relative-to="$LDIR" $SRC)
+
+    if  [[ "$SRC" -nt "$TRG" ]]; then
+        echo "From: " $SRC
+        echo "    ->   " $TRG
+#       echo ""
+        TRGDIR=$(dirname $TRG)
+        mkdir -p $TRGDIR >& /dev/null
+#        echo "target: " $TRGDIR
+        $SDIR/analyze $SRC
+
+#        exit
+    fi
+#    echo $TDIR
+#    echo "F $p"
+#    echo "$TRG"
+#    echo ""
+done < $TFL
