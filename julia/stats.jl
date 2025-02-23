@@ -52,9 +52,11 @@ function  stats_file( fl::String )
         println( "Mean         : ", mean( arr ) );
         println( "Median       : ", median( arr ) );
         println( "StdDev       : ", Statistics.std( arr ) );
+        println( "Minimum      : ", minimum( arr ) );
+        println( "Maximum      : ", maximum( arr ) );
+    else
+        println( "No successes, so nothing to report..." );
     end
-    println( "Minimum      : ", minimum( arr ) );
-    println( "Maximum      : ", maximum( arr ) );
 end
 
 function  (@main)(ARGS)
