@@ -1,5 +1,7 @@
 #! /bin/bash
 
+# COMMENT
+
 HOME=$(eval echo ~$USER)
 
 function  fix_up() {
