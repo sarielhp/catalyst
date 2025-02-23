@@ -181,11 +181,19 @@ function  (@main)(ARGS)
         df[ i, CL_SUCC_RUNS  ] = string( length( arr ) );
         df[ i, CL_FAIL_RUNS  ] = string( failures );
         df[ i, CL_RUNS       ]  = string( length( arr ) + failures );
-        df[ i, CL_MEAN       ] = sfloat( mean( arr ) );
-        df[ i, CL_MEDIAN     ] = sfloat( median( arr ) );
-        df[ i, CL_STDDEV     ] = sfloat( Statistics.std( arr ) );
-        df[ i, CL_MIN        ] = sfloat( minimum( arr ) );
-        df[ i, CL_MAX        ] = sfloat( maximum( arr ) );
+        if  ( length( arr ) == 0 )
+            df[ i, CL_MEAN       ] = "---";
+            df[ i, CL_MEDIAN     ] = "---";
+            df[ i, CL_STDDEV     ] = "---";
+            df[ i, CL_MIN        ] = "---";
+            df[ i, CL_MAX        ] = "---";
+        else
+            df[ i, CL_MEAN       ] = sfloat( mean( arr ) );
+            df[ i, CL_MEDIAN     ] = sfloat( median( arr ) );
+            df[ i, CL_STDDEV     ] = sfloat( Statistics.std( arr ) );
+            df[ i, CL_MIN        ] = sfloat( minimum( arr ) );
+            df[ i, CL_MAX        ] = sfloat( maximum( arr ) );
+        end
     end
 
     pref = longest_common_prefix( df[ :, CL_SIMULATION ] );
