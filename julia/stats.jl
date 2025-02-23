@@ -47,9 +47,9 @@ function  stats_file( fl::String )
         println( "# successes  : ", length(arr)  );
     end
     
-    #    println( typeof( arr ) );
-    println( "Mean         : ", mean( arr ) );
+    #    println( typeof( arr ) );   
     if  ( length( arr ) > 1 )
+        println( "Mean         : ", mean( arr ) );
         println( "Median       : ", median( arr ) );
         println( "StdDev       : ", Statistics.std( arr ) );
     end
