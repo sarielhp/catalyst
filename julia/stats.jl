@@ -35,7 +35,7 @@ function  stats_file( fl::String )
     arr = read_file_w_comments_floats( fl )
 
     number_timeouts = remove_above( arr, 3000 );
-    if  ( length( arr ) == 0 )  return  end
+    if  ( ( length( arr ) == 0 ) &&  ( number_timeouts == 0 ) )  return  end
 
 
 

@@ -23,6 +23,8 @@ function  handle_file() {
         exit
     fi
 
+    echo scripts/analyze_inner 
+    
     scripts/analyze_inner $FLO
 }
 
