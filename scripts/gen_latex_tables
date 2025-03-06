@@ -250,7 +250,9 @@ rm $FL >& /dev/null
 DIR=results/bug/valis_L2/
 
 julia_fast julia/stats_latex_table.jl             \
+           $DIR/parallel_valis_L2.txt \
            $DIR/counter_valis_L2.txt \
+           $DIR/zeta_2_valis_L2.txt \
            $DIR/counter_cache_valis_L2.txt
 
 check_out_file
@@ -357,6 +359,38 @@ replacer "Simulation"   "TTL"    $FL
 #insert_hline Parallel
 
 copy_it cat_bug_timeouts.tex
+
+
+############################################################################
+############################################################################
+############################################################################
+####### Shelves Catapult
+
+header "Shelves catapult"
+rm $FL >& /dev/null
+
+DIR=results/shelves/catapult/
+
+julia_fast julia/stats_latex_table.jl         \
+           $DIR/parallel_03_03_25__11_32_37.txt       \
+           $DIR/random_zeta_2__02_28_25__09_37_21.txt \
+           $DIR/count_cache__02_25_25__18_40_57.txt   \
+           $DIR/02_20_25__02_28_04_random_search.txt \
+           $DIR/counter_search_02_23_25__01_40_44.txt
+
+check_out_file
+fix_up
+
+replacer "rrrrrrr"         "|l||r||r|r||r|r|r|r"    $FL
+
+replacer "Simulation"   "TTL"    $FL
+
+#insert_hline Parallel
+
+copy_it shelves_catapult.tex
+
+
+
 
 ############################################################################
 cd ~/papers/25/catastrophe/
