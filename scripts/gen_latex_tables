@@ -372,11 +372,11 @@ rm $FL >& /dev/null
 DIR=results/shelves/catapult/
 
 julia_fast julia/stats_latex_table.jl         \
-           $DIR/parallel_03_03_25__11_32_37.txt       \
-           $DIR/random_zeta_2__02_28_25__09_37_21.txt \
-           $DIR/count_cache__02_25_25__18_40_57.txt   \
-           $DIR/02_20_25__02_28_04_random_search.txt \
-           $DIR/counter_search_02_23_25__01_40_44.txt
+           $DIR/parallel.txt       \
+           $DIR/random_zeta.txt \
+           $DIR/count_cache_.txt   \
+           $DIR/random_search.txt \
+           $DIR/counter_search.txt
 
 check_out_file
 fix_up

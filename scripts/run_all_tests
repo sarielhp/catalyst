@@ -290,7 +290,7 @@ function  check_system() {
 ###############################################################################
 # Main parameters choices
 BPROG=pmpl_script
-TIMES=61
+TIMES=25
 SCALE=1    # Scale: Scale time by this factor
 GTIMEOUT=3000    # Global timeout
 TIMEOUT=3
@@ -318,10 +318,10 @@ comp_vars
 #boring_tests
 #random_tests
 #counter_tests
-counter_cache_tests
+#counter_cache_tests
 #random_zeta_2_tests
 #copy_timeout_tests
-#wide_tests
+wide_tests
 #parallel_tests
 
 exit -1
