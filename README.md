@@ -152,5 +152,7 @@ own program you would like to test. See for example
 
 # Credits
 
-Catalyst was written by [Sariel Har-Peled](https://sarielhp.org). The
-inputs were mainly written by [Stav Ashur](https://publish.illinois.edu/stav-ashur/).
+Catalyst was written by 
+ [Stav Ashur](https://publish.illinois.edu/stav-ashur/)
+and
+[Sariel Har-Peled](https://sarielhp.org).
