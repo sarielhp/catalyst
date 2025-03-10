@@ -8,7 +8,26 @@ Catastrophe](https://arxiv.org/abs/2503.04633). An applied paper is in
 the works, but generally speaking a speedup up by a factor of 3 seems
 to be quite common for cases where catalyst helps.
 
-# Compilation
+## Basic idea/usage 
+The basic idea is that the user provides a program (say called) ALG
+that runs and try to solve some search problem - importantly ALG has
+to be randomized. 
+
+### For catalyst to be effective
+For catalyst to be effective, ALG need to have the
+behavior that with (usually) small probability it finds a solution
+quickly, and otherwise it might take much longer to find a
+solution. Random motion planers, for certain inputs
+
+### What catalyst do
+
+Catalyst would run "many" copies of ALG in parallel, killing some of
+the copies if they exceeds certain prespecified TTL (time to live). As
+soon as one of the runs of ALG succeeds, catalyst would kill all the
+running processes, and terminate.
+
+
+## Compilation
 
 The program is written using C++ and unix process signals
 (kill/stop/etc). It was tested on Linux extensively, but it should
