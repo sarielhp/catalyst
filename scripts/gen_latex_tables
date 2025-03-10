@@ -374,9 +374,10 @@ DIR=results/shelves/catapult/
 julia_fast julia/stats_latex_table.jl         \
            $DIR/parallel.txt       \
            $DIR/random_zeta.txt \
-           $DIR/count_cache_.txt   \
            $DIR/random_search.txt \
-           $DIR/counter_search.txt
+           $DIR/counter_search.txt \
+           $DIR/count_cache.txt
+
 
 check_out_file
 fix_up
@@ -390,6 +391,34 @@ replacer "Simulation"   "TTL"    $FL
 copy_it shelves_catapult.tex
 
 
+
+############################################################################
+############################################################################
+############################################################################
+####### Path lengths
+
+
+header "Path lengths "
+rm $FL >& /dev/null
+
+DIR=results/path_length/
+
+julia_fast julia/stats_latex_table.jl                   \
+           $DIR/counter_path_lengths.txt                \
+           $DIR/random_path_lengths.txt                 \
+           $DIR/parallel_path_lengths.txt               \
+           $DIR/zeta_path_lengths.txt
+
+check_out_file
+fix_up
+
+replacer "rrrrrrr"         "|l||r||r|r||r|r|r|r"    $FL
+
+replacer "Simulation"   "TTL"    $FL
+
+#insert_hline Parallel
+
+copy_it path_lengths.tex
 
 
 ############################################################################
