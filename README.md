@@ -88,11 +88,11 @@ modes:
 
     + "counter" distribution:
 
-    > ./catalyst -r ALG global_work_dir/
+      > ./catalyst -r ALG global_work_dir/
 
     + $\zeta_2$ distribution:
 
-    > ./catalyst -R ALG global_work_dir/
+      > ./catalyst -R ALG global_work_dir/
   
   
 
