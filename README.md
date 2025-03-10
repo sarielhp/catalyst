@@ -62,32 +62,54 @@ terminates if you want to use the computed results.
 
 # Modes
 
-Catalyst 
+Catalyst implements various simulation strategies. Do
+   
+   > ./catalyst  --help
+   
+To get command line options. Generally speaking, we have the following
+modes:
+
+- Counter search
+
+  > ./catalyst ALG global_work_dir/
+
+  Implements the counter mode in the stop/restart model. Using
+  naturally as many threads as there are threads in the system.
+
+- Caching processes 
+
+  > ./catalyst -m ALG global_work_dir/
+
+  Suspends/resumes some processes instead of killing them. Performs
+  betters in many cases. The above example run counter search with
+  this processes cache.
+  
+- Random search
+
+    + "counter" distribution:
+
+    > ./catalyst -r ALG global_work_dir/
+
+    + $\zeta_2$ distribution:
+
+    > ./catalyst -R ALG global_work_dir/
+  
+  
+
 
 - Wide search:
 
-  ./catalist -a ALG global_work_dir/
+  ./catalyst -a ALG global_work_dir/
 
-  Pause/resume the proceses implemnting the wide search described in
-  the writeup.
-
+  Pause/resume the processes implementing the wide search described in
+  the paper.
 
 - Parallel search
 
-  ./catalist -p ALG global_work_dir/
+  ./catalyst -p ALG global_work_dir/
 
   Runs as many parallel copies as there are threads in the
   system. Stops as soon as one of them succeeds.
-
-
-- Counter mode
-
-  ./catalist ALG global_work_dir/
-
-  Implements the conter mode in the stop/restart model. Using
-  naturally as many threads as there are threads in the system.
-
-
 
 
 ### Limitations
