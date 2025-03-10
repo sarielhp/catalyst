@@ -28,13 +28,6 @@ running processes, and terminate. See the
 [paper](https://arxiv.org/abs/2503.04633) for more details.
 
 
-### Compilation
-
-The program is written using C++ and unix process signals
-(kill/stop/etc). It was tested on Linux extensively, but it should
-theoretically work correctly on any POSIX complaint system. To
-compile, simply use *make*. The program uses high level process
-information provided by Linux, and it currently does NOT use libproc2.
 
 
 # To use 
@@ -94,16 +87,16 @@ Modes
 
 
 
-Limitations
-===========
+### Limitations
 
 Catalyst should compile on any posix compliant system - currently
 tested only on linux.
 
-================================================================
-Compilation
------------
 
-You might need to install procps:
+### Compilation
 
-    apt-get install libproc2-dev
+The program is written using C++ and unix process signals
+(kill/stop/etc). It was tested on Linux extensively, but it should
+theoretically work correctly on any POSIX complaint system. To
+compile, simply use *make*. The program uses high level process
+information provided by Linux, and it currently does NOT use libproc2.
