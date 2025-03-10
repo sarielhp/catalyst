@@ -37,15 +37,15 @@ running processes, and terminate. See the
    Create a script/program (say named) ALG. The program be run from
    the command line with the following interface:
 
->   ALG  work_dir/ [success_file_name]
+   >   ./ALG  work_dir/ [success_file_name]
 
    The [success_file_name] should be created by the end of ALG
-   execution only if it was successful - it is a good idea if the file
-   would contain the command line the program was called on, so that
-   one can identify which copy of the program/directory contains the
-   computed data of the successful fun.
+   execution only if the run was successful - it is a good idea if
+   this text file contains the command line the program was
+   called on, so that one can identify which copy of the
+   program/directory contains the computed data of the successful fun.
 
-3. Its a good idea to create script that starts catalyst. An example
+2. Its a good idea to create script that starts catalyst. An example
    is provided in the script "scripts/run_it". It call catalyst, as
    follows;
 
