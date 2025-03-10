@@ -2,4 +2,6 @@ versions/
 results/
 logs/
 out/
+out/*
+
 # DEL_THIS_LINE 21228
