@@ -149,3 +149,8 @@ have READMEs describing the inputs. The scripts used in these
 directories, might be a good starting point to write wrappers for your
 own program you would like to test. See for example
 [inputs/bug/pmpl_script](inputs/bug/pmpl_script).
+
+# Credits
+
+Catalyst was written by [Sariel Har-Peled](https://sarielhp.org). The
+inputs were mainly written by [Stav Ashur](https://publish.illinois.edu/stav-ashur/).
