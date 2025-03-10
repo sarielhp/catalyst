@@ -49,17 +49,20 @@ running processes, and terminate. See the
    is provided in the script "scripts/run_it". It call catalyst, as
    follows;
 
-   ./catalyst ALG temp_work_dir/
+   > ./catalyst ALG temp_work_dir/
 
    Catalyst runs many copies of ALG - the 1th created copy is run at
    directory temp_word_dir/000001/, etc.
 
-WARNNING: Catalyst deletes the temp_work_dir/ and recreates it. Do not
-store any information you want to keep in this directory.
+WARNING: Catalyst deletes the temp_work_dir/ and recreates it. Do not
+store any information you want to keep in this directory. Also, copy
+all the files in successful run work directory after the run
+terminates if you want to use the computed results.
 
 
-Modes
-=====
+# Modes
+
+Catalyst 
 
 - Wide search:
 
