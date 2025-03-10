@@ -5,7 +5,7 @@ algorithms so that they get a successful run faster.
 A theoretical paper describing the algorithms implemented is
 [Quickly Avoiding a Random
 Catastrophe](https://arxiv.org/abs/2503.04633). An applied paper is in
-the works, but generally speaking a speedup up by a factor of 3 seems
+the works, but  a speedup  by a factor of 3 seems
 to be quite common for cases where catalyst helps.
 
 ## Basic idea/usage 
@@ -24,10 +24,11 @@ solution. Random motion planers, for certain inputs
 Catalyst would run "many" copies of ALG in parallel, killing some of
 the copies if they exceeds certain prespecified TTL (time to live). As
 soon as one of the runs of ALG succeeds, catalyst would kill all the
-running processes, and terminate.
+running processes, and terminate. See the 
+[paper](https://arxiv.org/abs/2503.04633) for more details.
 
 
-## Compilation
+### Compilation
 
 The program is written using C++ and unix process signals
 (kill/stop/etc). It was tested on Linux extensively, but it should
