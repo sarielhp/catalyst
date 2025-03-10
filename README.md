@@ -93,20 +93,17 @@ modes:
     + $\zeta_2$ distribution:
 
       > ./catalyst -R ALG global_work_dir/
-  
-  
-
 
 - Wide search:
 
-  ./catalyst -a ALG global_work_dir/
+  > ./catalyst -a ALG global_work_dir/
 
   Pause/resume the processes implementing the wide search described in
   the paper.
 
 - Parallel search
 
-  ./catalyst -p ALG global_work_dir/
+  > ./catalyst -p ALG global_work_dir/
 
   Runs as many parallel copies as there are threads in the
   system. Stops as soon as one of them succeeds.
@@ -114,8 +111,20 @@ modes:
 
 ### Limitations
 
-Catalyst should compile on any posix compliant system - currently
-tested only on linux.
+Catalyst current is useful if the running time of ALG takes
+seconds. If you want to use the techniques of catalyst in sub-second
+resolution, you would need to probably program something
+different. As mentioned above, catalyst uses UNIX signals, and it is
+not clear what is the latency of this mechanism - might work perfectly
+well with sub-second resolutions, but we have not tried this.
+
+Also, the wide search seems to perform quite badly if the system has a
+large number of threads (i.e., 128). We do not currently understand
+why, but we suspect that these system are somewhat less effective in
+handling a huge number of processes being spawned simultaneously. As a
+general guideline, counter search and counter-search+cache seems to be
+good strategies to try first, but generally speaking, the random
+strategies seems to be performs similarly to the counter search.
 
 
 ### Compilation
@@ -124,4 +133,6 @@ The program is written using C++ and unix process signals
 (kill/stop/etc). It was tested on Linux extensively, but it should
 theoretically work correctly on any POSIX complaint system. To
 compile, simply use *make*. The program uses high level process
-information provided by Linux, and it currently does NOT use libproc2.
+information provided by Linux.
+
+
