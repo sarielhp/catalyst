@@ -11,21 +11,15 @@ to be quite common for cases where catalyst helps.
 # Compilation
 
 The program is written using C++ and unix process signals
-(kill/stop/etc). It was tested on linux extensively, but it should
+(kill/stop/etc). It was tested on Linux extensively, but it should
 theoretically work correctly on any POSIX complaint system. To
-compile, simply use *make*.
+compile, simply use *make*. The program uses high level process
+information provided by Linux, and it currently does NOT use libproc2.
 
 
-# How does it work?
+# To use 
 
-
-
-
-1. To compile use make.
-
-# Usage
-
-2. Create a program to be used by catalyst:
+1. Create a program to be used by catalyst:
 
    Create a script/program (say named) ALG. The program would be
    initialized as follows:
