@@ -1,18 +1,31 @@
 # What is catalyst?
 
 Catalyst is a user space scheduler/simulator intended to run Las Vegas
-algorithms so that they get a successful run faster. 
+algorithms so that they get a successful run faster.
 A theoretical paper describing the algorithms implemented is
-[Quickly Avoiding a Random Catastrophe](https://arxiv.org/abs/2503.04633).
-
+[Quickly Avoiding a Random
+Catastrophe](https://arxiv.org/abs/2503.04633). An applied paper is in
+the works, but generally speaking a speedup up by a factor of 3 seems
+to be quite common for cases where catalyst helps.
 
 # Compilation
+
+The program is written using C++ and unix process signals
+(kill/stop/etc). It was tested on linux extensively, but it should
+theoretically work correctly on any POSIX complaint system. To
+compile, simply use *make*.
+
+
+# How does it work?
+
+
+
 
 1. To compile use make.
 
 # Usage
 
-2. Createa program to be used by catalyst:
+2. Create a program to be used by catalyst:
 
    Create a script/program (say named) ALG. The program would be
    initialized as follows:
