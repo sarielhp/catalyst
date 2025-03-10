@@ -8,10 +8,10 @@ Catastrophe](https://arxiv.org/abs/2503.04633). An applied paper is in
 the works, but  a speedup  by a factor of 3 seems
 to be quite common for cases where catalyst helps.
 
-## Basic idea/usage 
+## Basic idea/usage
 The basic idea is that the user provides a program (say called) ALG
 that runs and try to solve some search problem - importantly ALG has
-to be randomized. 
+to be randomized.
 
 ### For catalyst to be effective
 For catalyst to be effective, ALG need to have the
@@ -24,13 +24,13 @@ solution. Random motion planers, for certain inputs
 Catalyst would run "many" copies of ALG in parallel, killing some of
 the copies if they exceeds certain prespecified TTL (time to live). As
 soon as one of the runs of ALG succeeds, catalyst would kill all the
-running processes, and terminate. See the 
+running processes, and terminate. See the
 [paper](https://arxiv.org/abs/2503.04633) for more details.
 
 
 
 
-# To use 
+# To use
 
 1. Create a program to be used by catalyst:
 
@@ -63,9 +63,9 @@ terminates if you want to use the computed results.
 # Modes
 
 Catalyst implements various simulation strategies. Do
-   
+
    > ./catalyst  --help
-   
+
 To get command line options. Generally speaking, we have the following
 modes:
 
@@ -76,14 +76,14 @@ modes:
   Implements the counter mode in the stop/restart model. Using
   naturally as many threads as there are threads in the system.
 
-- Caching processes 
+- Caching processes
 
   > ./catalyst -m ALG global_work_dir/
 
   Suspends/resumes some processes instead of killing them. Performs
   betters in many cases. The above example run counter search with
   this processes cache.
-  
+
 - Random search
 
     + "counter" distribution:
@@ -135,4 +135,17 @@ theoretically work correctly on any POSIX complaint system. To
 compile, simply use *make*. The program uses high level process
 information provided by Linux.
 
+### Whats in all the directories?
 
+Many of the directories in this git might not be of interest to
+you. The scripts/julia directories contains various scripts we used
+during our testing. The results/ subdirectory contains the results of
+our experiments.
+
+The inputs/ subdirectory might be the most interesting - it contains
+both several example Las Vegas algorithms, and more importantly, the
+inputs we used for our simulations. Some of the input sub-directories
+have READMEs describing the inputs. The scripts used in these
+directories, might be a good starting point to write wrappers for your
+own program you would like to test. See for example
+[inputs/bug/pmpl_script](inputs/bug/pmpl_script).
