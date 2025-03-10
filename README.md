@@ -34,10 +34,10 @@ running processes, and terminate. See the
 
 1. Create a program to be used by catalyst:
 
-   Create a script/program (say named) ALG. The program would be
-   initialized as follows:
+   Create a script/program (say named) ALG. The program be run from
+   the command line with the following interface:
 
-   ALG  work_dir/ [success_file_name]
+>   ALG  work_dir/ [success_file_name]
 
    The [success_file_name] should be created by the end of ALG
    execution only if it was successful - it is a good idea if the file
