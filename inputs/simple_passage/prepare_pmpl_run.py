@@ -21,6 +21,11 @@ def replace_placeholders(content):
     content = content.replace("@@goal@@", generate_numbers_from_ranges(goal_ranges))
 
 
+    coordinate = 9.3
+
+    content = content.replace("@@coordinate@@", str(coordinate))
+
+
     return content
 
 def generate_numbers_from_ranges(ranges):
@@ -35,7 +40,33 @@ def generate_numbers_from_ranges(ranges):
     return ' '.join(result)
 def main():
 
+    with open("env/side_block_temp.g", "r") as template_file:
+        template_content = template_file.read()
 
+        print(template_content)
+            
+        content = replace_placeholders(template_content)
+
+        print(template_content)
+
+
+        filename = f"env/side_block.g"
+        
+        with open(filename, "w") as new_file:
+            new_file.write(content)
+            
+
+
+    with open("env/top_bottom_block_temp.g", "r") as template_file:
+        template_content = template_file.read()
+            
+        content = replace_placeholders(template_content)
+        filename = f"env/top_bottom_block.g"
+
+        with open(filename, "w") as new_file:
+            new_file.write(content)
+
+    
     with open("CatExperimentTemplate.xml", "r") as template_file:
         template_content = template_file.read()
             
