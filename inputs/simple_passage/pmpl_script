@@ -2,9 +2,10 @@
 
 PPLMP=/home/sariel/prog/25/pmpl/build/ppl_mp
 if  [[ ! -e $PPLMP ]]; then
-    PPLMP=/home/stav/mptools/src/pmpl
+    #PPLMP=/home/stav/mptools/src/pmpl
+    PPLMP=~/mptools/src/pmpl
 fi
-PPLMP=~/mptools/src/pmpl
+
 
 # $1: Work directory
 # $2: Name of success file
@@ -46,7 +47,7 @@ echo "----------------------------------------------"
 pwd
 echo "----------------------------------------------"
 
-echo "### Cat bug *no scale*"
+echo "### Simple passage"
 
 #trap "echo received sigterm" SIGTERM
 
