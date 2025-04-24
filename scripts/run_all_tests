@@ -180,7 +180,7 @@ function datestr() {
 ############################################################
 
 function  random_tests() {
-    LOGFL=$(datestr)_random_search.txt
+    LOGFL=random_search_$(datestr).txt
     CATALYST_FLAGS="-r"    # "Regular distribution"
     SEARCH="Random search "
 
@@ -290,18 +290,21 @@ function  check_system() {
 ###############################################################################
 # Main parameters choices
 BPROG=pmpl_script
-TIMES=50
+
+TIMES=100
+
 SCALE=1    # Scale: Scale time by this factor
 GTIMEOUT=3000    # Global timeout
-TIMEOUT=3
+#TIMEOUT=3        # Used only for TTL search
 CACHE_SIZE=20
 
+INST=simple_passage
 #INST==wait_random_busy
 #INST=wait_forever_99
 #INST=cat_exp
 #INST=cat_bug_no_scale
 #INST=maze
-INST=bug
+#INST=bug
 #INST=path_length
 #INST=shelves
 #INST=fun
@@ -315,13 +318,13 @@ mkdir -p $DLOG $DSUCC >& /dev/null
 
 comp_vars
 
-#boring_tests
 #random_tests
-counter_tests
+#counter_tests
 #counter_cache_tests
 #random_zeta_2_tests
 #copy_timeout_tests
 #wide_tests
-#parallel_tests
+parallel_tests
+boring_tests
 
 exit -1

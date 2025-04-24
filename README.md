@@ -1,12 +1,13 @@
-# What is catalyst?
+# Catalyst: Speeding up Las Vegas algorithms
+
+## What is catalyst?
 
 Catalyst is a user space scheduler/simulator intended to run Las Vegas
-algorithms so that they get a successful run faster.
-A theoretical paper describing the algorithms implemented is
-[Quickly Avoiding a Random
-Catastrophe](https://arxiv.org/abs/2503.04633). An applied paper is in
-the works, but  a speedup  by a factor of 3 seems
-to be quite common for cases where catalyst helps.
+algorithms so that they get a successful run faster.  A theoretical
+paper describing the algorithms implemented is [Quickly Avoiding a
+Random Catastrophe](https://arxiv.org/abs/2503.04633). An applied
+paper is in the works, but a speedup by a factor of 3 seems to be
+quite common for cases where catalyst helps.
 
 ## Basic idea/usage
 The basic idea is that the user provides a program (say called) ALG

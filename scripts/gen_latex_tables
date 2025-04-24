@@ -397,7 +397,6 @@ copy_it shelves_catapult.tex
 ############################################################################
 ####### Path lengths
 
-
 header "Path lengths "
 rm $FL >& /dev/null
 
@@ -419,6 +418,33 @@ replacer "Simulation"   "TTL"    $FL
 #insert_hline Parallel
 
 copy_it path_lengths.tex
+
+
+############################################################################
+############################################################################
+############################################################################
+####### Simple passage
+
+header "simple_passage"
+rm $FL >& /dev/null
+
+DIR=results/simple_passage/
+
+julia_fast julia/stats_latex_table.jl         \
+           $DIR/count_cache.txt \
+           $DIR/counter_search.txt \
+           $DIR/parallel.txt \
+           $DIR/random_search.txt \
+           $DIR/random_zeta_2.txt \
+           $DIR/wide.txt
+
+check_out_file
+fix_up
+
+replacer "rrrrrrr"         "|l||r||r|r||r|r|r|r"    $FL
+
+copy_it simple_passage_valis.tex
+
 
 
 ############################################################################
