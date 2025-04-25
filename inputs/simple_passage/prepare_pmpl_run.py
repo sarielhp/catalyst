@@ -21,7 +21,9 @@ def replace_placeholders(content):
     content = content.replace("@@goal@@", generate_numbers_from_ranges(goal_ranges))
 
 
-    coordinate = 9.3
+    # 9.1 : too easy?
+    
+    coordinate = 9.16
 
     content = content.replace("@@coordinate@@", str(coordinate))
 

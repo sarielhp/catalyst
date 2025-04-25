@@ -10,18 +10,25 @@ function  fix_up() {
     replacer "\# Fails"        "Fails"    $FL
 
     replacer "count\_comb"           "Counter+Cache" $FL
-    replacer "counter\_comb\_search" "Counter+Cache" $FL
-    replacer "Counter\_cache"   "Counter+Cache"    $FL
     replacer "count\_cache"     "Counter+Cache"    $FL
+    replacer "counter\_comb\_search" "Counter+Cache" $FL
+    replacer "counter\_cache"   "Counter+Cache"    $FL
+    replacer "counter\_cach"    "Counter+Cache"    $FL
+    replacer "Counter\_cache"   "Counter+Cache"    $FL
+    replacer "counter\_search"     "Counter"    $FL
+    replacer "\_maz "     " "    $FL
+    replacer "counter"         "Counter"           $FL
+    replacer "random\_search"      "Random"    $FL
     replacer "scale\_0\_99" "Counter" $FL
     replacer "wide\_search" "Wide" $FL
     replacer "wide"         "Wide" $FL
     replacer "random\_zeta\_2" "Random $\zeta(2)$" $FL
+    replacer "zeta\_2"         "Random $\zeta(2)$" $FL
+    replacer "random\_zeta" "Random $\zeta(2)$" $FL
     replacer '\\texttt{zeta}'  '\\texttt{Random $\zeta(2)$}' $FL
     replacer "random"          "Random"            $FL
     replacer "boring"          "Boring"            $FL
     replacer "parallel"        "Parallel"          $FL
-    replacer "counter"         "Counter"           $FL
 }
 
 # insert_hline out/result.tex Random
@@ -165,7 +172,7 @@ check_out_file
 
 fix_up
 
-replacer "rrrrrrr"         "l||r|r|r||rr|rr"    $FL
+replacer "rrrrrrrr"         "|l||r|r|r||r|r||r|r|r|"    $FL
 
 replacer "Counter\_cache"   "Counter+Cache"    $FL
 
@@ -186,10 +193,10 @@ DIR=results/shelves/7713
 
 julia_fast julia/stats_latex_table.jl             \
     $DIR/shelves_parallel_7713.txt     \
-    $DIR/shelves_random_7713.txt       \
-    $DIR/shelves_counter_7713.txt      \
-    $DIR/shelves_counter_comb_7713.txt \
     $DIR/shelves_random_zeta_7713.txt  \
+    $DIR/shelves_counter_comb_7713.txt \
+    $DIR/shelves_counter_7713.txt      \
+    $DIR/shelves_random_7713.txt       \
     $DIR/shelves_ttl_2_7713.txt        \
     $DIR/shelves_ttl_3_7713.txt        \
     $DIR/shelves_ttl_5_7713.txt        \
@@ -197,11 +204,15 @@ julia_fast julia/stats_latex_table.jl             \
 check_out_file
 
 fix_up_7713
+fix_up
 
-replacer "rrrrrrr"         "l|r||r|r||rrrr"    $FL
+# XXX
+
+replacer "rrrrrrr"         "|l||r||r|r||r|r|r|"    $FL
 
 insert_hline TTL
-insert_hline Parallel
+#insert_hline Parallel
+insert_hline Random
 
 copy_it shelves_7713.tex
 
@@ -217,23 +228,24 @@ rm $FL >& /dev/null
 DIR=results/bug/7713
 
 julia_fast julia/stats_latex_table.jl             \
-    $DIR/wide_bug_L2_7713.txt \
     $DIR/parallel_bug_L2_7713.txt \
-    $DIR/counter_bug_L2_7713.txt \
-    $DIR/random_zeta_bug_L2_7713.txt \
+    $DIR/wide_bug_L2_7713.txt \
+    $DIR/random_bug_L2_7713.txt \
     $DIR/counter_comb_bug_L2_7713.txt \
-    $DIR/random_bug_L2_7713.txt
+    $DIR/counter_bug_L2_7713.txt \
+    $DIR/random_zeta_bug_L2_7713.txt 
 
 check_out_file
 
 fix_up_7713
 
-replacer "rrrrrrr"         "l||r|r|r||rr|rr"    $FL
+replacer "rrrrrrrrr"         "|l||r|r|r||r|r||r|r|r|"    $FL
 replacer "\# Runs"         "\#"    $FL
 replacer "\# Succ"        "Succs"    $FL
 replacer "\# Fails"        "Fails"    $FL
 
-insert_hline Parallel
+insert_hline Wide
+#insert_hline Random
 
 copy_it bug_len_2_7713.tex
 
@@ -251,18 +263,21 @@ DIR=results/bug/valis_L2/
 
 julia_fast julia/stats_latex_table.jl             \
            $DIR/parallel_valis_L2.txt \
+           $DIR/counter_cache_valis_L2.txt \
            $DIR/counter_valis_L2.txt \
-           $DIR/zeta_2_valis_L2.txt \
-           $DIR/counter_cache_valis_L2.txt
+           $DIR/zeta_2_valis_L2.txt 
 
 check_out_file
 
+fix_up
 fix_up_7713
 
-replacer "rrrrrrr"         "l||r|r|r||rr|rr"    $FL
+replacer "rrrrrrrrr"         "|l||r|r|r||r|r||r|r|r|"    $FL
 replacer "\# Runs"         "\#"    $FL
 replacer "\# Succ"        "Succs"    $FL
 replacer "\# Fails"        "Fails"    $FL
+
+insert_hline Counter
 
 copy_it bug_len_2_valis.tex
 
@@ -279,25 +294,19 @@ DIR=results/maze/valis/
 
 julia_fast julia/stats_latex_table.jl             \
     $DIR/parallel_maze_valis.txt \
-    $DIR/wide_maze_valis.txt \
-    $DIR/counter_cache_valis.txt \
-    $DIR/random_zeta_maze_valis.txt \
     $DIR/counter_search_maze_valis.txt \
-    $DIR/random_maze_valis.txt
+    $DIR/random_zeta_maze_valis.txt \
+    $DIR/counter_cache_valis.txt \
+    $DIR/random_maze_valis.txt \
+    $DIR/wide_maze_valis.txt 
 
 check_out_file
 
 fix_up
 
-replacer "rrrrrrr"         "l||r|r|r||rr|rr"    $FL
-#replacer "\# Runs"         "\#"    $FL
-#replacer "\# Succ"        "Succs"    $FL
-#replacer "\# Fails"        "Fails"    $FL
+replacer "rrrrrrr"         "|l||r||r|r||r|r|r|"    $FL
 
-#replacer "Counter\_cach"   "Counter+Cache"    $FL
-replacer "\_maz"   ""    $FL
-
-insert_hline Wide
+insert_hline Counter
 
 copy_it maze_valis.tex
 
@@ -314,24 +323,19 @@ DIR=results/maze/7713
 
 julia_fast julia/stats_latex_table.jl             \
     $DIR/parallel_maze_7713.txt    \
-    $DIR/random_zeta_maze_7713.txt \
-    $DIR/counter_cache_maze_7713.txt \
+    $DIR/wide_maze_7713.txt \
     $DIR/counter_maze_7713.txt \
-    $DIR/wide_maze_7713.txt
+    $DIR/random_zeta_maze_7713.txt \
+    $DIR/counter_cache_maze_7713.txt 
 
 check_out_file
 
-fix_up_7713
 fix_up
+fix_up_7713
 
-replacer "rrrrrrr"         "l||r|r|r||rr|rr"    $FL
-replacer "\# Runs"         "\#"    $FL
-replacer "\# Succ"        "Succs"    $FL
-replacer "\# Fails"        "Fails"    $FL
+replacer "rrrrrrr"         "|l||r||r|r||r|r|r|"    $FL
 
-replacer "Counter\_cache"   "Counter+Cache"    $FL
-
-insert_hline Parallel
+insert_hline Wide
 
 copy_it maze_7713.tex
 
@@ -382,9 +386,12 @@ julia_fast julia/stats_latex_table.jl         \
 check_out_file
 fix_up
 
-replacer "rrrrrrr"         "|l||r||r|r||r|r|r|r"    $FL
+insert_hline zeta
+
+replacer "rrrrrrrr"         "|l||r|r|r||r|r||r|r|r|"    $FL
 
 replacer "Simulation"   "TTL"    $FL
+
 
 #insert_hline Parallel
 
