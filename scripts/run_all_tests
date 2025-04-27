@@ -318,13 +318,13 @@ mkdir -p $DLOG $DSUCC >& /dev/null
 
 comp_vars
 
-#random_tests
-#counter_tests
-#counter_cache_tests
-#random_zeta_2_tests
+random_tests
+counter_tests
+counter_cache_tests
+random_zeta_2_tests
 #copy_timeout_tests
-#wide_tests
-parallel_tests
-boring_tests
+wide_tests
+#parallel_tests
+#boring_tests
 
 exit -1

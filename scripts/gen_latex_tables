@@ -9,6 +9,7 @@ function  fix_up() {
     replacer "\# Succ"        "Succs"    $FL
     replacer "\# Fails"        "Fails"    $FL
 
+    replacer "single\_thread"           "Single" $FL
     replacer "count\_comb"           "Counter+Cache" $FL
     replacer "count\_cache"     "Counter+Cache"    $FL
     replacer "counter\_comb\_search" "Counter+Cache" $FL
@@ -237,6 +238,7 @@ julia_fast julia/stats_latex_table.jl             \
 
 check_out_file
 
+fix_up
 fix_up_7713
 
 replacer "rrrrrrrrr"         "|l||r|r|r||r|r||r|r|r|"    $FL
@@ -390,9 +392,7 @@ insert_hline zeta
 
 replacer "rrrrrrrr"         "|l||r|r|r||r|r||r|r|r|"    $FL
 
-replacer "Simulation"   "TTL"    $FL
-
-
+replacer "Parallel" "Single" $FL
 #insert_hline Parallel
 
 copy_it shelves_catapult.tex
@@ -438,9 +438,10 @@ rm $FL >& /dev/null
 DIR=results/simple_passage/
 
 julia_fast julia/stats_latex_table.jl         \
+           $DIR/single_thread.txt \
+           $DIR/parallel.txt \
            $DIR/count_cache.txt \
            $DIR/counter_search.txt \
-           $DIR/parallel.txt \
            $DIR/random_search.txt \
            $DIR/random_zeta_2.txt \
            $DIR/wide.txt
@@ -448,7 +449,7 @@ julia_fast julia/stats_latex_table.jl         \
 check_out_file
 fix_up
 
-replacer "rrrrrrr"         "|l||r||r|r||r|r|r|r"    $FL
+replacer "rrrrrrrrr"         "|l||r|r|r||r|r||r|r|r|"    $FL
 
 copy_it simple_passage_valis.tex
 
