@@ -418,9 +418,9 @@ julia_fast julia/stats_latex_table.jl                   \
 check_out_file
 fix_up
 
+insert_after_tabular
 replacer "rrrrrrr"         "|l||r||r|r||r|r|r|r"    $FL
 
-replacer "Simulation"   "TTL"    $FL
 
 #insert_hline Parallel
 
