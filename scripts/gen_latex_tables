@@ -10,12 +10,15 @@ function  fix_up() {
     replacer "\# Fails"        "Fails"    $FL
 
     replacer "single\_thread"           "Single" $FL
+
     replacer "count\_comb"           "Counter+Cache" $FL
-    replacer "count\_cache"     "Counter+Cache"    $FL
+    replacer "counter\_comb"         "Counter+Cache" $FL
+    replacer "count\_cache"          "Counter+Cache"    $FL
     replacer "counter\_comb\_search" "Counter+Cache" $FL
-    replacer "counter\_cache"   "Counter+Cache"    $FL
-    replacer "counter\_cach"    "Counter+Cache"    $FL
+    replacer "counter\_cache"        "Counter+Cache"    $FL
+    replacer "counter\_cach"         "Counter+Cache"    $FL
     replacer "Counter\_cache"   "Counter+Cache"    $FL
+
     replacer "counter\_search"     "Counter"    $FL
     replacer "\_maz "     " "    $FL
     replacer "counter"         "Counter"           $FL
@@ -104,6 +107,78 @@ function  header() {
 FL=$(realpath out/results.tex)
 
 
+############################################################################
+############################################################################
+############################################################################
+####### Path lengths
+
+header "Path lengths "
+rm $FL >& /dev/null
+
+DIR=results/path_length/
+
+julia_fast julia/stats_latex_table.jl                   \
+           $DIR/parallel_path_lengths.txt               \
+           $DIR/random_path_lengths.txt                 \
+           $DIR/zeta_path_lengths.txt \
+           $DIR/counter_path_lengths.txt                
+
+check_out_file
+fix_up
+
+#insert_after_tabular
+replacer "rrrrrrr"         "|l||r||r|r||r|r|r|"    $FL
+
+TMPFL=`mktemp`
+
+echo "  \cline{3-7}" >> $TMPFL
+echo "  \multicolumn{2}{c||}{}" >> $TMPFL
+echo "  &\multicolumn{5}{c|}{Path lengths}" >> $TMPFL
+echo "  \\\\" >> $TMPFL
+
+# Insert the special header at second line of file.
+sed -i "1r $TMPFL" "$FL"
+
+rm $TMPFL >& /dev/null
+
+echo $FL  
+#exit
+
+copy_it path_lengths.tex
+
+
+
+
+############################################################################
+############################################################################
+############################################################################
+####### Simple passage
+
+header "simple_passage"
+rm $FL >& /dev/null
+
+DIR=results/simple_passage/
+
+julia_fast julia/stats_latex_table.jl         \
+           $DIR/single_thread.txt \
+           $DIR/parallel.txt \
+           $DIR/wide.txt \
+           $DIR/random_search.txt \
+           $DIR/count_cache.txt \
+           $DIR/random_zeta_2.txt \
+           $DIR/counter_search.txt
+
+check_out_file
+fix_up
+
+replacer "rrrrrrrrr"         "|l||r|r|r||r|r||r|r|r|"    $FL
+
+insert_hline Wide
+
+copy_it simple_passage_valis.tex
+
+
+
 #############################################################################
 #############################################################################
 #############################################################################
@@ -165,8 +240,9 @@ rm out/results.tex >& /dev/null
 
 julia_fast julia/stats_latex_table.jl    \
     $DIR/shelves_valis_parallel.txt      \
-    $DIR/shelves_valis_random.txt        \
+    $DIR/shelves_valis_wide.txt          \
     $DIR/shelves_valis_zeta.txt          \
+    $DIR/shelves_valis_random.txt        \
     $DIR/shelves_valis_counter.txt       \
     $DIR/shelves_valis_count_cache.txt
 check_out_file
@@ -177,7 +253,7 @@ replacer "rrrrrrrr"         "|l||r|r|r||r|r||r|r|r|"    $FL
 
 replacer "Counter\_cache"   "Counter+Cache"    $FL
 
-insert_hline Random
+insert_hline Wide
 
 copy_it shelves_valis.tex
 
@@ -194,6 +270,7 @@ DIR=results/shelves/7713
 
 julia_fast julia/stats_latex_table.jl             \
     $DIR/shelves_parallel_7713.txt     \
+    $DIR/shelves_wide_7713.txt         \
     $DIR/shelves_random_zeta_7713.txt  \
     $DIR/shelves_counter_comb_7713.txt \
     $DIR/shelves_counter_7713.txt      \
@@ -213,7 +290,7 @@ replacer "rrrrrrr"         "|l||r||r|r||r|r|r|"    $FL
 
 insert_hline TTL
 #insert_hline Parallel
-insert_hline Random
+insert_hline Wide
 
 copy_it shelves_7713.tex
 
@@ -234,7 +311,7 @@ julia_fast julia/stats_latex_table.jl             \
     $DIR/random_bug_L2_7713.txt \
     $DIR/counter_comb_bug_L2_7713.txt \
     $DIR/counter_bug_L2_7713.txt \
-    $DIR/random_zeta_bug_L2_7713.txt 
+    $DIR/random_zeta_bug_L2_7713.txt
 
 check_out_file
 
@@ -267,7 +344,7 @@ julia_fast julia/stats_latex_table.jl             \
            $DIR/parallel_valis_L2.txt \
            $DIR/counter_cache_valis_L2.txt \
            $DIR/counter_valis_L2.txt \
-           $DIR/zeta_2_valis_L2.txt 
+           $DIR/zeta_2_valis_L2.txt
 
 check_out_file
 
@@ -300,7 +377,7 @@ julia_fast julia/stats_latex_table.jl             \
     $DIR/random_zeta_maze_valis.txt \
     $DIR/counter_cache_valis.txt \
     $DIR/random_maze_valis.txt \
-    $DIR/wide_maze_valis.txt 
+    $DIR/wide_maze_valis.txt
 
 check_out_file
 
@@ -328,7 +405,7 @@ julia_fast julia/stats_latex_table.jl             \
     $DIR/wide_maze_7713.txt \
     $DIR/counter_maze_7713.txt \
     $DIR/random_zeta_maze_7713.txt \
-    $DIR/counter_cache_maze_7713.txt 
+    $DIR/counter_cache_maze_7713.txt
 
 check_out_file
 
@@ -382,6 +459,7 @@ julia_fast julia/stats_latex_table.jl         \
            $DIR/random_zeta.txt \
            $DIR/random_search.txt \
            $DIR/counter_search.txt \
+           $DIR/wide.txt           \
            $DIR/count_cache.txt
 
 
@@ -398,60 +476,6 @@ replacer "Parallel" "Single" $FL
 copy_it shelves_catapult.tex
 
 
-
-############################################################################
-############################################################################
-############################################################################
-####### Path lengths
-
-header "Path lengths "
-rm $FL >& /dev/null
-
-DIR=results/path_length/
-
-julia_fast julia/stats_latex_table.jl                   \
-           $DIR/counter_path_lengths.txt                \
-           $DIR/random_path_lengths.txt                 \
-           $DIR/parallel_path_lengths.txt               \
-           $DIR/zeta_path_lengths.txt
-
-check_out_file
-fix_up
-
-insert_after_tabular
-replacer "rrrrrrr"         "|l||r||r|r||r|r|r|r"    $FL
-
-
-#insert_hline Parallel
-
-copy_it path_lengths.tex
-
-
-############################################################################
-############################################################################
-############################################################################
-####### Simple passage
-
-header "simple_passage"
-rm $FL >& /dev/null
-
-DIR=results/simple_passage/
-
-julia_fast julia/stats_latex_table.jl         \
-           $DIR/single_thread.txt \
-           $DIR/parallel.txt \
-           $DIR/count_cache.txt \
-           $DIR/counter_search.txt \
-           $DIR/random_search.txt \
-           $DIR/random_zeta_2.txt \
-           $DIR/wide.txt
-
-check_out_file
-fix_up
-
-replacer "rrrrrrrrr"         "|l||r|r|r||r|r||r|r|r|"    $FL
-
-copy_it simple_passage_valis.tex
 
 
 

@@ -81,8 +81,9 @@ struct ArgsInfo
     WMode  mode;
     bool  f_verbose;
     bool  f_print_succ_file;
-    bool  f_jobs_cache;
+    bool  f_jobs_cache, f_num_threads_spec;
     int   time_out, scale, copy_time_out, number_jobs_cache;
+    int  number_threads;
     const char *program;
     const char *work_dir;
     unsigned int  num_threads;
@@ -92,11 +93,13 @@ struct ArgsInfo
         f_print_succ_file = false;
         f_verbose = false;
         f_jobs_cache = false;
+        f_num_threads_spec = false;
         time_out = -1;
         copy_time_out = -1;
         number_jobs_cache = 0;
         program = "";
         work_dir = "";
+        number_threads = -1;
         scale = 1;
         num_threads = std::thread::hardware_concurrency();
         mode.set( MODE_NOT_DEF );
@@ -631,7 +634,7 @@ void  SManager::setup( ArgsInfo  & opt )
     set_orig_mode( opt.mode );
     set_mode( opt.mode );
 
-    
+
     //printf( "MODE = %d\n",  opt.mode.get() );
     if  ( is( MODE_NOT_DEF ) ) {
         printf( "You must select a search mode...\n" );
@@ -1584,6 +1587,8 @@ static struct argp_option options[] = {
     {"boring",      'b', 0,      0,  "Boring: Runs a single thread"
                                   "no fancy nonsense." },
     {"random",      'r', 0,      0,  "Random search" },
+    {"threads",     'd', "Threads",OPTION_ARG_OPTIONAL,
+                                 "Use specified number of threads." },
     {"cache",       'm', "Procs",OPTION_ARG_OPTIONAL,
                                  "Use cache of suspended threads, procs." },
     {"zeta",        'R', 0,      0,  "Random search using ζ(2) distribution" },
@@ -1633,6 +1638,12 @@ static error_t    parse_opt (int key, char *arg, struct argp_state *state)
   case 'm':
       info.f_jobs_cache = true;
       info.number_jobs_cache = arg? atoi(arg) : 0;
+      break;
+
+  case 'd':
+      info.f_num_threads_spec = true;
+      info.number_threads = arg? atoi(arg) : 1;
+      assert( info.number_threads > 0 );
       break;
 
   case 'R':
@@ -1785,7 +1796,11 @@ int  main(int   argc, char*   argv[])
         else
             p_manager->set_max_suspends_num( opt.num_threads );
     }
-    
+
+    if  ( opt.f_num_threads_spec ) {
+        p_manager->set_threads_num( opt.number_threads );
+    }
+
     p_manager->set_program( opt.program );
 
     if  ( ! is_file_exists( opt.program ) ) {

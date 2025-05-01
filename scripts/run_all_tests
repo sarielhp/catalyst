@@ -298,7 +298,7 @@ GTIMEOUT=3000    # Global timeout
 #TIMEOUT=3        # Used only for TTL search
 CACHE_SIZE=20
 
-INST=simple_passage
+#INST=simple_passage
 #INST==wait_random_busy
 #INST=wait_forever_99
 #INST=cat_exp
@@ -306,7 +306,7 @@ INST=simple_passage
 #INST=maze
 #INST=bug
 #INST=path_length
-#INST=shelves
+INST=shelves
 #INST=fun
 
 ###############################################################################
@@ -318,10 +318,10 @@ mkdir -p $DLOG $DSUCC >& /dev/null
 
 comp_vars
 
-random_tests
-counter_tests
-counter_cache_tests
-random_zeta_2_tests
+#random_tests
+#counter_tests
+#counter_cache_tests
+#random_zeta_2_tests
 #copy_timeout_tests
 wide_tests
 #parallel_tests
