@@ -349,8 +349,8 @@ public:
             sum += INV_PI_SQ_OVER_6 / ( ix  * ix  );
             //printf( "Diff: %Lg\n", val- sum );
         }
-        if (  i == 1 )
-            return  1;
+        //if (  i == 1 )
+        //   return  1;
         return  i;
     }
 };
