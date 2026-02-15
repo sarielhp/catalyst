@@ -302,8 +302,9 @@ public:
 };
 
 
+#define  PI_SQ_OVER_6  1.6449340668482264
+#define  INV_PI_SQ_OVER_6  0.6079271018540267
 
-#define  PI_SQ_OVER_6  0.6079271018540267
 
 // Gamma 2 distribution:
 // Returns the value i with probability proportional to 1/i^2....
@@ -330,14 +331,22 @@ public:
         long double  val = get_real_sample();
         long double  sum;
 
+        /* Okay, lets do the calculations.
+           ζ(2) = Σ_{i=1}^∞ 1/i^2 = π^2/6
+
+           P[X = 1 ] = (1/1^2)/ ζ(2) = 6/π^2.
+           ...
+           P[X = i ] = (1/i^2)/ ζ(2) = (1/i^2) / (π^2/6) = (6/π^2) / i^2.
+         */
+
         //val = 0.9999999;
         //printf( "val: %Lg\n", val );
         int  i = 1;
-        sum = PI_SQ_OVER_6;
+        sum = INV_PI_SQ_OVER_6;
         while  ( sum < val ) {
             i = i + 1;
             long double ix = i;
-            sum += PI_SQ_OVER_6 / ( ix  * ix  );
+            sum += INV_PI_SQ_OVER_6 / ( ix  * ix  );
             //printf( "Diff: %Lg\n", val- sum );
         }
         if (  i == 1 )
